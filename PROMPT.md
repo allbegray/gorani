@@ -11,6 +11,7 @@
 ## 1. 초기화
 - 최초 실행 판단: 루트에 AGENTS.md 또는 BACKLOG.md 없으면 → 전체 분석 → 6종 일괄 생성
 - /init-deep (또는 /init) 권장: 아키텍처/코드베이스/기술스택 분석 → 6종 생성 + AGENTS.md 상세 기록
+- graphify 설치·그래프 구축: uv tool install --from graphifyy (uv 없으면 pip install graphifyy) → graphify-out/graph.json 없으면 초기 빌드 (graphify-out/ 에 graph.json, GRAPH_REPORT.md, graph.html 생성)
 
 ## 2. 루트 디렉터리 거버넌스
 - 루트엔 6종 .md 만 허용, 그 외 .md 는 예외 없이 docs/ 로 이동
@@ -20,7 +21,7 @@
 
 ### 3.1 AGENTS.md — 에이전트 지식·컨텍스트 (지속 업데이트)
 역할 1줄 + 필수 섹션: # 프로젝트 요약(1-2문장) / ## 빌드/테스트 방법(실행 명령) / ## 에이전트 행동 지침(핵심 규칙 요약) / ## 서브시스템 구조 / ## 실행 기록(날짜별 Append)
-업데이트: 패키지 추가·아키텍처 변경·버그 수정 방식 파악 시 즉시 기록
+업데이트: 패키지 추가·아키텍처 변경·버그 수정 방식 파악 시 즉시 기록. 코드베이스 검색 시 graphify-out/ 존재하면 graphify query "<질문>" 으로 그래프 탐색, 코드 수정 후 graphify --update 로 그래프 동기화 → AGENTS.md 실행 기록 갱신
 
 ### 3.2 BACKLOG.md — 할 일 관리
 역할 1줄 + 필수 포맷: # 백로그 / ## 높음 (H) 아래 - [ ] [H1] 설명 / ## 중간 (M) 아래 - [ ] [M1] 설명 / ## 낮음 (L) 아래 - [ ] [L1] 설명
