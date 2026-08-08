@@ -30,7 +30,7 @@ PowerShell은 한글 인코딩 안전을 위해 모든 명령 앞에 아래 프�
 PowerShell:
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; opencode run "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $p=$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md); opencode run "$p"
 ```
 
 bash:
@@ -46,7 +46,7 @@ opencode run "$(curl -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-pro
 PowerShell:
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; claude -p "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $p=$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md); claude -p "$p"
 ```
 
 bash:
@@ -62,7 +62,7 @@ claude -p "$(curl -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt
 PowerShell:
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; codex exec "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $p=$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md); codex exec "$p"
 ```
 
 bash:
@@ -109,7 +109,7 @@ codex exec "$(curl -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-promp
 opencode는 `--auto` 플래그로 권한을 자동 승인할 수 있습니다. 단, `--auto`는 명시적으로 거부되지 않은 모든 권한을 자동 승인하므로 **위험합니다**. 신뢰하는 환경에서만 사용하세요.
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; opencode run --auto "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $p=$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md); opencode run --auto "$p"
 ```
 
 대안으로 opencode 설정에서 파일 쓰기 권한을 미리 허용하거나, 권한 프롬프트에서 수동 승인하면 됩니다. 다른 CLI도 비슷한 자동 승인 옵션(`--yes` 등)을 제공하는지 공식 문서를 확인하세요.
