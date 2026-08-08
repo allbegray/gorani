@@ -10,26 +10,8 @@
 ## 사전 준비
 
 1. 프로젝트를 clone 합니다.
-2. GitHub 개인 액세스 토큰을 발급합니다. private 저장소의 raw 파일(`PROMPT.md`)을 읽으려면 **`repo` scope**가 필요합니다.
-3. 토큰을 환경 변수로 설정합니다.
 
-### 환경 변수 설정
-
-`GH_TOKEN`을 우선 사용하고, 없으면 `GITHUB_TOKEN`으로 대체됩니다. 둘 중 하나만 설정하면 됩니다.
-
-PowerShell:
-
-```powershell
-$env:GH_TOKEN="ghp_여기에_토큰"
-```
-
-bash:
-
-```bash
-export GH_TOKEN=ghp_여기에_토큰
-```
-
-> 토큰을 명령어에 직접 하드코딩하지 마세요. 반드시 환경 변수로만 전달합니다.
+이 저장소는 공개 저장소이므로 별도 토큰 없이 raw URL에서 `PROMPT.md`를 내려받을 수 있습니다.
 
 ## 한 줄 명령
 
@@ -48,13 +30,13 @@ PowerShell은 한글 인코딩 안전을 위해 모든 명령 앞에 아래 프�
 PowerShell:
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; opencode run "$(curl.exe -fsSL -H "Authorization: Bearer $env:GH_TOKEN" https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; opencode run "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
 ```
 
 bash:
 
 ```bash
-opencode run "$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+opencode run "$(curl -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
 ```
 
 `opencode run`은 프롬프트를 위치 인자(positional message)로 받습니다. `-p`는 password 플래그이므로 사용하지 마세요.
@@ -64,13 +46,13 @@ opencode run "$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://raw.gith
 PowerShell:
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; claude -p "$(curl.exe -fsSL -H "Authorization: Bearer $env:GH_TOKEN" https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; claude -p "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
 ```
 
 bash:
 
 ```bash
-claude -p "$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+claude -p "$(curl -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
 ```
 
 `claude -p`(print 모드)는 비대화형 실행입니다.
@@ -80,13 +62,13 @@ claude -p "$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://raw.githubu
 PowerShell:
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; codex exec "$(curl.exe -fsSL -H "Authorization: Bearer $env:GH_TOKEN" https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; codex exec "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
 ```
 
 bash:
 
 ```bash
-codex exec "$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+codex exec "$(curl -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
 ```
 
 `codex exec`는 Codex의 비대화형 실행 모드입니다.
@@ -127,7 +109,7 @@ codex exec "$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://raw.github
 opencode는 `--auto` 플래그로 권한을 자동 승인할 수 있습니다. 단, `--auto`는 명시적으로 거부되지 않은 모든 권한을 자동 승인하므로 **위험합니다**. 신뢰하는 환경에서만 사용하세요.
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; opencode run --auto "$(curl.exe -fsSL -H "Authorization: Bearer $env:GH_TOKEN" https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; opencode run --auto "$(curl.exe -fsSL https://raw.githubusercontent.com/aimnext-dev1/ai-prompt/main/PROMPT.md)"
 ```
 
 대안으로 opencode 설정에서 파일 쓰기 권한을 미리 허용하거나, 권한 프롬프트에서 수동 승인하면 됩니다. 다른 CLI도 비슷한 자동 승인 옵션(`--yes` 등)을 제공하는지 공식 문서를 확인하세요.
