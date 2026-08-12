@@ -88,6 +88,7 @@ codex exec "$(curl -fsSL https://raw.githubusercontent.com/allbegray/gorani/main
   - `BACKLOG.md`: 할 일을 H/M/L 우선순위로 분류하고 `H1`/`M1`/`L1` 라벨 부여, 완료 시 `[x]` 표시 후 항목 삭제
   - `CHANGELOG.md`: 변경 사항을 한국어로 정리하고 시맨틱 버저닝(`MAJOR.MINOR.PATCH`)으로 버전 갱신
   - `SOLUTION.md`: 트러블슈팅 지식 통합 기록
+- git push 전 필수 문서 6종 최신화 확인
 - 모든 문서는 한국어로 작성
 
 ## 재실행

@@ -7,6 +7,7 @@
 - 모든 문서 및 커밋 메시지는 한국어 (코드/기술 용어 영문 허용)
 - PowerShell 실행 시 UTF-8 강제
 - 작업 시작 시 AGENTS.md 최우선 Read, 변경 발생 시 실행 기록/규칙 즉시 Append
+- git push 전 필수 문서 6종 최신화: 변경 사항을 해당 문서에 반영 (CHANGELOG.md 새 버전 기록, AGENTS.md 실행 기록 Append 등) 후 push
 
 ## 1. 초기화
 - 최초 실행 판단: 루트에 AGENTS.md 또는 BACKLOG.md 없으면 → 전체 분석 → 6종 일괄 생성
