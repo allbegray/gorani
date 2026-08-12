@@ -8,7 +8,7 @@
 ## 룰북(PROMPT.md) 수정 시 필수 규칙
 - 모든 문서·커밋 메시지는 한국어
 - 인라인 표기만 — 코드 펜스(triple backtick) 사용 금지
-- 기존 요구사항 보존: 6종 양식(3.1-3.6), H/M/L 라벨, UTF-8, SECURITY 인증 curl 규칙(3.5), graphify 규칙(1장/3.1)
+- 기존 요구사항 보존: 6종 양식(3.1-3.6), H/M/L 라벨, BACKLOG 완료 항목 [x] 표시 후 삭제(3.2), UTF-8, SECURITY 인증 curl 규칙(3.5), graphify 규칙(1장/3.1, 갱신은 CLI 직접 실행·skill/에이전트 경유 금지)
 - 수정 후 반드시 검증: scratch repo 에서 opencode run "$(cat PROMPT.md)" 실행 → 6종 생성 + 양식 준수 확인 → evidence .omo/evidence/ 기록
 
 ## 명령
@@ -18,3 +18,6 @@
 ## 주의
 - .omo/, .codegraph/, graphify-out/ 커밋 금지
 - README 명령 구조 불변 (opencode run positional / claude -p / codex exec / curl.exe + UTF-8 프리픽스)
+
+## 실행 기록
+- 2026-08-12: PROMPT.md 수정 — BACKLOG 완료 항목 삭제 규칙(3.2), graphify CLI 직접 실행 규칙(1장/3.1). scratch repo 검증 완료, evidence: .omo/evidence/2026-08-12-prompt-backlog-delete-graphify-cli.md
