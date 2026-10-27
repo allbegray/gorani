@@ -40,8 +40,9 @@
 | 명령 | `syft dir:.`, `osv-scanner scan source -r`, `trivy fs`, `grype sbom:` |
 | 종료 코드 | osv-scanner는 취약점 발견 시 1, trivy·grype는 옵션 없이 발견해도 0 |
 | VEX 기본값 | 수정 버전이 있으면 `affected`, 없으면 `under_investigation`. 근거 없는 `not_affected` 금지 |
+| VEX 보고서 | 사용자 요청 시에만 xlsx·OpenVEX 생성. 요청 없으면 스캔 요약·조치 목록만 만들고 openpyxl 없이 동작 |
 | 스크립트 | `scripts/vex_xlsx.py`, openpyxl만 사용, 입력 JSON과 시트 구성 유지 |
-| 검증 | 샘플 lockfile로 네 도구 실행 + xlsx·OpenVEX 생성 확인 |
+| 검증 | 샘플 lockfile로 네 도구 실행 + 요청 시 xlsx·OpenVEX 생성 확인 |
 
 ### release-check
 
@@ -59,9 +60,10 @@
 | --- | --- |
 | 수집 | `syft` CycloneDX + 설치된 패키지의 LICENSE·NOTICE. npm·pnpm·pub·python 경로만 자동 수집 |
 | 기본 출력 | 자기완결 HTML + md. 외부 CSS·JS·폰트·이미지 금지, CSP `default-src 'none'` |
+| 산출물 선택 | `--formats html,md,review,xlsx`. 기본 `html,md,review`. xlsx는 선택 시에만 openpyxl 사용 |
 | 검토 분리 | copyleft·복수 라이선스·unknown·전문 없음·dev 는 `-review.md`(필요 시 xlsx). HTML·md 에 내부 사유 금지 |
 | 분류 | none/notice/weak/strong/network/unknown, OR=약한 쪽, AND=강한 쪽 |
-| 스크립트 | `scripts/collect_licenses.py`, `scripts/notice_build.py`. HTML·md 는 표준 라이브러리만, xlsx 는 `--xlsx` + openpyxl |
+| 스크립트 | `scripts/collect_licenses.py`, `scripts/notice_build.py`. HTML·md 는 표준 라이브러리만, xlsx는 `--formats xlsx` 또는 `--xlsx` + openpyxl |
 | 검증 | 샘플 입력으로 HTML·md·review 생성, 외부 요청 0건, 검토 파일 미포함 확인 |
 
 ### release-note
@@ -70,6 +72,7 @@
 | --- | --- |
 | 수집 | `scripts/collect_changes.py` — `git log --no-merges`, conventional commit·키워드로 분류 제안, 내부 변경은 제외 후보 |
 | 기본 출력 | `release-notes.md`, `.html`, `-short.txt`(기본 500자), `-store.txt`(기본 4,000자), `-internal.md` |
+| 산출물 선택 | `--formats html,md,short,store,internal`. 기본 전체. 선택한 형식만 생성·갱신 |
 | 고객 문구 | 이점 중심, 내부 용어·commit hash·이슈 번호·직원 이름·내부 URL 금지, 보안 상세 금지 |
 | 검토 분리 | commit 매핑과 제외 사유는 `-internal.md` 에만. 고객 md·html·txt 에 넣지 않음 |
 | 스크립트 | `scripts/notes_build.py`, 표준 라이브러리만. 앱스토어 제한은 입력 `limits` 로 조정 |

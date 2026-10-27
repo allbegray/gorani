@@ -84,6 +84,8 @@ ALIASES = {
 }
 
 EXCEL_TEXT_LIMIT = 30_000
+OUTPUT_FORMATS = ("html", "md", "review", "xlsx")
+DEFAULT_FORMATS = "html,md,review"
 UNKNOWN_LICENSE = "Unknown license"
 PAGE_TITLE = "Third-Party Notices"
 COPYRIGHT_LINE_RE = re.compile(r"^\s*copyright\b|\(c\)|©", re.I)
@@ -95,14 +97,29 @@ def parse_args():
     parser.add_argument("--input", required=True, help="정규화된 라이선스 JSON 경로")
     parser.add_argument("--outdir", default="docs/licenses", help="출력 디렉터리")
     parser.add_argument("--name", default="third-party-notices", help="출력 파일 기본 이름")
-    parser.add_argument("--xlsx", action="store_true", help="검토용 엑셀도 생성 (openpyxl 필요)")
+    parser.add_argument(
+        "--formats",
+        default=DEFAULT_FORMATS,
+        help=f"생성할 산출물: {','.join(OUTPUT_FORMATS)} (기본: {DEFAULT_FORMATS})",
+    )
+    parser.add_argument("--xlsx", action="store_true", help="--formats 에 xlsx 추가 (openpyxl 필요)")
     parser.add_argument("--exclude-dev", action="store_true", help="scope 가 dev 인 패키지 제외")
     parser.add_argument(
         "--fail-on-review",
         action="store_true",
         help="검토 필요 항목이 있으면 종료 코드 1",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    formats = [item.strip().lower() for item in args.formats.split(",") if item.strip()]
+    unknown = [item for item in formats if item not in OUTPUT_FORMATS]
+    if unknown:
+        parser.error(f"지원하지 않는 형식입니다: {', '.join(unknown)}")
+    if not formats:
+        parser.error("--formats 에 하나 이상의 형식을 지정하세요.")
+    args.formats = set(formats)
+    if args.xlsx:
+        args.formats.add("xlsx")
+    return args
 
 
 def canonical_license(value):
@@ -963,20 +980,24 @@ def main():
     review_path = outdir / f"{args.name}-review.md"
     xlsx_path = outdir / f"{args.name}.xlsx"
 
-    html_path.write_text(build_html(data, groups), encoding="utf-8")
-    md_path.write_text(build_markdown(data, groups), encoding="utf-8")
-    if review:
-        review_path.write_text(build_review_markdown(data, review), encoding="utf-8")
-    elif review_path.exists():
-        review_path.unlink()
-    if args.xlsx:
+    if "html" in args.formats:
+        html_path.write_text(build_html(data, groups), encoding="utf-8")
+    if "md" in args.formats:
+        md_path.write_text(build_markdown(data, groups), encoding="utf-8")
+    if "review" in args.formats:
+        if review:
+            review_path.write_text(build_review_markdown(data, review), encoding="utf-8")
+        elif review_path.exists():
+            review_path.unlink()
+    if "xlsx" in args.formats:
         write_workbook(xlsx_path, data, packages, review, groups, args.name)
 
     summary = {
-        "html": str(html_path),
-        "md": str(md_path),
-        "review": str(review_path) if review else "",
-        "xlsx": str(xlsx_path) if args.xlsx else "",
+        "formats": [item for item in OUTPUT_FORMATS if item in args.formats],
+        "html": str(html_path) if "html" in args.formats else "",
+        "md": str(md_path) if "md" in args.formats else "",
+        "review": str(review_path) if review and "review" in args.formats else "",
+        "xlsx": str(xlsx_path) if "xlsx" in args.formats else "",
         "packages": len(packages),
         "licenses": len(groups),
         "license_texts": sum(len(group["variants"]) for group in groups),

@@ -49,6 +49,8 @@ LABELS = {
 }
 
 DEFAULT_LIMITS = {"short": 500, "store": 4000}
+OUTPUT_FORMATS = ("html", "md", "short", "store", "internal")
+DEFAULT_FORMATS = ",".join(OUTPUT_FORMATS)
 
 
 def parse_args():
@@ -57,11 +59,24 @@ def parse_args():
     parser.add_argument("--outdir", default="docs/releases", help="출력 디렉터리")
     parser.add_argument("--name", default="release-notes", help="출력 파일 기본 이름")
     parser.add_argument(
+        "--formats",
+        default=DEFAULT_FORMATS,
+        help=f"생성할 산출물: {','.join(OUTPUT_FORMATS)} (기본: {DEFAULT_FORMATS})",
+    )
+    parser.add_argument(
         "--strict",
         action="store_true",
         help="commit 매핑 누락, 지원 경로 누락, 잘못된 링크를 오류로 처리",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    formats = [item.strip().lower() for item in args.formats.split(",") if item.strip()]
+    unknown = [item for item in formats if item not in OUTPUT_FORMATS]
+    if unknown:
+        parser.error(f"지원하지 않는 형식입니다: {', '.join(unknown)}")
+    if not formats:
+        parser.error("--formats 에 하나 이상의 형식을 지정하세요.")
+    args.formats = set(formats)
+    return args
 
 
 def text(value):
@@ -495,7 +510,7 @@ footer { padding-top: 1.5rem; padding-bottom: 3rem; color: var(--muted); font-si
     return "\n".join(parts) + "\n"
 
 
-def validate(data):
+def validate(data, formats):
     errors = []
     warnings = []
     strict_issues = []
@@ -601,11 +616,11 @@ def validate(data):
     }
     short_summary = text(data.get("short_summary"))
     store_summary = text(data.get("store_summary"))
-    if short_summary and len(short_summary) > limits["short"]:
+    if "short" in formats and short_summary and len(short_summary) > limits["short"]:
         errors.append(
             f"short_summary가 {len(short_summary)}자입니다. 제한 {limits['short']}자를 넘습니다."
         )
-    if store_summary and len(store_summary) > limits["store"]:
+    if "store" in formats and store_summary and len(store_summary) > limits["store"]:
         errors.append(
             f"store_summary가 {len(store_summary)}자입니다. 제한 {limits['store']}자를 넘습니다."
         )
@@ -737,7 +752,7 @@ def main():
     if not isinstance(data, dict):
         sys.exit("입력 JSON 의 최상위가 객체가 아닙니다.")
 
-    errors, warnings, strict_issues, limits = validate(data)
+    errors, warnings, strict_issues, limits = validate(data, args.formats)
     if errors:
         print(json.dumps({"errors": errors, "warnings": warnings, "strict": strict_issues}, ensure_ascii=False))
         sys.exit(1)
@@ -752,22 +767,26 @@ def main():
     labels = LABELS[language]
 
     auto_notes = []
-    short_summary = text(data.get("short_summary"))
-    if short_summary:
-        short_text = short_summary
-    else:
-        short_text, truncated = auto_short_summary(data, labels, limits["short"])
-        auto_notes.append("short_summary 가 없어 highlights/sections 에서 자동 생성했습니다.")
-        if truncated:
-            warnings.append(f"short 요약을 {limits['short']}자로 줄였습니다.")
-    store_summary = text(data.get("store_summary"))
-    if store_summary:
-        store_text = store_summary
-    else:
-        store_text, truncated = auto_store_summary(data, labels, limits["store"])
-        auto_notes.append("store_summary 가 없어 sections 에서 자동 생성했습니다.")
-        if truncated:
-            warnings.append(f"store 요약을 {limits['store']}자로 줄였습니다.")
+    short_text = ""
+    store_text = ""
+    if "short" in args.formats:
+        short_summary = text(data.get("short_summary"))
+        if short_summary:
+            short_text = short_summary
+        else:
+            short_text, truncated = auto_short_summary(data, labels, limits["short"])
+            auto_notes.append("short_summary 가 없어 highlights/sections 에서 자동 생성했습니다.")
+            if truncated:
+                warnings.append(f"short 요약을 {limits['short']}자로 줄였습니다.")
+    if "store" in args.formats:
+        store_summary = text(data.get("store_summary"))
+        if store_summary:
+            store_text = store_summary
+        else:
+            store_text, truncated = auto_store_summary(data, labels, limits["store"])
+            auto_notes.append("store_summary 가 없어 sections 에서 자동 생성했습니다.")
+            if truncated:
+                warnings.append(f"store 요약을 {limits['store']}자로 줄였습니다.")
 
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
@@ -777,30 +796,36 @@ def main():
     store_path = outdir / f"{args.name}-store.txt"
     internal_path = outdir / f"{args.name}-internal.md"
 
-    md_path.write_text(render_markdown(data, labels), encoding="utf-8")
-    html_path.write_text(render_html(data, labels), encoding="utf-8")
-    short_path.write_text(short_text.rstrip() + "\n", encoding="utf-8")
-    store_path.write_text(store_text.rstrip() + "\n", encoding="utf-8")
-    internal_path.write_text(
-        render_internal(data, warnings, strict_issues, limits, auto_notes),
-        encoding="utf-8",
-    )
+    if "md" in args.formats:
+        md_path.write_text(render_markdown(data, labels), encoding="utf-8")
+    if "html" in args.formats:
+        html_path.write_text(render_html(data, labels), encoding="utf-8")
+    if "short" in args.formats:
+        short_path.write_text(short_text.rstrip() + "\n", encoding="utf-8")
+    if "store" in args.formats:
+        store_path.write_text(store_text.rstrip() + "\n", encoding="utf-8")
+    if "internal" in args.formats:
+        internal_path.write_text(
+            render_internal(data, warnings, strict_issues, limits, auto_notes),
+            encoding="utf-8",
+        )
 
     commits = data.get("commits") or []
     summary = {
-        "md": str(md_path),
-        "html": str(html_path),
-        "short": str(short_path),
-        "store": str(store_path),
-        "internal": str(internal_path),
+        "formats": [item for item in OUTPUT_FORMATS if item in args.formats],
+        "md": str(md_path) if "md" in args.formats else "",
+        "html": str(html_path) if "html" in args.formats else "",
+        "short": str(short_path) if "short" in args.formats else "",
+        "store": str(store_path) if "store" in args.formats else "",
+        "internal": str(internal_path) if "internal" in args.formats else "",
         "sections": len(data.get("sections") or []),
         "highlights": len(data.get("highlights") or []),
         "commits": len(commits),
         "included": sum(1 for commit in commits if commit.get("included", True)),
         "excluded": sum(1 for commit in commits if not commit.get("included", True)),
-        "short_chars": len(short_text),
+        "short_chars": len(short_text) if "short" in args.formats else 0,
         "short_limit": limits["short"],
-        "store_chars": len(store_text),
+        "store_chars": len(store_text) if "store" in args.formats else 0,
         "store_limit": limits["store"],
         "auto_summary": bool(auto_notes),
         "warnings": warnings,

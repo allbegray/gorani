@@ -14,12 +14,12 @@ description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 S
   - macOS: `brew install syft`
 - 라이선스 전문은 설치된 패키지 디렉터리에서 읽습니다. npm·pnpm·pub·python 패키지가 설치되어 있어야 하며, 설치하지 않았다면 전문이 비고 검토 목록에 남습니다.
 - 앱에 실제로 포함되는 패키지만 대상으로 하려면 운영 의존성만 설치한 상태에서 수집합니다. 예: `npm ci --omit=dev`
-- 선택 기능인 `--xlsx` 를 쓸 때만 openpyxl 이 필요합니다.
+- `xlsx` 산출물을 선택할 때만 openpyxl 이 필요합니다.
 - 이 스킬은 라이선스 판단을 대신하지 않습니다. copyleft 와 미확인 라이선스는 검토 목록으로 넘깁니다.
 
 ## 절차
 
-1. 대상 앱과 패키지 매니저를 확인합니다. 모노레포라면 저장소 루트가 아니라 앱 디렉터리에서 수집합니다. 앱 버전을 확인할 수 없으면 추측하지 말고 사용자에게 묻습니다.
+1. 대상 앱과 패키지 매니저를 확인합니다. 모노레포라면 저장소 루트가 아니라 앱 디렉터리에서 수집합니다. 앱 버전을 확인할 수 없으면 추측하지 말고 사용자에게 묻습니다. 함께 생성할 산출물(html, md, review, xlsx)도 확인합니다.
 2. 작업 디렉터리를 만듭니다. SBOM 과 중간 JSON 은 `.legal/` 에 두고, 저장소 정책에 따라 `.gitignore` 에 추가합니다. 이미 커밋된 파일은 건드리지 않습니다.
 3. SBOM 을 만듭니다. `syft dir:. -o cyclonedx-json=.legal/sbom.cdx.json`
 4. 운영 범위를 기록합니다. npm 이면 `npm ls --omit=dev --all --json > .legal/runtime.json` 을 실행합니다. peer 의존성 문제로 종료 코드가 1이어도 JSON 이 만들어졌는지 먼저 확인합니다.
@@ -28,7 +28,7 @@ description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 S
    - `missing_text` 가 0보다 크면 해당 패키지가 설치되어 있는지, 패키지에 LICENSE 파일이 실제로 있는지 확인합니다.
    - `unknown_license` 가 0보다 크면 패키지 메타데이터나 원본 저장소에서 확인해 입력 JSON 의 `license` 를 보정합니다. 확인할 수 없으면 unknown 으로 남깁니다.
    - 개발 의존성이 섞였으면 `--runtime` 을 지정해 다시 수집하거나, 생성 단계에서 `--exclude-dev` 를 씁니다.
-7. 고지 페이지를 생성합니다. `python3 <스킬 폴더>/scripts/notice_build.py --input .legal/licenses-input.json --outdir docs/licenses --name third-party-notices`
+7. 고지 페이지를 생성합니다. `python3 <스킬 폴더>/scripts/notice_build.py --input .legal/licenses-input.json --outdir docs/licenses --name third-party-notices --formats html,md,review`. 사용자가 고른 형식만 `--formats`에 넣습니다.
 8. 앱이나 백엔드에 연결합니다. HTML 은 외부 요청 없이 동작하므로 앱 자산에 넣거나 정적 파일로 제공합니다.
 9. 검증합니다. 브라우저에서 데스크톱·모바일 폭으로 열어 검색과 라이선스 전문 표시를 확인하고, 네트워크 요청이 없는지 확인합니다.
 10. 의존성이 바뀔 때마다 다시 생성합니다. 릴리스 체크리스트나 CI 에 `--fail-on-review` 를 넣으면 검토 항목이 있는 상태로 배포되는 것을 막을 수 있습니다.
@@ -64,7 +64,20 @@ description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 S
 
 ## 출력 형식
 
-기본 산출물은 `third-party-notices.html` 과 `third-party-notices.md` 입니다.
+생성할 산출물은 사용자에게 먼저 묻고 `--formats`로 지정합니다. 기본은 `html,md,review`이고, `xlsx`는 요청할 때만 만듭니다.
+
+| 형식 | 파일 | 용도 |
+| --- | --- | --- |
+| html | `third-party-notices.html` | 앱 WebView·백엔드에 게시하는 자기완결 페이지 |
+| md | `third-party-notices.md` | diff 검토, 앱스토어 제출 자료 |
+| review | `third-party-notices-review.md` | 내부 검토 목록. 검토 항목이 있을 때만 생성 |
+| xlsx | `third-party-notices.xlsx` | 내부 검토용 엑셀. openpyxl 필요 |
+
+사용자에게는 짧게 이렇게 묻습니다. "고지 산출물을 선택해 주세요. 기본은 HTML·md·검토 목록입니다. 엑셀도 필요하신가요?"
+
+- 선택한 형식만 생성하거나 갱신합니다. 선택하지 않은 기존 파일은 건드리지 않습니다.
+- `--xlsx`는 `--formats`에 xlsx를 추가하는 별칭으로 계속 쓸 수 있습니다.
+- `review` 없이 `html`만 선택해도 검토 항목 수는 요약에 표시됩니다. 검토 사유가 필요하면 `review`를 포함합니다.
 
 HTML:
 
@@ -82,16 +95,21 @@ md:
 - HTML 과 같은 내용을 평문으로 담습니다. diff 검토와 앱스토어 제출 자료로 씁니다.
 - 라이선스 전문은 코드 블록으로 원문 그대로 넣습니다.
 
-검토 파일:
+review:
 
 - `third-party-notices-review.md`: 패키지, 버전, 라이선스, 사유, 조치를 담은 한국어 표입니다. 검토 항목이 있을 때만 생성합니다.
-- `--xlsx` 를 주면 `third-party-notices.xlsx` 도 만듭니다. 시트는 요약, 패키지, 라이선스 전문, 검토 필요, 실행 로그입니다.
-- 두 파일은 내부용입니다. 앱 자산이나 배포 경로에 넣지 않습니다.
+
+xlsx:
+
+- `third-party-notices.xlsx`: 시트는 요약, 패키지, 라이선스 전문, 검토 필요, 실행 로그입니다.
+- `xlsx`를 선택한 경우에만 openpyxl이 필요합니다.
+
+검토 파일과 엑셀은 내부용입니다. 앱 자산이나 배포 경로에 넣지 않습니다.
 
 종료 코드:
 
 - 정상 0
-- `--fail-on-review` 를 주었고 검토 항목이 있으면 1
+- `--fail-on-review` 를 주었고 검토 항목이 있으면 1. `review` 형식을 선택하지 않아도 게이트는 동작합니다.
 - 입력·인자 오류는 argparse 기본값인 2
 
 ## 앱과 백엔드 연결
@@ -118,7 +136,7 @@ md:
 - `npm ls` 결과를 읽을 수 없으면 `--runtime` 을 빼고 수집합니다. 이때 scope 는 unknown 이 되고 모든 패키지가 대상이 됩니다.
 - 라이선스 전문이 없으면 원본 저장소의 LICENSE 를 받아 입력 JSON 의 `license_text` 에 넣습니다. 없는 채로 두면 페이지에 "License text not found" 로 표시되고 검토 목록에 남습니다.
 - 라이선스를 확인할 수 없으면 unknown 으로 두고 검토합니다. 추측한 SPDX ID 를 넣지 않습니다.
-- `--xlsx` 에서 openpyxl 이 없으면 설치 명령을 안내합니다. HTML 과 md 는 이미 생성되었으므로 그대로 사용할 수 있습니다.
+- `xlsx`를 선택했는데 openpyxl 이 없으면 설치 명령을 안내합니다. 선택한 다른 형식은 생성되었으므로 그대로 사용할 수 있습니다.
 - `--fail-on-review` 로 종료 코드 1이 나오면 실패가 아니라 검토가 필요하다는 뜻입니다. 검토 파일을 확인하고, 남길 항목은 사유를 기록합니다.
 - HTML 이 WebView 에서 깨지면 CSP 위반과 JavaScript 비활성 여부를 확인합니다. 정적 내용은 JavaScript 없이도 보여야 합니다.
 

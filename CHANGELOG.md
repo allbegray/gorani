@@ -1,6 +1,19 @@
 # 변경 이력
 
-최신 버전은 2.2.0(2026-10-28)입니다. 2.2.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 2.3.0(2026-10-28)입니다. 2.3.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 2.3.0 · 2026-10-28
+
+보고서·산출물 선택화
+
+**변경**
+
+- `cve-scan`: VEX 엑셀·OpenVEX 보고서를 사용자 요청 시에만 생성
+- 요청하지 않으면 CVE 요약·조치 목록만 보고하고 openpyxl 없이 동작
+- `license-notice`: `--formats html,md,review,xlsx`로 산출물 선택. 기본 html,md,review
+- `release-note`: `--formats html,md,short,store,internal`로 산출물 선택. 기본 전체
+- 선택한 형식만 생성·갱신하고, 선택하지 않은 기존 파일은 건드리지 않음
+- README·AGENTS에 선택 동작과 openpyxl 조건 반영
 
 ## 2.2.0 · 2026-10-28
 

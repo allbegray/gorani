@@ -1,11 +1,11 @@
 ---
 name: release-note
-description: git 변경과 릴리스 범위에서 고객이 이해할 수 있는 릴리스 노트를 만든다. 새 기능·개선·수정·보안을 고객 관점으로 다시 쓰고, 앱 내 페이지·스토어 요약·GitHub Release 본문을 함께 생성한다. 배포 전 릴리스 노트 작성, 앱 업데이트 안내, 스토어 "새로운 기능" 문구가 필요할 때 사용.
+description: git 변경과 릴리스 범위에서 고객이 이해할 수 있는 릴리스 노트를 만든다. 새 기능·개선·수정·보안을 고객 관점으로 다시 쓰고, 사용자가 고른 산출물(앱 페이지·GitHub 본문·스토어 요약·내부 기록)을 생성한다. 배포 전 릴리스 노트 작성, 앱 업데이트 안내, 스토어 "새로운 기능" 문구가 필요할 때 사용.
 ---
 
 # 고객용 릴리스 노트 생성
 
-git 범위의 변경을 고객이 읽을 문장으로 바꾸고, 앱 페이지·스토어 요약·내부 검토 기록을 함께 만듭니다. 커밋을 그대로 나열하지 않고, 고객에게 보이는 변화만 골라 이점과 사용 방법을 설명합니다.
+git 범위의 변경을 고객이 읽을 문장으로 바꾸고, 사용자가 고른 산출물(앱 페이지·GitHub 본문·스토어 요약·내부 기록)을 만듭니다. 커밋을 그대로 나열하지 않고, 고객에게 보이는 변화만 골라 이점과 사용 방법을 설명합니다.
 
 ## 전제
 
@@ -18,7 +18,7 @@ git 범위의 변경을 고객이 읽을 문장으로 바꾸고, 앱 페이지·
 
 ## 절차
 
-1. 릴리스 정보를 확인합니다. 제품명, 새 버전, 이전 릴리스 태그, 배포일, 고객, 채널(앱 내·백엔드·GitHub Release·앱스토어·이메일), 언어를 정합니다.
+1. 릴리스 정보를 확인합니다. 제품명, 새 버전, 이전 릴리스 태그, 배포일, 고객, 채널(앱 내·백엔드·GitHub Release·앱스토어·이메일), 언어, 필요한 산출물(html, md, short, store, internal)을 정합니다.
 2. 작업 디렉터리를 만듭니다. 원본 수집 JSON 은 `.release/` 에 두고, 저장소 정책에 따라 `.gitignore` 에 추가합니다.
 3. 변경을 수집합니다. `python3 <스킬 폴더>/scripts/collect_changes.py --repo . --from <이전 태그> --to <대상> --product "<제품명>" --version "<버전>" --out .release/release-input.json`
 4. 수집 결과를 검토합니다. 출력의 `commits`, `included`, `excluded`, `categories`, `warnings` 를 읽고, 분류가 `other` 이거나 `confidence` 가 `low` 인 항목은 diff와 PR을 직접 확인합니다.
@@ -26,8 +26,8 @@ git 범위의 변경을 고객이 읽을 문장으로 바꾸고, 앱 페이지·
 6. 깨지는 변경을 찾습니다. 기존 설정·API·파일 형식·동작이 바뀌면 `breaking_changes` 로 올리고, 고객이 따라 할 수 있는 구체적인 조치를 씁니다.
 7. 릴리스 노트 JSON 을 큐레이션합니다. 아래 입력 형식에 맞춰 `highlights`, `sections`, `breaking_changes`, `known_issues`, `upgrade_notes`, `support`, `short_summary`, `store_summary` 를 채웁니다.
 8. 고객 문장을 씁니다. 아래 고객 문구 규칙을 적용하고, 모든 주장이 commit·diff·PR로 확인되는지 표시합니다. 확인할 수 없으면 쓰지 않습니다.
-9. 결과물을 생성합니다. `python3 <스킬 폴더>/scripts/notes_build.py --input .release/release-input.json --outdir docs/releases --name release-notes --strict`
-10. 검증합니다. md와 html을 읽고, 글자 수·링크·내부 정보·깨지는 변경 조치·지원 경로를 확인합니다. HTML 은 데스크톱과 모바일 폭에서 엽니다.
+9. 결과물을 생성합니다. `python3 <스킬 폴더>/scripts/notes_build.py --input .release/release-input.json --outdir docs/releases --name release-notes --formats html,md,short,store,internal --strict`. 사용자가 고른 형식만 `--formats`에 넣습니다.
+10. 검증합니다. 선택한 산출물을 읽고, 글자 수·링크·내부 정보·깨지는 변경 조치·지원 경로를 확인합니다. HTML을 선택했다면 데스크톱과 모바일 폭에서 엽니다.
 11. 채널에 맞게 게시합니다. GitHub Release 본문은 md, 앱·백엔드 페이지는 html, 앱스토어는 short/store txt를 사용합니다. 게시는 사람이 승인한 뒤에 합니다.
 
 ## 입력 JSON
@@ -93,13 +93,22 @@ commit 항목:
 
 ## 출력 형식
 
-기본 이름이 `release-notes` 일 때 다음 파일을 만듭니다.
+생성할 산출물은 사용자에게 먼저 묻고 `--formats`로 지정합니다. 기본 이름이 `release-notes`일 때 사용할 수 있는 형식은 다음과 같습니다.
 
-- `release-notes.md`: 고객용 긴 버전. GitHub Release 본문, 이메일, 문서에 사용
-- `release-notes.html`: 고객용 자기완결 페이지. 앱 WebView, 백엔드 정적 페이지에 사용
-- `release-notes-short.txt`: 스토어 짧은 버전. 기본 500자
-- `release-notes-store.txt`: 스토어 긴 버전. 기본 4,000자
-- `release-notes-internal.md`: 내부 검토용. commit 매핑, 제외 사유, 경고, 배포 전 확인 목록
+| 형식 | 파일 | 채널 |
+| --- | --- | --- |
+| html | `release-notes.html` | 앱 WebView·백엔드 정적 페이지 |
+| md | `release-notes.md` | GitHub Release 본문·이메일·문서 |
+| short | `release-notes-short.txt` | 앱스토어 짧은 버전 (기본 500자) |
+| store | `release-notes-store.txt` | 앱스토어 긴 버전 (기본 4,000자) |
+| internal | `release-notes-internal.md` | 내부 검토용 commit 매핑·경고·확인 목록 |
+
+사용자에게는 짧게 이렇게 묻습니다. "릴리스 노트 산출물을 선택해 주세요. 앱 페이지(html), GitHub 본문(md), 스토어 요약(short/store), 내부 검토(internal) 중 필요한 것을 알려 주세요."
+
+- 선택한 형식만 생성하거나 갱신합니다. 선택하지 않은 기존 파일은 건드리지 않습니다.
+- `internal`을 선택하지 않으면 내부 매핑 파일을 만들지 않습니다. `--strict` 검증은 그대로 수행되고, 경고·검토 항목은 콘솔 요약에 남깁니다.
+- `short`·`store`를 선택한 경우에만 해당 글자 수 제한을 검사합니다. 선택하지 않은 요약이 길어도 HTML·md 생성을 막지 않습니다.
+- `--formats`를 생략하면 기존 동작과 같은 전체 산출물을 만듭니다. 사용자에게 물었으면 선택 결과를 명시해 전달합니다.
 
 HTML:
 
@@ -113,11 +122,14 @@ md:
 - 같은 내용을 평문으로 담습니다. 링크는 https 또는 mailto만 허용합니다.
 - 고객 문구에 커밋 해시와 티켓 번호를 넣지 않습니다.
 
-검토 파일:
+short·store:
 
-- `.md` 와 `.html` 은 고객에게 배포할 수 있습니다.
-- `-short.txt` 와 `-store.txt` 는 스토어 입력란에 붙여 넣습니다.
-- `-internal.md` 는 내부용입니다. 앱 자산, 공개 페이지, 스토어에 넣지 않습니다.
+- `short`는 스토어 짧은 버전, `store`는 긴 버전입니다.
+- 글자 수 제한은 입력의 `limits`로 조정하고, 제출 화면에서 실제 제한을 다시 확인합니다.
+
+internal:
+
+- `-internal.md`는 내부용입니다. 앱 자산, 공개 페이지, 스토어에 넣지 않습니다.
 
 종료 코드:
 
@@ -129,7 +141,7 @@ md:
 
 - GitHub Release: `release-notes.md` 본문을 붙이고, 제목은 제품명과 버전으로 씁니다.
 - 앱 내·백엔드: `release-notes.html` 을 정적 파일로 두거나 앱 자산에 넣습니다. 파일이 자기완결이므로 네트워크 요청이 필요 없습니다.
-- 앱스토어: `release-notes-short.txt` 는 500자 제한, `release-notes-store.txt` 는 4,000자 제한을 기본으로 합니다. 제출 화면의 실제 제한과 줄바꿈 처리를 확인합니다.
+- 앱스토어: `release-notes-short.txt` 는 500자 제한, `release-notes-store.txt` 는 4,000자 제한을 기본으로 합니다. 제출 화면의 실제 제한과 줄바꿈 처리를 확인합니다. 스토어 산출물을 쓰려면 `short`·`store`를 `--formats`에 포함합니다.
 - 이메일·푸시: `short_summary` 를 쓰고 전체 노트 링크를 답니다. 푸시에는 긴 설명을 넣지 않습니다.
 - 다국어: 언어별로 입력 JSON 을 따로 만들고 `language` 를 `ko` 또는 `en` 으로 지정합니다. 섹션 이름과 본문도 해당 언어로 큐레이션합니다.
 
@@ -137,8 +149,8 @@ md:
 
 - `--strict` 로 실행해 commit 매핑, 지원 경로, 링크 형식이 모두 채워졌는지 확인합니다.
 - `short_chars` 와 `store_chars` 가 제한 이하인지 확인합니다. 초과한 명시 요약은 스크립트가 실패시킵니다.
-- md와 html에서 커밋 해시, 이슈 번호, 직원 이름, 내부 URL이 없는지 확인합니다.
-- 모든 고객 문장이 commit·diff·PR로 확인되는지 내부 매핑 표와 대조합니다.
+- 선택한 고객 산출물에서 커밋 해시, 이슈 번호, 직원 이름, 내부 URL이 없는지 확인합니다.
+- 모든 고객 문장이 commit·diff·PR로 확인되는지 내부 매핑 표 또는 콘솔 요약과 대조합니다.
 - 깨지는 변경의 `action` 이 실제로 따라 할 수 있는 수준인지 확인합니다.
 - 링크가 https 또는 mailto이고 실제로 열리는지 확인합니다.
 - HTML 을 데스크톱과 모바일 폭에서 열고, 페이지를 열 때 자동으로 나가는 외부 리소스 요청이 0건인지 확인합니다. 고객이 누르는 링크는 https 또는 mailto만 허용합니다.

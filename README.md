@@ -7,10 +7,10 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | 스킬 | 이럴 때 | 결과 |
 | --- | --- | --- |
 | `docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
-| `cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | VEX 엑셀 + OpenVEX JSON, 조치 목록 |
+| `cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
 | `release-check` | 운영 배포 전 운영·개발 브랜치 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
-| `license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 자기완결 HTML 고지 페이지 + 검토 목록 |
-| `release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 고객용 HTML·md, 스토어 요약, 내부 검토 기록 |
+| `license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀 |
+| `release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
 | `dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
 
 ## 각 스킬이 하는 일
@@ -30,7 +30,9 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 
 - 같은 취약점은 하나로 합치고 높은 심각도를 채택
 - 수정 버전이 있으면 `affected`, 없으면 `under_investigation`이 기본
-- 결과: `docs/security/cve-report-YYYY-MM-DD.xlsx`와 같은 이름의 `.vex.json`
+- 기본 결과: CVE 요약과 조치 목록
+- VEX 엑셀·OpenVEX JSON은 사용자가 요청할 때만 생성. 요청하지 않으면 openpyxl 없이 동작
+- 요청 시 결과: `docs/security/cve-report-YYYY-MM-DD.xlsx`와 같은 이름의 `.vex.json`
 - 패키지를 올리지는 않고 조치 목록만 제시
 
 ### release-check
@@ -49,8 +51,9 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - `syft`로 SBOM을 만들고, 설치된 패키지에서 라이선스 전문과 저작권 표시를 수집
 - 같은 라이선스 전문은 한 번만 수록하고, 패키지별 저작권은 각 패키지에 표시
 - 결과: `docs/licenses/third-party-notices.html`, `.md`, 검토가 필요하면 `-review.md`
+- 산출물은 `--formats`로 선택: `html`, `md`, `review`, `xlsx`. 기본은 `html,md,review`
 - copyleft·복수 라이선스·미확인·전문 없음은 검토 목록으로 분리하고, 앱 페이지에는 내부 사유를 넣지 않음
-- `--xlsx`를 주면 검토용 엑셀도 생성. 기본 경로는 openpyxl 없이 동작
+- `--xlsx` 또는 `--formats xlsx`를 주면 검토용 엑셀도 생성. 기본 경로는 openpyxl 없이 동작
 
 ### release-note
 
@@ -59,6 +62,7 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - `git log` 범위를 수집해 기능·개선·수정·보안으로 분류하고 내부 변경은 제외 후보로 표시
 - 깨지는 변경은 가장 위에 두고, 고객이 따라 할 수 있는 조치를 함께 작성
 - 결과: `docs/releases/release-notes.html`, `.md`, 스토어 짧은·긴 요약, 내부 검토 기록
+- 산출물은 `--formats`로 선택: `html`, `md`, `short`, `store`, `internal`. 기본은 전체
 - `--strict`로 commit 매핑·지원 경로·링크를 검증
 - 앱스토어 글자 수 제한은 입력의 `limits`로 조정
 
@@ -162,8 +166,8 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 
 | 파일 | 내용 |
 | --- | --- |
-| `samples/cve-scan/cve-report-sample.xlsx` | VEX 엑셀 (요약, VEX 판정, 원본 findings, 실행 로그) |
-| `samples/cve-scan/cve-report-sample.vex.json` | OpenVEX JSON |
+| `samples/cve-scan/cve-report-sample.xlsx` | VEX 엑셀 (요청 시 생성, 요약·VEX 판정·원본 findings·실행 로그) |
+| `samples/cve-scan/cve-report-sample.vex.json` | OpenVEX JSON (요청 시 생성) |
 | `samples/release-check/release-check-sample.xlsx` | 릴리스 점검 엑셀 (요약, 점검 항목, 변경 파일, 커밋, 실행 로그) |
 | `samples/license-notice/third-party-notices.html` | 앱에 넣는 자기완결 고지 페이지 (검색, 라이선스 전문 접기) |
 | `samples/license-notice/third-party-notices.md` | 같은 내용의 평문 |
@@ -200,11 +204,11 @@ samples/<스킬>/             예시 입력과 결과물
 | 루트 `.md`가 `docs/`로 이동함 | docs-governance가 문서 세트 외 `.md`를 옮긴 것. 스킬 폴더는 대상이 아님 |
 | cve-scan이 도구가 없다고 함 | `brew install osv-scanner trivy syft grype` 후 재실행. 스킬은 도구를 임의 설치하지 않음 |
 | license-notice가 syft가 없다고 함 | `brew install syft` 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
-| VEX 엑셀 생성 실패 | `python3 -m pip install --user openpyxl` 필요. 설치 전에는 임의 설치하지 않음 |
+| VEX 엑셀 생성 실패 | VEX 보고서를 요청한 경우에만 openpyxl 필요. 요청하지 않았으면 생성하지 않으며, 필요할 때 `python3 -m pip install --user openpyxl` |
 | release-check가 브랜치를 못 찾음 | `git fetch origin` 후 `main`·`develop` 존재 확인. 다른 이름이면 스킬에 알려줄 것 |
 | license-notice에서 라이선스 전문이 비어 있음 | 대상 패키지가 설치되어 있는지 확인. `npm ci --omit=dev` 후 재수집. 원본에 LICENSE가 없으면 입력 JSON에 원문을 넣거나 검토 목록에 남김 |
 | HTML이 앱 WebView에서 안 열림 | 파일을 앱 자산에 실제로 복사했는지, CSP·WebView의 JavaScript 설정 확인. 검색만 안 되고 목록은 보여야 정상 |
-| `--xlsx`에서 openpyxl 오류 | HTML·md는 이미 생성됨. 엑셀이 필요할 때만 `python3 -m pip install --user openpyxl` |
+| `--xlsx`에서 openpyxl 오류 | 선택한 다른 형식은 이미 생성됨. 엑셀이 필요할 때만 `python3 -m pip install --user openpyxl` |
 | release-note가 이전 태그를 못 찾음 | `git tag`로 릴리스 태그를 확인하고 `--from`을 지정. 태그가 없으면 임의로 만들지 않음 |
 | release-note `--strict`에서 note/reason 오류 | 포함 commit에는 `note`, 제외 commit에는 `reason`을 채움. 수집 직후에는 비어 있음 |
 | 스토어 요약 글자 수 초과 | `short_summary`·`store_summary`를 줄이거나 `limits`를 조정. 제출 화면의 실제 제한을 확인 |

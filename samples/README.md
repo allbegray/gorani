@@ -10,6 +10,8 @@
 | `cve-report-sample.xlsx` | VEX 엑셀 보고서 (요약, VEX 판정, 원본 findings, 실행 로그) |
 | `cve-report-sample.vex.json` | OpenVEX JSON |
 
+VEX 엑셀과 OpenVEX는 사용자가 요청했을 때만 생성되는 선택 산출물의 예시입니다. 요청하지 않으면 스캔 요약과 조치 목록만 만듭니다.
+
 재생성:
 
 ```bash
@@ -41,10 +43,12 @@ python3 skills/release-check/scripts/release_xlsx.py --input samples/release-che
 재생성:
 
 ```bash
-python3 skills/license-notice/scripts/notice_build.py --input samples/license-notice/license-input.json --outdir samples/license-notice --name third-party-notices
+python3 skills/license-notice/scripts/notice_build.py --input samples/license-notice/license-input.json --outdir samples/license-notice --name third-party-notices --formats html,md,review
 ```
 
 샘플 프로젝트와 `legacy-widget` 패키지는 가상입니다. 라이선스 원문은 실제 npm 패키지에서 가져왔고, unknown·전문 없음·copyleft 검토 항목을 함께 보여 줍니다.
+
+샘플은 `html,md,review` 기본 형식으로 생성합니다. 엑셀은 `--formats xlsx`를 추가했을 때만 만듭니다.
 
 ## release-note
 
@@ -60,10 +64,12 @@ python3 skills/license-notice/scripts/notice_build.py --input samples/license-no
 재생성:
 
 ```bash
-python3 skills/release-note/scripts/notes_build.py --input samples/release-note/release-input.json --outdir samples/release-note --name release-notes
+python3 skills/release-note/scripts/notes_build.py --input samples/release-note/release-input.json --outdir samples/release-note --name release-notes --formats html,md,short,store,internal
 ```
 
 샘플 제품·버전·링크는 가상입니다. 깨지는 변경, 알려진 문제, 고객 문의 경로, 내부 commit 매핑을 함께 보여 줍니다.
+
+샘플은 전체 형식으로 생성합니다. 실제 프로젝트에서는 필요한 형식만 `--formats`로 지정합니다.
 
 ## 주의
 
