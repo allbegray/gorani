@@ -1,6 +1,6 @@
 # 플로우차트
 
-> 문서 지도: [index](index.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
+> 문서 지도: [index](index.md) · [source.plain](source.plain.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
 
 <a id="f-reservation-create-01" name="f-reservation-create-01"></a>
 ## F-RESERVATION-CREATE-01 예약 신청 (P-RESERVATION-CREATE-01)

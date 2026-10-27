@@ -1,6 +1,6 @@
 # 프로세스 정의
 
-> 문서 지도: [index](index.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
+> 문서 지도: [index](index.md) · [source.plain](source.plain.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
 
 AS-IS는 메신저와 엑셀을 사용하고, TO-BE는 웹 화면에서 예약·승인·대여·반납을 처리합니다. 원문에는 TO-BE 흐름만 구체적으로 기술되어 있습니다.
 

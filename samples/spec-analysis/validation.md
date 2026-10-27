@@ -1,6 +1,6 @@
 # 검증 리포트
 
-> 문서 지도: [index](index.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
+> 문서 지도: [index](index.md) · [source.plain](source.plain.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
 
 ## 요약
 
@@ -43,7 +43,7 @@
 
 ## 검증 메모
 
-- `scripts/check_links.py`로 상대 링크 138개와 앵커를 검사해 깨진 링크 0건을 확인했습니다.
+- `scripts/check_links.py`로 상대 링크 144개와 앵커를 검사해 깨진 링크 0건을 확인했습니다.
 - finding 10개, 프로세스 5개, 플로우 5개의 ID와 앵커 중복은 없습니다.
 
 ## 확인하지 못한 것

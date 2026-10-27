@@ -1,8 +1,10 @@
 # 장비 예약 서비스 분석
 
-> 문서 지도: [index](index.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
+> 문서 지도: [index](index.md) · [source.plain](source.plain.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
 
-- 원본: `source.md` (Markdown, 7개 섹션)
+- 원본: `source.plain.md` (Markdown, 7개 섹션)
+- 원문 보존: both (`source.plain.md` + `source.md`)
+- ID·링크 수준: full
 - 범위: 사내 장비 예약·승인·대여·반납의 1차 웹 출시
 - 대상: 임직원, 운영자, 승인자, 관리자
 - 준비 상태: **blocked**
@@ -21,6 +23,9 @@
 
 | 문서 | 내용 |
 | --- | --- |
+| `index.md` | 분석 범위·핵심 발견·ID Index·결정 필요 항목 |
+| `source.plain.md` | 원본을 그대로 옮긴 단순 markdown |
+| `source.md` | 추적용 변환 원문 (frontmatter·페이지 표시) |
 | `glossary.md` | 용어 사전과 동의어·충돌 |
 | `domain.md` | 도메인 모델과 상태 전이 |
 | `processes.md` | 예약·승인·수령·반납 프로세스 |

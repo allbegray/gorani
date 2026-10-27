@@ -77,7 +77,8 @@ python3 skills/gorani-release-note/scripts/notes_build.py --input samples/releas
 
 | 파일 | 내용 |
 | --- | --- |
-| `source.md` | 변환된 기획서 원문 예시 (가상 장비 예약 서비스) |
+| `source.plain.md` | 단순 변환 원문 예시 (frontmatter 없음) |
+| `source.md` | 추적용 변환 원문 예시 (frontmatter·페이지 표시) |
 | `index.md` | 분석 범위·핵심 발견·결정 필요 항목 |
 | `glossary.md` | 용어 사전과 동의어·충돌 |
 | `domain.md` | 도메인 모델과 Mermaid 클래스 다이어그램 |
@@ -89,7 +90,7 @@ python3 skills/gorani-release-note/scripts/notes_build.py --input samples/releas
 
 ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식을 사용합니다. 샘플은 `P-RESERVATION-CREATE-01`, `F-RESERVATION-CREATE-01`, `V-PROC-RETURN-01`처럼 접두사에서 내용 영역을 유추할 수 있게 했고, `RESERVATION`은 샘플 `index.md`에서 추가한 프로젝트별 AREA입니다.
 
-각 문서 상단에는 문서 지도가 있고, `index.md`에는 Finding/Process/Flow Index가 있습니다. 프로세스·플로우·finding은 서로 상대 링크와 앵커로 연결됩니다.
+각 문서 상단에는 문서 지도가 있고, `index.md`에는 Finding/Process/Flow Index가 있습니다. 프로세스·플로우·finding은 서로 상대 링크와 앵커로 연결됩니다. 샘플은 원문 보존 `both`, ID·링크 수준 `full`을 사용합니다.
 
 ## 주의
 

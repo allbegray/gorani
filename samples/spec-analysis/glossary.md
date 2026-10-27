@@ -1,6 +1,6 @@
 # 용어 사전
 
-> 문서 지도: [index](index.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
+> 문서 지도: [index](index.md) · [source.plain](source.plain.md) · [source](source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
 
 | 용어 | 정의 | 동의어·약어 | 출처 | 상태 | 비고 | 관련 |
 | --- | --- | --- | --- | --- | --- | --- |

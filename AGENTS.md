@@ -93,7 +93,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 변환 | 로컬 도구로 PDF·DOCX·PPTX·HWP·XLSX·Markdown을 `source.md`로 변환. 원본 보존, 페이지·슬라이드 손실 warnings 기록 |
+| 변환 | 로컬 도구로 PDF·DOCX·PPTX·HWP·XLSX·Markdown을 `source.plain.md`(단순)와 `source.md`(추적)로 변환. 원본 보존, 페이지·슬라이드 손실 warnings 기록 |
+| 보존 | 변환 원문 보존을 `both`/`plain`/`trace`/`none`으로 확인. `none`이면 임시 변환 후 삭제하고 `index.md`에 기록 |
+| 수준 | ID·링크 작업을 `full`/`ids`/`none`으로 확인. `full`은 의미 ID·문서 지도·Index·상호 링크·검사 수행 |
 | 분석 | `glossary`, `domain`, `processes`, `flows`, `validation` 생성. 사실·추론·질문을 분리하고 원문 위치를 인용 |
 | ID | `V/P/F-{AREA}-{TOPIC}-{NN}` 형식. 심각도를 ID에 넣지 않고, `index.md`에 AREA 코드·개수와 Finding/Process/Flow Index를 기록 |
 | 링크 | 문서 상단 지도, `index.md`의 Finding/Process/Flow Index, 상대 링크·앵커. `scripts/check_links.py`로 검사하고 깨진 링크가 있으면 완료로 보고하지 않음 |
@@ -132,3 +134,4 @@
 | 2026-10-28 | `dependency-update` 추가 (3모드, 생태계별 수동 절차) | `.omo/evidence/2026-10-28-dependency-update.md` |
 | 2026-10-28 | 모든 스킬 ID에 `gorani-` prefix 적용 (v3.0.0) | `.omo/evidence/2026-10-28-skill-rename.md` |
 | 2026-10-28 | `gorani-spec-analysis` 추가 (기획서 md 변환·용어·도메인·프로세스·플로우·검증, 의미 기반 ID·문서 링크) | `.omo/evidence/2026-10-28-spec-analysis.md` |
+| 2026-10-28 | `source.plain.md`·원문 보존 선택 추가 (v3.2.0) | `.omo/evidence/2026-10-28-spec-analysis.md` |

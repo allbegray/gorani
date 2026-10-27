@@ -85,8 +85,10 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 기획서 원본을 markdown으로 변환하고, 용어·도메인·프로세스·플로우차트·검증 결과를 한 패키지로 정리합니다.
 
 - 입력: PDF, DOCX, PPTX, HWP, XLSX, Markdown
-- 원본은 보존하고 `source.md`에 변환 도구와 손실 경고를 기록
-- 결과: `docs/spec/<slug>/`에 `source`, `index`, `glossary`, `domain`, `processes`, `flows`, `validation`
+- 변환 원문 보존 여부를 먼저 선택: `both`(기본), `plain`, `trace`, `none`
+- ID·링크 작업 수준을 선택: `full`(기본), `ids`, `none`. `full`은 시간이 더 걸리지만 검색·추적이 좋아짐
+- 원본은 보존하고 `source.plain.md`에 단순 변환, `source.md`에 변환 도구와 손실 경고를 기록
+- 결과: `docs/spec/<slug>/`에 `source.plain`, `source`, `index`, `glossary`, `domain`, `processes`, `flows`, `validation`
 - ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식으로, 접두사에서 내용 영역을 유추
 - 문서 상단 지도, Finding/Process/Flow Index, 상대 링크·앵커로 문서 간 이동
 - [scripts/check_links.py](skills/gorani-spec-analysis/scripts/check_links.py)로 상대 링크와 앵커 검사
