@@ -73,6 +73,24 @@ python3 skills/gorani-release-note/scripts/notes_build.py --input samples/releas
 
 샘플은 전체 형식으로 생성합니다. 실제 프로젝트에서는 필요한 형식만 `--formats`로 지정합니다.
 
+## gorani-spec-analysis
+
+| 파일 | 내용 |
+| --- | --- |
+| `source.md` | 변환된 기획서 원문 예시 (가상 장비 예약 서비스) |
+| `index.md` | 분석 범위·핵심 발견·결정 필요 항목 |
+| `glossary.md` | 용어 사전과 동의어·충돌 |
+| `domain.md` | 도메인 모델과 Mermaid 클래스 다이어그램 |
+| `processes.md` | 예약·승인·수령·반납 프로세스 |
+| `flows.md` | 예약·승인 Mermaid 플로우차트 |
+| `validation.md` | finding 10건과 추적성 |
+
+샘플 기획서는 가상이며 Markdown 입력이라 PDF·DOCX 변환 손실 검증은 포함하지 않습니다. 실제 변환은 스킬의 형식별 도구 표를 따릅니다.
+
+ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식을 사용합니다. 샘플은 `P-RESERVATION-CREATE-01`, `F-RESERVATION-CREATE-01`, `V-PROC-RETURN-01`처럼 접두사에서 내용 영역을 유추할 수 있게 했고, `RESERVATION`은 샘플 `index.md`에서 추가한 프로젝트별 AREA입니다.
+
+각 문서 상단에는 문서 지도가 있고, `index.md`에는 Finding/Process/Flow Index가 있습니다. 프로세스·플로우·finding은 서로 상대 링크와 앵커로 연결됩니다.
+
 ## 주의
 
 - 샘플 데이터는 형식을 보여주기 위한 가상 데이터입니다. 실제 프로젝트 결과가 아닙니다.

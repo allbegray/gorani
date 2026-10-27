@@ -12,6 +12,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | `gorani-license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀 |
 | `gorani-release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
 | `gorani-dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
+| `gorani-spec-analysis` | 기획서를 정리·검토할 때, 용어·도메인·프로세스·흐름을 뽑을 때 | markdown 원문, 용어 사전, 도메인 모델, 프로세스·플로우, 검증 리포트 |
 
 ## 각 스킬이 하는 일
 
@@ -79,6 +80,19 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - major 변경·프레임워크 범위 밖 재정의·모드 3은 계획을 보여 주고 확인 후 적용
 - npm/pnpm/yarn, pip/Poetry/uv, Flutter, Maven/Gradle, .NET, Go, Cargo, Bundler, Composer 절차를 안내
 
+### gorani-spec-analysis
+
+기획서 원본을 markdown으로 변환하고, 용어·도메인·프로세스·플로우차트·검증 결과를 한 패키지로 정리합니다.
+
+- 입력: PDF, DOCX, PPTX, HWP, XLSX, Markdown
+- 원본은 보존하고 `source.md`에 변환 도구와 손실 경고를 기록
+- 결과: `docs/spec/<slug>/`에 `source`, `index`, `glossary`, `domain`, `processes`, `flows`, `validation`
+- ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식으로, 접두사에서 내용 영역을 유추
+- 문서 상단 지도, Finding/Process/Flow Index, 상대 링크·앵커로 문서 간 이동
+- [scripts/check_links.py](skills/gorani-spec-analysis/scripts/check_links.py)로 상대 링크와 앵커 검사
+- 원문에 없는 규칙은 사실로 쓰지 않고 `추론`·`질문`으로 분리
+- 변환 도구가 없으면 설치를 임의로 하지 않고 대체 도구나 markdown 입력을 안내
+
 ## 설치
 
 스킬 폴더를 에이전트가 읽는 위치에 연결합니다. 심볼릭 링크를 쓸 수 없는 환경(Windows 등)에서는 같은 경로에 폴더를 복사하세요.
@@ -94,7 +108,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -104,14 +118,14 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
-opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 여섯 스킬이 보입니다.
+opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 일곱 스킬이 보입니다.
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`를 넣습니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`를 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -177,6 +191,7 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/release-note/release-notes-short.txt` | 스토어 짧은 버전 (기본 500자) |
 | `samples/release-note/release-notes-store.txt` | 스토어 긴 버전 (기본 4,000자) |
 | `samples/release-note/release-notes-internal.md` | commit 매핑·검토 기록 (내부용, 배포 제외) |
+| `samples/spec-analysis/` | 기획서 분석 패키지 (source, index, glossary, domain, processes, flows, validation) |
 
 샘플 데이터는 형식 설명용 가상 데이터입니다. 재생성 명령은 `samples/README.md`에 있습니다.
 
@@ -215,3 +230,7 @@ samples/<스킬>/                    예시 입력과 결과물
 | gorani-dependency-update에서 프레임워크 관리 판정이 애매함 | peerDependencies, BOM, SDK manifest, 공식 업데이트 도구를 근거로 삼고, 근거가 없으면 관리하지 않는 것으로 두고 가정을 기록 |
 | gorani-dependency-update에서 CVE 도구가 없음 | `osv-scanner` 또는 OSV API로 확인. 둘 다 불가능하면 "CVE 미확인"으로 남기고 없음으로 단정하지 않음 |
 | gorani-dependency-update 모드 3에서 peer 충돌 | `--force` 금지. 프레임워크 패밀리를 함께 올리거나 모드 1로 되돌리고 충돌 패키지를 보고 |
+| gorani-spec-analysis 변환 도구가 없음 | `pandoc`·`markitdown`·`pdftotext` 등을 안내하고 임의 설치하지 않음. 사용자가 markdown·텍스트를 제공할 수 있음 |
+| 스캔 PDF가 변환되지 않음 | OCR 도구나 원문 텍스트를 요청. 인식되지 않은 내용을 추측하지 않음 |
+| HWP가 변환되지 않음 | `hwp5txt` 또는 LibreOffice로 DOCX 변환 후 `pandoc` 사용 |
+| Mermaid 플로우차트가 렌더링되지 않음 | 노드를 줄이고 문법을 단순화. `mmdc`가 없으면 소스만 남기고 렌더링 미실행을 명시 |

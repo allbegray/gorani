@@ -1,6 +1,27 @@
 # 변경 이력
 
-최신 버전은 3.0.0(2026-10-28)입니다. 3.0.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.1.0(2026-10-28)입니다. 3.1.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 3.1.0 · 2026-10-28
+
+기획서 분석 스킬 추가
+
+**추가**
+
+- `gorani-spec-analysis`: 기획서를 markdown으로 변환하고 용어·도메인·프로세스·Mermaid 플로우차트·검증 리포트 생성
+- `source`, `index`, `glossary`, `domain`, `processes`, `flows`, `validation` 7종 산출물
+- PDF·DOCX·PPTX·HWP·XLSX·Markdown 변환 도구 선택과 충실도 점검 절차
+- 사실·추론·질문 분리, blocker/major/minor/question 검증과 추적성
+- `V/P/F-{AREA}-{TOPIC}-{NN}` 의미 기반 ID 규칙과 `index.md`의 AREA 카탈로그·ID Index
+- 문서 지도, Finding/Process/Flow Index, 문서 간 상대 링크·앵커와 링크 검사 절차
+- `scripts/check_links.py`: 상대 링크·앵커 검사 스크립트
+
+**변경**
+
+- README 스킬 표·설치·예시에 `gorani-spec-analysis` 등록
+- AGENTS 3장에 `gorani-spec-analysis` 계약 추가
+- `samples/spec-analysis/` 샘플 패키지 추가
+- 샘플과 문서의 ID를 의미 기반 접두사로 변경
 
 ## 3.0.0 · 2026-10-28
 
