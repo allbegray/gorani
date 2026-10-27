@@ -125,6 +125,19 @@ for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-lice
 
 opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 일곱 스킬이 보입니다.
 
+## 도구 자동 설치
+
+모든 스킬은 필요한 프로그램이 없으면 자동 설치를 시도합니다.
+
+- OS 패키지 관리자(`brew`, `apt-get`, `dnf`, `pacman`, `winget`, `choco`, `scoop`)와 언어 패키지 관리자(`uv`, `pipx`, `npm`, `cargo`, `go`)를 우선합니다.
+- 작업에 필요한 도구만 설치하고, 무관한 패키지나 전체 도구 묶음은 설치하지 않습니다.
+- 설치 전에 도구와 명령을 알립니다. 사용자가 거부하면 설치하지 않고 대체 도구나 입력 파일을 요청합니다.
+- 사용자 권한 설치를 우선하고, `sudo`가 필요하면 `sudo -n`으로만 시도합니다. 암호 입력을 요구하지 않습니다.
+- 공식 패키지·저장소만 사용합니다. `curl | sh`, 출처 불명 바이너리, 임의 URL 설치는 금지합니다.
+- 설치 후 `command -v`와 `--version`으로 확인하고, 실패하면 대체 도구나 입력 파일을 요청합니다.
+- 설치한 도구·버전·실패 사유를 결과나 evidence에 기록합니다.
+- 문서·고객 데이터를 설치 과정에서 외부로 보내지 않습니다.
+
 ## 프롬프트로 쓰기
 
 저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`를 넣습니다.
@@ -219,20 +232,20 @@ samples/<스킬>/                    예시 입력과 결과물
 | --- | --- |
 | 스킬 목록에 안 보임 | `SKILL.md` 대문자 여부, frontmatter의 `name`이 폴더명과 같은지, 같은 이름의 스킬이 여러 위치에 있는지 |
 | 루트 `.md`가 `docs/`로 이동함 | gorani-docs-governance가 문서 세트 외 `.md`를 옮긴 것. 스킬 폴더는 대상이 아님 |
-| gorani-cve-scan이 도구가 없다고 함 | `brew install osv-scanner trivy syft grype` 후 재실행. 스킬은 도구를 임의 설치하지 않음 |
-| gorani-license-notice가 syft가 없다고 함 | `brew install syft` 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
-| VEX 엑셀 생성 실패 | VEX 보고서를 요청한 경우에만 openpyxl 필요. 요청하지 않았으면 생성하지 않으며, 필요할 때 `python3 -m pip install --user openpyxl` |
+| gorani-cve-scan이 도구가 없다고 함 | 스킬이 `## 도구 설치` 원칙에 따라 자동 설치를 시도. 실패하면 표시된 명령으로 수동 설치 후 재실행 |
+| gorani-license-notice가 syft가 없다고 함 | 스킬이 자동 설치를 시도. 실패하면 표시된 명령으로 수동 설치 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
+| VEX 엑셀 생성 실패 | VEX 보고서를 요청한 경우에만 openpyxl 필요. 요청하지 않았으면 생성하지 않으며, 필요할 때 스킬이 자동 설치를 시도 |
 | gorani-release-check가 브랜치를 못 찾음 | `git fetch origin` 후 `main`·`develop` 존재 확인. 다른 이름이면 스킬에 알려줄 것 |
 | gorani-license-notice에서 라이선스 전문이 비어 있음 | 대상 패키지가 설치되어 있는지 확인. `npm ci --omit=dev` 후 재수집. 원본에 LICENSE가 없으면 입력 JSON에 원문을 넣거나 검토 목록에 남김 |
 | HTML이 앱 WebView에서 안 열림 | 파일을 앱 자산에 실제로 복사했는지, CSP·WebView의 JavaScript 설정 확인. 검색만 안 되고 목록은 보여야 정상 |
-| `--xlsx`에서 openpyxl 오류 | 선택한 다른 형식은 이미 생성됨. 엑셀이 필요할 때만 `python3 -m pip install --user openpyxl` |
+| `--xlsx`에서 openpyxl 오류 | 선택한 다른 형식은 이미 생성됨. 엑셀이 필요할 때만 스킬이 자동 설치를 시도 |
 | gorani-release-note가 이전 태그를 못 찾음 | `git tag`로 릴리스 태그를 확인하고 `--from`을 지정. 태그가 없으면 임의로 만들지 않음 |
 | gorani-release-note `--strict`에서 note/reason 오류 | 포함 commit에는 `note`, 제외 commit에는 `reason`을 채움. 수집 직후에는 비어 있음 |
 | 스토어 요약 글자 수 초과 | `short_summary`·`store_summary`를 줄이거나 `limits`를 조정. 제출 화면의 실제 제한을 확인 |
 | gorani-dependency-update에서 프레임워크 관리 판정이 애매함 | peerDependencies, BOM, SDK manifest, 공식 업데이트 도구를 근거로 삼고, 근거가 없으면 관리하지 않는 것으로 두고 가정을 기록 |
-| gorani-dependency-update에서 CVE 도구가 없음 | `osv-scanner` 또는 OSV API로 확인. 둘 다 불가능하면 "CVE 미확인"으로 남기고 없음으로 단정하지 않음 |
+| gorani-dependency-update에서 CVE 도구가 없음 | 자동 설치를 시도하고, 실패하면 `osv-scanner` 또는 OSV API로 확인. 둘 다 불가능하면 "CVE 미확인"으로 남기고 없음으로 단정하지 않음 |
 | gorani-dependency-update 모드 3에서 peer 충돌 | `--force` 금지. 프레임워크 패밀리를 함께 올리거나 모드 1로 되돌리고 충돌 패키지를 보고 |
-| gorani-spec-analysis 변환 도구가 없음 | `pandoc`·`markitdown`·`pdftotext` 등을 안내하고 임의 설치하지 않음. 사용자가 markdown·텍스트를 제공할 수 있음 |
+| gorani-spec-analysis 변환 도구가 없음 | 스킬이 자동 설치를 시도. 실패하면 사용자가 markdown·텍스트를 제공할 수 있음 |
 | 스캔 PDF가 변환되지 않음 | OCR 도구나 원문 텍스트를 요청. 인식되지 않은 내용을 추측하지 않음 |
-| HWP가 변환되지 않음 | `hwp5txt` 또는 LibreOffice로 DOCX 변환 후 `pandoc` 사용 |
-| Mermaid 플로우차트가 렌더링되지 않음 | 노드를 줄이고 문법을 단순화. `mmdc`가 없으면 소스만 남기고 렌더링 미실행을 명시 |
+| HWP가 변환되지 않음 | `hwp5txt` 자동 설치를 시도하고, 실패하면 LibreOffice로 DOCX 변환 후 `pandoc` 사용 |
+| Mermaid 플로우차트가 렌더링되지 않음 | 노드를 줄이고 문법을 단순화. `mmdc` 자동 설치를 시도하고, 실패하면 소스만 남기고 렌더링 미실행을 명시 |
