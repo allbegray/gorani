@@ -1,5 +1,19 @@
 # 변경 이력
 
+## [v1.0.0] - 2026-10-27
+
+### 추가
+- 프롬프트 모음집 구조: prompts/ 플랫 디렉터리 (파일 1개 = 완결된 지시문)
+- README 프롬프트 목록·프롬프트 추가 규칙 섹션
+
+### 변경
+- 프로젝트 성격: 단일 룰북 배포 → AI CLI 프롬프트 모음집
+- `PROMPT.md` → `prompts/docs-governance.md` (내용 동일, raw URL 변경)
+- README를 프롬프트 목록·추가 규칙 중심으로 재구성
+
+### 제거
+- 루트 `PROMPT.md` (prompts/docs-governance.md 로 대체, 기존 raw URL 무효)
+
 ## [v0.3.0] - 2026-08-13
 
 ### 추가
