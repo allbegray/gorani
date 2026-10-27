@@ -11,6 +11,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | `release-check` | 운영 배포 전 운영·개발 브랜치 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
 | `license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 자기완결 HTML 고지 페이지 + 검토 목록 |
 | `release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 고객용 HTML·md, 스토어 요약, 내부 검토 기록 |
+| `dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
 
 ## 각 스킬이 하는 일
 
@@ -61,6 +62,19 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - `--strict`로 commit 매핑·지원 경로·링크를 검증
 - 앱스토어 글자 수 제한은 입력의 `limits`로 조정
 
+### dependency-update
+
+의존성 업데이트 방식을 세 가지로 나눠 사용자와 먼저 정합니다. 생태계별 스크립트를 두지 않고, 저장소의 패키지 매니저와 프레임워크 도구를 그대로 사용합니다.
+
+| 모드 | 장점 | 주의 |
+| --- | --- | --- |
+| 1. 언어·프레임워크 최신 안정화 (기본) | 현재 라인의 호환성을 지키고 변경 범위가 작음 | 일부 CVE가 남을 수 있음. 프레임워크 패치를 빠르게 따라가는 패스트 팔로워 운영 필요 |
+| 2. 모드 1 + CVE 재정의 | 잔여 CVE까지 보완 | BOM property override·버전 불일치로 의존성 관리가 지저분해질 수 있음. override 제거 계획 필요 |
+| 3. 전체 최신 안정 | 모든 직접 의존성을 최신으로 맞춤 | 호환성이 깨질 수 있음. 호환성 체크와 충분한 테스트 케이스 필수, major 변경은 분리 권장 |
+
+- major 변경·프레임워크 범위 밖 재정의·모드 3은 계획을 보여 주고 확인 후 적용
+- npm/pnpm/yarn, pip/Poetry/uv, Flutter, Maven/Gradle, .NET, Go, Cargo, Bundler, Composer 절차를 안내
+
 ## 설치
 
 스킬 폴더를 에이전트가 읽는 위치에 연결합니다. 심볼릭 링크를 쓸 수 없는 환경(Windows 등)에서는 같은 경로에 폴더를 복사하세요.
@@ -76,7 +90,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in docs-governance cve-scan release-check license-notice release-note; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in docs-governance cve-scan release-check license-notice release-note dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -86,14 +100,14 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in docs-governance cve-scan release-check license-notice release-note; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in docs-governance cve-scan release-check license-notice release-note dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
-opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 다섯 스킬이 보입니다.
+opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 여섯 스킬이 보입니다.
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `docs-governance`, `cve-scan`, `release-check`, `license-notice`, `release-note`를 넣습니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `docs-governance`, `cve-scan`, `release-check`, `license-notice`, `release-note`, `dependency-update`를 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -194,3 +208,6 @@ samples/<스킬>/             예시 입력과 결과물
 | release-note가 이전 태그를 못 찾음 | `git tag`로 릴리스 태그를 확인하고 `--from`을 지정. 태그가 없으면 임의로 만들지 않음 |
 | release-note `--strict`에서 note/reason 오류 | 포함 commit에는 `note`, 제외 commit에는 `reason`을 채움. 수집 직후에는 비어 있음 |
 | 스토어 요약 글자 수 초과 | `short_summary`·`store_summary`를 줄이거나 `limits`를 조정. 제출 화면의 실제 제한을 확인 |
+| dependency-update에서 프레임워크 관리 판정이 애매함 | peerDependencies, BOM, SDK manifest, 공식 업데이트 도구를 근거로 삼고, 근거가 없으면 관리하지 않는 것으로 두고 가정을 기록 |
+| dependency-update에서 CVE 도구가 없음 | `osv-scanner` 또는 OSV API로 확인. 둘 다 불가능하면 "CVE 미확인"으로 남기고 없음으로 단정하지 않음 |
+| dependency-update 모드 3에서 peer 충돌 | `--force` 금지. 프레임워크 패밀리를 함께 올리거나 모드 1로 되돌리고 충돌 패키지를 보고 |

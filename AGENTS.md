@@ -75,6 +75,17 @@
 | 스크립트 | `scripts/notes_build.py`, 표준 라이브러리만. 앱스토어 제한은 입력 `limits` 로 조정 |
 | 검증 | 샘플 입력으로 고객용·내부용 생성, `--strict`, 글자 수, 외부 리소스 0건 확인 |
 
+### dependency-update
+
+| 항목 | 내용 |
+| --- | --- |
+| 모드 | 1 언어·프레임워크 최신 안정화(기본), 2 CVE 최소 수정(프레임워크 패치와 비교), 3 전체 최신 안정 |
+| 선택 기준 | 1 호환성 우선·패스트 팔로워, 2 CVE 보완·override 관리 부담, 3 최신화·호환성 테스트 필수 |
+| 관리 판정 | peerDependencies, BOM, SDK manifest, constraints, 공식 업데이트 도구를 근거로 기록. 근거가 없으면 비관리로 두고 가정을 명시 |
+| 적용 | 해당 생태계의 네이티브 패키지 매니저 사용. lockfile 직접 편집·`--force` 금지 |
+| 검증 | install/build/test/lint/typecheck, audit 재확인, lockfile diff, 프레임워크 진단 |
+| 금지 | 확인 없는 모드 3, 프레임워크 관리 무단 갱신, CVE 재정의 은폐, 자동 커밋·푸시 |
+
 ## 4. 스킬 형식
 
 - frontmatter: `name`(폴더명과 동일, 소문자·숫자·하이픈), `description`(1-1024자, 언제 쓰는지 중심)
@@ -103,3 +114,4 @@
 | 2026-10-27 | README·AGENTS·CHANGELOG를 새 양식으로 재작성 | - |
 | 2026-10-27 | `license-notice` 추가 (HTML 고지 페이지, 검토 목록 분리) | `.omo/evidence/2026-10-27-license-notice.md` |
 | 2026-10-27 | `release-note` 추가 (고객용 HTML·md·스토어 요약, 내부 매핑) | `.omo/evidence/2026-10-27-release-note.md` |
+| 2026-10-28 | `dependency-update` 추가 (3모드, 생태계별 수동 절차) | `.omo/evidence/2026-10-28-dependency-update.md` |
