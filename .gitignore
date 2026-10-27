@@ -1,3 +1,7 @@
 .omo/
 .codegraph/
 .idea/
+.security/
+.qa/
+__pycache__/
+*.pyc

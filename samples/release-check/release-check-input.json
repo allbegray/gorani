@@ -1,0 +1,133 @@
+{
+  "project": "todo-cli",
+  "release_version": "v1.4.0",
+  "base": "main",
+  "head": "develop",
+  "merge_base": "a1b2c3d4",
+  "generated_at": "2026-10-27T11:00:00+09:00",
+  "stats": { "commits": 7, "files": 12, "additions": 340, "deletions": 85 },
+  "commits": [
+    {
+      "hash": "9f8e7d6",
+      "date": "2026-10-26",
+      "author": "hong",
+      "subject": "feat: 비밀번호 재설정 링크 만료 추가"
+    },
+    {
+      "hash": "7c6b5a4",
+      "date": "2026-10-25",
+      "author": "kim",
+      "subject": "feat: 할 일 공유 API 추가"
+    },
+    {
+      "hash": "3d2c1b0",
+      "date": "2026-10-24",
+      "author": "lee",
+      "subject": "chore: 의존성 업데이트"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/auth/reset.js",
+      "status": "M",
+      "additions": 60,
+      "deletions": 12,
+      "area": "인증",
+      "related_items": ["P0-QA-01", "P0-DEV-01"]
+    },
+    {
+      "path": "src/api/share.js",
+      "status": "A",
+      "additions": 120,
+      "deletions": 0,
+      "area": "API",
+      "related_items": ["P1-QA-01", "P1-DEV-01"]
+    },
+    {
+      "path": "db/migrations/0042_share.sql",
+      "status": "A",
+      "additions": 20,
+      "deletions": 0,
+      "area": "DB",
+      "related_items": ["P0-DEV-02"]
+    },
+    {
+      "path": "README.md",
+      "status": "M",
+      "additions": 5,
+      "deletions": 3,
+      "area": "문서",
+      "related_items": ["P2-QA-01"]
+    }
+  ],
+  "items": [
+    {
+      "priority": "P0",
+      "audience": "dev",
+      "area": "DB",
+      "item": "공유 테이블 마이그레이션이 기존 데이터와 충돌하지 않는지 확인",
+      "expected": "마이그레이션 롤백 후 재적용 시 오류 없음",
+      "evidence": "db/migrations/0042_share.sql (3d2c1b0)",
+      "status": "미확인"
+    },
+    {
+      "priority": "P1",
+      "audience": "qa",
+      "area": "API",
+      "item": "공유 API 호출 시 권한 없는 사용자가 403을 받는지 확인",
+      "expected": "403과 오류 코드 반환",
+      "evidence": "src/api/share.js (7c6b5a4)",
+      "status": "미확인"
+    },
+    {
+      "priority": "P0",
+      "audience": "qa",
+      "area": "인증",
+      "item": "비밀번호 재설정 링크가 24시간 후 만료되는지 확인",
+      "expected": "만료 후 접근 시 오류 메시지 표시",
+      "evidence": "src/auth/reset.js (9f8e7d6)",
+      "status": "미확인"
+    },
+    {
+      "priority": "P2",
+      "audience": "qa",
+      "area": "문서",
+      "item": "README의 공유 기능 설명이 실제 동작과 일치하는지 확인",
+      "expected": "설명대로 동작",
+      "evidence": "README.md",
+      "status": "해당 없음"
+    },
+    {
+      "priority": "P1",
+      "audience": "dev",
+      "area": "API",
+      "item": "공유 API의 트랜잭션 경계가 중복 생성을 막는지 코드 확인",
+      "expected": "동시 요청에서도 1건만 생성",
+      "evidence": "src/api/share.js (7c6b5a4)",
+      "status": "미확인"
+    },
+    {
+      "priority": "P0",
+      "audience": "dev",
+      "area": "인증",
+      "item": "토큰 만료 검증이 서버 시간 기준인지 코드 확인",
+      "expected": "클라이언트 시간 조작으로 우회 불가",
+      "evidence": "src/auth/reset.js (9f8e7d6)",
+      "status": "미확인"
+    }
+  ],
+  "logs": [
+    {
+      "command": "git diff --stat origin/main...origin/develop",
+      "exit_code": 0,
+      "status": "ok",
+      "note": ""
+    },
+    {
+      "command": "git log --oneline --no-merges origin/main..origin/develop",
+      "exit_code": 0,
+      "status": "ok",
+      "note": ""
+    }
+  ]
+}
