@@ -1,0 +1,269 @@
+{
+  "product": "SampleApp",
+  "version": "2.0.0",
+  "release_date": "2026-10-27",
+  "language": "ko",
+  "audience": "앱 사용자",
+  "generated_at": "2026-10-27T10:00:00+09:00",
+  "range": {
+    "from": "v1.0.0",
+    "to": "HEAD",
+    "from_commit": "0f1e2d3c4b5a69788796a5b4c3d2e1f001234567",
+    "to_commit": "b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7081"
+  },
+  "headline": "더 빠르고 안전해진 SampleApp 2.0",
+  "summary": "검색과 시작 속도를 개선하고 미리보기 보안을 강화했습니다. 레거시 내보내기 기능은 종료되므로 업그레이드 전 확인해 주세요.",
+  "highlights": [
+    {
+      "title": "오타에도 강한 검색",
+      "description": "비슷한 단어와 띄어쓰기가 달라도 원하는 항목을 찾습니다."
+    },
+    {
+      "title": "더 빠른 시작",
+      "description": "앱을 열고 첫 화면이 보이기까지 걸리는 시간을 줄였습니다."
+    },
+    {
+      "title": "안전한 미리보기",
+      "description": "링크 미리보기에서 발생할 수 있던 스크립트 실행 문제를 수정했습니다."
+    }
+  ],
+  "sections": [
+    {
+      "name": "새 기능",
+      "items": [
+        {
+          "title": "오타에도 강한 검색",
+          "description": "검색어에 오타가 있거나 띄어쓰기가 달라도 비슷한 결과를 찾아 줍니다.",
+          "action": "검색창에 평소 쓰던 단어를 그대로 입력해 보세요.",
+          "link": "https://example.com/help/search"
+        }
+      ]
+    },
+    {
+      "name": "개선",
+      "items": [
+        {
+          "title": "앱 시작 속도 개선",
+          "description": "앱을 열고 첫 화면이 보이기까지 걸리는 시간을 줄였습니다.",
+          "action": "앱을 다시 실행하면 적용됩니다."
+        }
+      ]
+    },
+    {
+      "name": "수정",
+      "items": [
+        {
+          "title": "로그인이 풀리던 문제",
+          "description": "인증 토큰이 만료된 뒤에도 로그인 상태가 유지되지 않던 문제를 고쳤습니다.",
+          "action": "앱을 다시 실행하면 적용됩니다."
+        }
+      ]
+    },
+    {
+      "name": "보안",
+      "items": [
+        {
+          "title": "미리보기 화면 보안 강화",
+          "description": "링크 미리보기에서 발생할 수 있던 스크립트 실행 문제를 수정했습니다. 추가로 하실 일은 없습니다.",
+          "action": ""
+        }
+      ]
+    }
+  ],
+  "breaking_changes": [
+    {
+      "title": "레거시 내보내기 기능 종료",
+      "description": "2.0.0부터 예전 '내보내기(legacy)' 메뉴를 제공하지 않습니다. 새 내보내기 메뉴를 이용해 주세요.",
+      "action": "설정 > 데이터 > 내보내기에서 새 형식으로 내보낸 뒤, 기존 자동화가 있다면 새 API로 교체하세요.",
+      "link": "https://example.com/help/export"
+    }
+  ],
+  "known_issues": [
+    "일부 Android 기기에서 첫 실행 후 홈 위젯이 늦게 갱신될 수 있습니다. 다음 업데이트에서 개선할 예정입니다."
+  ],
+  "upgrade_notes": [
+    "2.0.0은 이전 버전의 레거시 내보내기 파일을 읽지 않습니다.",
+    "자동화에서 레거시 내보내기 API를 사용하고 있다면 새 API로 교체해야 합니다."
+  ],
+  "support": {
+    "url": "https://example.com/support",
+    "email": "support@example.com"
+  },
+  "short_summary": "SampleApp 2.0.0 업데이트\n• 검색: 오타가 있어도 원하는 항목을 찾습니다.\n• 시작 속도: 앱을 여는 시간이 짧아졌습니다.\n• 보안: 미리보기 화면의 스크립트 실행 문제를 수정했습니다.\n레거시 내보내기 기능은 종료됩니다. 자세한 내용은 앱에서 확인해 주세요.",
+  "store_summary": "SampleApp 2.0.0 업데이트\n\n이번 업데이트에서는 검색과 시작 속도를 개선하고, 미리보기 화면의 보안을 강화했습니다.\n\n• 검색: 오타나 띄어쓰기 차이가 있어도 원하는 항목을 찾습니다.\n• 시작 속도: 앱을 열고 첫 화면이 보이기까지 걸리는 시간을 줄였습니다.\n• 보안: 링크 미리보기에서 발생할 수 있던 스크립트 실행 문제를 수정했습니다.\n\n[업그레이드 전 확인]\n레거시 내보내기 기능이 종료됩니다. 설정 > 데이터 > 내보내기에서 새 형식으로 내보낸 뒤, 기존 자동화가 있다면 새 API로 교체해 주세요.\n\n자세한 내용: https://example.com/help/release-2-0",
+  "limits": {
+    "short": 500,
+    "store": 4000
+  },
+  "commits": [
+    {
+      "hash": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+      "short_hash": "a1b2c3d",
+      "date": "2026-10-20",
+      "author": "Sample Author",
+      "subject": "feat(search): add fuzzy search",
+      "body": "",
+      "files": [
+        "src/search/index.ts",
+        "src/search/fuzzy.ts"
+      ],
+      "file_count": 2,
+      "references": [
+        "#101"
+      ],
+      "suggested_category": "feature",
+      "suggested_section": "새 기능",
+      "confidence": "high",
+      "breaking": false,
+      "included": true,
+      "note": "새 기능 > 오타에도 강한 검색"
+    },
+    {
+      "hash": "b2c3d4e5f60718293a4b5c6d7e8f901234567890",
+      "short_hash": "b2c3d4e",
+      "date": "2026-10-21",
+      "author": "Sample Author",
+      "subject": "fix(auth): handle expired token",
+      "body": "",
+      "files": [
+        "src/auth/session.ts"
+      ],
+      "file_count": 1,
+      "references": [
+        "#102"
+      ],
+      "suggested_category": "fix",
+      "suggested_section": "수정",
+      "confidence": "high",
+      "breaking": false,
+      "included": true,
+      "note": "수정 > 로그인이 풀리던 문제"
+    },
+    {
+      "hash": "c3d4e5f60718293a4b5c6d7e8f90123456789012",
+      "short_hash": "c3d4e5f",
+      "date": "2026-10-22",
+      "author": "Sample Author",
+      "subject": "perf: reduce startup time",
+      "body": "",
+      "files": [
+        "src/bootstrap.ts"
+      ],
+      "file_count": 1,
+      "references": [],
+      "suggested_category": "improvement",
+      "suggested_section": "개선",
+      "confidence": "high",
+      "breaking": false,
+      "included": true,
+      "note": "개선 > 앱 시작 속도 개선"
+    },
+    {
+      "hash": "d4e5f60718293a4b5c6d7e8f9012345678901234",
+      "short_hash": "d4e5f60",
+      "date": "2026-10-23",
+      "author": "Sample Author",
+      "subject": "chore: bump dependencies",
+      "body": "",
+      "files": [
+        "package-lock.json"
+      ],
+      "file_count": 1,
+      "references": [],
+      "suggested_category": "internal",
+      "suggested_section": "제외",
+      "confidence": "high",
+      "breaking": false,
+      "included": false,
+      "reason": "의존성 업데이트, 고객에게 보이는 변화 없음"
+    },
+    {
+      "hash": "e5f60718293a4b5c6d7e8f901234567890123456",
+      "short_hash": "e5f6071",
+      "date": "2026-10-24",
+      "author": "Sample Author",
+      "subject": "feat!: remove legacy export",
+      "body": "BREAKING CHANGE: The legacy export API has been removed.",
+      "files": [
+        "src/export/legacy.ts",
+        "src/export/index.ts"
+      ],
+      "file_count": 2,
+      "references": [
+        "#103"
+      ],
+      "suggested_category": "feature",
+      "suggested_section": "업그레이드 전 확인",
+      "confidence": "high",
+      "breaking": true,
+      "included": true,
+      "note": "업그레이드 전 확인 > 레거시 내보내기 기능 종료"
+    },
+    {
+      "hash": "f60718293a4b5c6d7e8f90123456789012345678",
+      "short_hash": "f607182",
+      "date": "2026-10-25",
+      "author": "Sample Author",
+      "subject": "security: patch XSS in preview",
+      "body": "",
+      "files": [
+        "src/preview/render.ts"
+      ],
+      "file_count": 1,
+      "references": [],
+      "suggested_category": "security",
+      "suggested_section": "보안",
+      "confidence": "high",
+      "breaking": false,
+      "included": true,
+      "note": "보안 > 미리보기 화면 보안 강화"
+    },
+    {
+      "hash": "a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f70",
+      "short_hash": "a7b8c9d",
+      "date": "2026-10-26",
+      "author": "Sample Author",
+      "subject": "docs: update README",
+      "body": "",
+      "files": [
+        "README.md"
+      ],
+      "file_count": 1,
+      "references": [],
+      "suggested_category": "internal",
+      "suggested_section": "제외",
+      "confidence": "high",
+      "breaking": false,
+      "included": false,
+      "reason": "README 문서 변경"
+    },
+    {
+      "hash": "b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f7081",
+      "short_hash": "b8c9d0e",
+      "date": "2026-10-27",
+      "author": "Sample Author",
+      "subject": "Update stuff",
+      "body": "",
+      "files": [
+        "src/misc.ts"
+      ],
+      "file_count": 1,
+      "references": [],
+      "suggested_category": "other",
+      "suggested_section": "기타",
+      "confidence": "low",
+      "breaking": false,
+      "included": false,
+      "reason": "사용자에게 보이는 변화가 없어 제외"
+    }
+  ],
+  "warnings": [],
+  "logs": [
+    {
+      "tool": "git",
+      "command": "git log --no-merges --date=short v1.0.0..HEAD",
+      "status": "ok",
+      "note": "commits 8, merges excluded 0"
+    }
+  ]
+}

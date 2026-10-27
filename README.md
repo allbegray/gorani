@@ -9,6 +9,8 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | `docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
 | `cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | VEX 엑셀 + OpenVEX JSON, 조치 목록 |
 | `release-check` | 운영 배포 전 운영·개발 브랜치 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
+| `license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 자기완결 HTML 고지 페이지 + 검토 목록 |
+| `release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 고객용 HTML·md, 스토어 요약, 내부 검토 기록 |
 
 ## 각 스킬이 하는 일
 
@@ -39,6 +41,26 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - 결과: `docs/qa/release-check-YYYY-MM-DD.xlsx`
 - 코드는 건드리지 않음
 
+### license-notice
+
+SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지를 만듭니다. 기본 결과는 엑셀이 아니라 자기완결 HTML입니다.
+
+- `syft`로 SBOM을 만들고, 설치된 패키지에서 라이선스 전문과 저작권 표시를 수집
+- 같은 라이선스 전문은 한 번만 수록하고, 패키지별 저작권은 각 패키지에 표시
+- 결과: `docs/licenses/third-party-notices.html`, `.md`, 검토가 필요하면 `-review.md`
+- copyleft·복수 라이선스·미확인·전문 없음은 검토 목록으로 분리하고, 앱 페이지에는 내부 사유를 넣지 않음
+- `--xlsx`를 주면 검토용 엑셀도 생성. 기본 경로는 openpyxl 없이 동작
+
+### release-note
+
+이전 릴리스 이후 변경을 고객이 읽을 문장으로 바꿉니다. 커밋을 그대로 나열하지 않고, 고객에게 보이는 변화만 골라 이점과 사용 방법을 설명합니다.
+
+- `git log` 범위를 수집해 기능·개선·수정·보안으로 분류하고 내부 변경은 제외 후보로 표시
+- 깨지는 변경은 가장 위에 두고, 고객이 따라 할 수 있는 조치를 함께 작성
+- 결과: `docs/releases/release-notes.html`, `.md`, 스토어 짧은·긴 요약, 내부 검토 기록
+- `--strict`로 commit 매핑·지원 경로·링크를 검증
+- 앱스토어 글자 수 제한은 입력의 `limits`로 조정
+
 ## 설치
 
 스킬 폴더를 에이전트가 읽는 위치에 연결합니다. 심볼릭 링크를 쓸 수 없는 환경(Windows 등)에서는 같은 경로에 폴더를 복사하세요.
@@ -54,7 +76,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in docs-governance cve-scan release-check; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in docs-governance cve-scan release-check license-notice release-note; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -64,14 +86,14 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in docs-governance cve-scan release-check; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in docs-governance cve-scan release-check license-notice release-note; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
-opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 세 스킬이 보입니다.
+opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 다섯 스킬이 보입니다.
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `docs-governance`, `cve-scan`, `release-check`, `license-notice`, `release-note`를 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -129,13 +151,21 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/cve-scan/cve-report-sample.xlsx` | VEX 엑셀 (요약, VEX 판정, 원본 findings, 실행 로그) |
 | `samples/cve-scan/cve-report-sample.vex.json` | OpenVEX JSON |
 | `samples/release-check/release-check-sample.xlsx` | 릴리스 점검 엑셀 (요약, 점검 항목, 변경 파일, 커밋, 실행 로그) |
+| `samples/license-notice/third-party-notices.html` | 앱에 넣는 자기완결 고지 페이지 (검색, 라이선스 전문 접기) |
+| `samples/license-notice/third-party-notices.md` | 같은 내용의 평문 |
+| `samples/license-notice/third-party-notices-review.md` | 검토 필요 목록 (내부용, 배포 제외) |
+| `samples/release-note/release-notes.html` | 고객용 릴리스 노트 페이지 |
+| `samples/release-note/release-notes.md` | 고객용 긴 버전 (GitHub Release·문서) |
+| `samples/release-note/release-notes-short.txt` | 스토어 짧은 버전 (기본 500자) |
+| `samples/release-note/release-notes-store.txt` | 스토어 긴 버전 (기본 4,000자) |
+| `samples/release-note/release-notes-internal.md` | commit 매핑·검토 기록 (내부용, 배포 제외) |
 
 샘플 데이터는 형식 설명용 가상 데이터입니다. 재생성 명령은 `samples/README.md`에 있습니다.
 
 ## 스킬 추가
 
 1. `skills/<이름>/SKILL.md`를 만듭니다. frontmatter의 `name`은 폴더명과 같게, `description`은 언제 쓰는지를 앞세워 1-1024자로 씁니다.
-2. 본문은 H1 + 역할 한 줄로 시작하고 `## 전제`, `## 절차`, `## 출력`, `## 금지` 같은 섹션을 둡니다.
+2. 본문은 H1 + 역할 한 줄로 시작하고 `## 전제`, `## 절차`, `## 출력 형식`, `## 실패 처리`, `## 금지` 같은 섹션을 둡니다.
 3. 한국어로 쓰고, 코드 펜스 없이 인라인으로 표기하며, 다른 스킬이나 저장소 밖 파일을 참조하지 않습니다.
 4. 보조 스크립트가 필요하면 `skills/<이름>/scripts/`에 둡니다.
 5. 위 스킬 표에 한 줄 추가합니다.
@@ -155,5 +185,12 @@ samples/<스킬>/             예시 입력과 결과물
 | 스킬 목록에 안 보임 | `SKILL.md` 대문자 여부, frontmatter의 `name`이 폴더명과 같은지, 같은 이름의 스킬이 여러 위치에 있는지 |
 | 루트 `.md`가 `docs/`로 이동함 | docs-governance가 문서 세트 외 `.md`를 옮긴 것. 스킬 폴더는 대상이 아님 |
 | cve-scan이 도구가 없다고 함 | `brew install osv-scanner trivy syft grype` 후 재실행. 스킬은 도구를 임의 설치하지 않음 |
+| license-notice가 syft가 없다고 함 | `brew install syft` 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
 | VEX 엑셀 생성 실패 | `python3 -m pip install --user openpyxl` 필요. 설치 전에는 임의 설치하지 않음 |
 | release-check가 브랜치를 못 찾음 | `git fetch origin` 후 `main`·`develop` 존재 확인. 다른 이름이면 스킬에 알려줄 것 |
+| license-notice에서 라이선스 전문이 비어 있음 | 대상 패키지가 설치되어 있는지 확인. `npm ci --omit=dev` 후 재수집. 원본에 LICENSE가 없으면 입력 JSON에 원문을 넣거나 검토 목록에 남김 |
+| HTML이 앱 WebView에서 안 열림 | 파일을 앱 자산에 실제로 복사했는지, CSP·WebView의 JavaScript 설정 확인. 검색만 안 되고 목록은 보여야 정상 |
+| `--xlsx`에서 openpyxl 오류 | HTML·md는 이미 생성됨. 엑셀이 필요할 때만 `python3 -m pip install --user openpyxl` |
+| release-note가 이전 태그를 못 찾음 | `git tag`로 릴리스 태그를 확인하고 `--from`을 지정. 태그가 없으면 임의로 만들지 않음 |
+| release-note `--strict`에서 note/reason 오류 | 포함 commit에는 `note`, 제외 commit에는 `reason`을 채움. 수집 직후에는 비어 있음 |
+| 스토어 요약 글자 수 초과 | `short_summary`·`store_summary`를 줄이거나 `limits`를 조정. 제출 화면의 실제 제한을 확인 |

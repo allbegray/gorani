@@ -1,6 +1,27 @@
 # 변경 이력
 
-최신 버전은 2.0.0(2026-10-27)입니다. 2.0.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 2.1.0(2026-10-27)입니다. 2.1.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 2.1.0 · 2026-10-27
+
+오픈소스 고지 페이지·고객용 릴리스 노트 추가
+
+**추가**
+
+- `license-notice`: SBOM과 패키지의 LICENSE·NOTICE에서 라이선스 전문·저작권 수집
+- 자기완결 HTML 고지 페이지: 검색, 라이선스별 접기, 라이트·다크 모드, 외부 요청 없음
+- `--xlsx` 검토용 엑셀, `--fail-on-review` CI 게이트, `--exclude-dev`
+- `samples/license-notice/`: 입력 JSON, HTML, md, 검토 목록
+- `release-note`: git 범위의 변경을 고객 관점으로 재작성
+- `collect_changes.py`: conventional commit·키워드 분류, 내부 변경 제외 제안, commit 매핑
+- `notes_build.py`: 자기완결 HTML, md, 스토어 짧은·긴 요약, 내부 검토 기록
+- `--strict` 검증과 입력 `limits` 기반 앱스토어 글자 수 확인
+- `samples/release-note/`: 입력 JSON과 고객용·내부용 결과
+
+**변경**
+
+- README 스킬 표·설치·예시에 `license-notice`, `release-note` 등록
+- AGENTS 3장에 두 스킬의 계약 추가
 
 ## 2.0.0 · 2026-10-27
 

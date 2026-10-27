@@ -53,6 +53,28 @@
 | 스크립트 | openpyxl만 사용, 입력 JSON과 시트 구성 유지 |
 | 검증 | 샘플 JSON으로 xlsx 생성 후 시트 순서·ID·집계 확인 |
 
+### license-notice
+
+| 항목 | 내용 |
+| --- | --- |
+| 수집 | `syft` CycloneDX + 설치된 패키지의 LICENSE·NOTICE. npm·pnpm·pub·python 경로만 자동 수집 |
+| 기본 출력 | 자기완결 HTML + md. 외부 CSS·JS·폰트·이미지 금지, CSP `default-src 'none'` |
+| 검토 분리 | copyleft·복수 라이선스·unknown·전문 없음·dev 는 `-review.md`(필요 시 xlsx). HTML·md 에 내부 사유 금지 |
+| 분류 | none/notice/weak/strong/network/unknown, OR=약한 쪽, AND=강한 쪽 |
+| 스크립트 | `scripts/collect_licenses.py`, `scripts/notice_build.py`. HTML·md 는 표준 라이브러리만, xlsx 는 `--xlsx` + openpyxl |
+| 검증 | 샘플 입력으로 HTML·md·review 생성, 외부 요청 0건, 검토 파일 미포함 확인 |
+
+### release-note
+
+| 항목 | 내용 |
+| --- | --- |
+| 수집 | `scripts/collect_changes.py` — `git log --no-merges`, conventional commit·키워드로 분류 제안, 내부 변경은 제외 후보 |
+| 기본 출력 | `release-notes.md`, `.html`, `-short.txt`(기본 500자), `-store.txt`(기본 4,000자), `-internal.md` |
+| 고객 문구 | 이점 중심, 내부 용어·commit hash·이슈 번호·직원 이름·내부 URL 금지, 보안 상세 금지 |
+| 검토 분리 | commit 매핑과 제외 사유는 `-internal.md` 에만. 고객 md·html·txt 에 넣지 않음 |
+| 스크립트 | `scripts/notes_build.py`, 표준 라이브러리만. 앱스토어 제한은 입력 `limits` 로 조정 |
+| 검증 | 샘플 입력으로 고객용·내부용 생성, `--strict`, 글자 수, 외부 리소스 0건 확인 |
+
 ## 4. 스킬 형식
 
 - frontmatter: `name`(폴더명과 동일, 소문자·숫자·하이픈), `description`(1-1024자, 언제 쓰는지 중심)
@@ -79,3 +101,5 @@
 | 날짜 | 변경 | 기록 |
 | --- | --- | --- |
 | 2026-10-27 | README·AGENTS·CHANGELOG를 새 양식으로 재작성 | - |
+| 2026-10-27 | `license-notice` 추가 (HTML 고지 페이지, 검토 목록 분리) | `.omo/evidence/2026-10-27-license-notice.md` |
+| 2026-10-27 | `release-note` 추가 (고객용 HTML·md·스토어 요약, 내부 매핑) | `.omo/evidence/2026-10-27-release-note.md` |

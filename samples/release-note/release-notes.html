@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>SampleApp 2.0.0 — 릴리스 노트</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #fbfaf7;
+  --fg: #1d1b18;
+  --muted: #6b655d;
+  --line: #e5e0d8;
+  --panel: #ffffff;
+  --accent: #8a4b1f;
+  --accent-soft: #f6e7da;
+  --warn: #7a4a00;
+  --warn-bg: #fff4dd;
+  --warn-line: #e8c27a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141210;
+    --fg: #eee9e1;
+    --muted: #a9a198;
+    --line: #302b26;
+    --panel: #1b1815;
+    --accent: #e6b184;
+    --accent-soft: #3a2a1d;
+    --warn: #ffd28a;
+    --warn-bg: #2d2415;
+    --warn-line: #6b5226;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Hiragino Sans", "Noto Sans KR", sans-serif;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+main, header, footer { max-width: 46rem; margin: 0 auto; padding: 0 1.25rem; }
+header { padding-top: 3rem; padding-bottom: 1.5rem; }
+.eyebrow { margin: 0; color: var(--accent); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+h1 { margin: .5rem 0; font-size: 2rem; line-height: 1.2; letter-spacing: -.02em; }
+.meta { margin: 0; color: var(--muted); font-size: .875rem; }
+.headline { margin: 1.5rem 0 .5rem; font-size: 1.125rem; font-weight: 700; }
+.summary { margin: 0; color: var(--muted); }
+main { padding-bottom: 3rem; }
+section { padding: 1.75rem 0; border-top: 1px solid var(--line); }
+h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+h3 { margin: 1.25rem 0 .35rem; font-size: 1rem; }
+p { margin: .4rem 0; }
+ul { margin: .4rem 0; padding-left: 1.2rem; }
+li { margin: .3rem 0; }
+.callout { margin: 1.5rem 0 0; padding: 1rem 1.1rem; background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: .75rem; }
+.callout h2 { color: var(--warn); }
+.callout h3 { color: var(--warn); }
+.highlights { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
+.card { padding: .9rem 1rem; background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; }
+.card h3 { margin: 0 0 .3rem; }
+.card p { color: var(--muted); font-size: .9375rem; }
+.action { margin-top: .4rem; color: var(--muted); font-size: .875rem; }
+a { color: var(--accent); text-underline-offset: 2px; }
+footer { padding-top: 1.5rem; padding-bottom: 3rem; color: var(--muted); font-size: .8125rem; border-top: 1px solid var(--line); }
+@media print {
+  body { background: #fff; color: #000; font-size: 11pt; }
+  section { break-inside: avoid-page; }
+  a { color: #000; }
+}
+</style>
+</head>
+<body>
+<header>
+<p class="eyebrow">릴리스 노트</p>
+<h1>SampleApp 2.0.0</h1>
+<p class="meta">2026-10-27 · 앱 사용자</p>
+<p class="headline">더 빠르고 안전해진 SampleApp 2.0</p>
+<p class="summary">검색과 시작 속도를 개선하고 미리보기 보안을 강화했습니다. 레거시 내보내기 기능은 종료되므로 업그레이드 전 확인해 주세요.</p>
+</header>
+<main>
+<section class="callout">
+<h2>업그레이드 전 확인</h2>
+<h3>레거시 내보내기 기능 종료</h3>
+<p>2.0.0부터 예전 &#x27;내보내기(legacy)&#x27; 메뉴를 제공하지 않습니다. 새 내보내기 메뉴를 이용해 주세요.</p>
+<p class="action">조치: 설정 &gt; 데이터 &gt; 내보내기에서 새 형식으로 내보낸 뒤, 기존 자동화가 있다면 새 API로 교체하세요.</p>
+<p><a href="https://example.com/help/export" rel="noopener noreferrer">자세히 보기</a></p>
+</section>
+<section>
+<h2>한눈에 보기</h2>
+<div class="highlights">
+<div class="card">
+<h3>오타에도 강한 검색</h3>
+<p>비슷한 단어와 띄어쓰기가 달라도 원하는 항목을 찾습니다.</p>
+</div>
+<div class="card">
+<h3>더 빠른 시작</h3>
+<p>앱을 열고 첫 화면이 보이기까지 걸리는 시간을 줄였습니다.</p>
+</div>
+<div class="card">
+<h3>안전한 미리보기</h3>
+<p>링크 미리보기에서 발생할 수 있던 스크립트 실행 문제를 수정했습니다.</p>
+</div>
+</div>
+</section>
+<section>
+<h2>새 기능</h2>
+<h3>오타에도 강한 검색</h3>
+<p>검색어에 오타가 있거나 띄어쓰기가 달라도 비슷한 결과를 찾아 줍니다.</p>
+<p class="action">사용 방법: 검색창에 평소 쓰던 단어를 그대로 입력해 보세요.</p>
+<p><a href="https://example.com/help/search" rel="noopener noreferrer">자세히 보기</a></p>
+</section>
+<section>
+<h2>개선</h2>
+<h3>앱 시작 속도 개선</h3>
+<p>앱을 열고 첫 화면이 보이기까지 걸리는 시간을 줄였습니다.</p>
+<p class="action">사용 방법: 앱을 다시 실행하면 적용됩니다.</p>
+</section>
+<section>
+<h2>수정</h2>
+<h3>로그인이 풀리던 문제</h3>
+<p>인증 토큰이 만료된 뒤에도 로그인 상태가 유지되지 않던 문제를 고쳤습니다.</p>
+<p class="action">사용 방법: 앱을 다시 실행하면 적용됩니다.</p>
+</section>
+<section>
+<h2>보안</h2>
+<h3>미리보기 화면 보안 강화</h3>
+<p>링크 미리보기에서 발생할 수 있던 스크립트 실행 문제를 수정했습니다. 추가로 하실 일은 없습니다.</p>
+</section>
+<section>
+<h2>업그레이드 참고</h2>
+<ul>
+<li>2.0.0은 이전 버전의 레거시 내보내기 파일을 읽지 않습니다.</li>
+<li>자동화에서 레거시 내보내기 API를 사용하고 있다면 새 API로 교체해야 합니다.</li>
+</ul>
+</section>
+<section>
+<h2>알려진 문제</h2>
+<ul>
+<li>일부 Android 기기에서 첫 실행 후 홈 위젯이 늦게 갱신될 수 있습니다. 다음 업데이트에서 개선할 예정입니다.</li>
+</ul>
+</section>
+<section>
+<h2>도움이 필요하신가요?</h2>
+<ul>
+<li><a href="https://example.com/support" rel="noopener noreferrer">https://example.com/support</a></li>
+<li><a href="mailto:support@example.com">support@example.com</a></li>
+</ul>
+</section>
+</main>
+<footer>
+SampleApp 2.0.0
+</footer>
+</body>
+</html>
