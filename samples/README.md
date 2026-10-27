@@ -1,8 +1,10 @@
 # 샘플 보고서
 
+스킬 ID는 `gorani-` prefix를 쓰지만, 샘플 디렉터리는 산출물 종류를 따라 짧은 이름을 유지합니다.
+
 스킬이 만드는 엑셀·JSON 결과의 예시입니다. 입력 JSON을 함께 두어 같은 결과를 다시 만들 수 있습니다.
 
-## cve-scan
+## gorani-cve-scan
 
 | 파일 | 내용 |
 | --- | --- |
@@ -15,10 +17,10 @@ VEX 엑셀과 OpenVEX는 사용자가 요청했을 때만 생성되는 선택 �
 재생성:
 
 ```bash
-python3 skills/cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-input.json --outdir samples/cve-scan --name cve-report-sample
+python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-input.json --outdir samples/cve-scan --name cve-report-sample
 ```
 
-## release-check
+## gorani-release-check
 
 | 파일 | 내용 |
 | --- | --- |
@@ -28,10 +30,10 @@ python3 skills/cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-input.j
 재생성:
 
 ```bash
-python3 skills/release-check/scripts/release_xlsx.py --input samples/release-check/release-check-input.json --outdir samples/release-check --name release-check-sample
+python3 skills/gorani-release-check/scripts/release_xlsx.py --input samples/release-check/release-check-input.json --outdir samples/release-check --name release-check-sample
 ```
 
-## license-notice
+## gorani-license-notice
 
 | 파일 | 내용 |
 | --- | --- |
@@ -43,14 +45,14 @@ python3 skills/release-check/scripts/release_xlsx.py --input samples/release-che
 재생성:
 
 ```bash
-python3 skills/license-notice/scripts/notice_build.py --input samples/license-notice/license-input.json --outdir samples/license-notice --name third-party-notices --formats html,md,review
+python3 skills/gorani-license-notice/scripts/notice_build.py --input samples/license-notice/license-input.json --outdir samples/license-notice --name third-party-notices --formats html,md,review
 ```
 
 샘플 프로젝트와 `legacy-widget` 패키지는 가상입니다. 라이선스 원문은 실제 npm 패키지에서 가져왔고, unknown·전문 없음·copyleft 검토 항목을 함께 보여 줍니다.
 
 샘플은 `html,md,review` 기본 형식으로 생성합니다. 엑셀은 `--formats xlsx`를 추가했을 때만 만듭니다.
 
-## release-note
+## gorani-release-note
 
 | 파일 | 내용 |
 | --- | --- |
@@ -64,7 +66,7 @@ python3 skills/license-notice/scripts/notice_build.py --input samples/license-no
 재생성:
 
 ```bash
-python3 skills/release-note/scripts/notes_build.py --input samples/release-note/release-input.json --outdir samples/release-note --name release-notes --formats html,md,short,store,internal
+python3 skills/gorani-release-note/scripts/notes_build.py --input samples/release-note/release-input.json --outdir samples/release-note --name release-notes --formats html,md,short,store,internal
 ```
 
 샘플 제품·버전·링크는 가상입니다. 깨지는 변경, 알려진 문제, 고객 문의 경로, 내부 commit 매핑을 함께 보여 줍니다.
@@ -74,6 +76,6 @@ python3 skills/release-note/scripts/notes_build.py --input samples/release-note/
 ## 주의
 
 - 샘플 데이터는 형식을 보여주기 위한 가상 데이터입니다. 실제 프로젝트 결과가 아닙니다.
-- cve-scan·release-check 샘플과 license-notice의 `--xlsx`는 `openpyxl`이 필요합니다: `python3 -m pip install --user openpyxl`
-- release-note는 표준 라이브러리만 사용합니다.
+- gorani-cve-scan·gorani-release-check 샘플과 gorani-license-notice의 `--xlsx`는 `openpyxl`이 필요합니다: `python3 -m pip install --user openpyxl`
+- gorani-release-note는 표준 라이브러리만 사용합니다.
 - 스크립트나 시트 구성을 바꾸면 샘플도 다시 생성해 같은 변경에 포함합니다.

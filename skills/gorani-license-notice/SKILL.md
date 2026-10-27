@@ -1,5 +1,5 @@
 ---
-name: license-notice
+name: gorani-license-notice
 description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 SBOM과 패키지의 LICENSE·NOTICE 원문에서 자동 생성한다. 앱 배포 전 고지 의무 확인, 서드파티 라이선스 목록 작성, copyleft 검토가 필요할 때 사용.
 ---
 

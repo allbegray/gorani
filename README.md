@@ -6,16 +6,16 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 
 | 스킬 | 이럴 때 | 결과 |
 | --- | --- | --- |
-| `docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
-| `cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
-| `release-check` | 운영 배포 전 운영·개발 브랜치 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
-| `license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀 |
-| `release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
-| `dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
+| `gorani-docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
+| `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
+| `gorani-release-check` | 운영 배포 전 운영·개발 브랜치 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
+| `gorani-license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀 |
+| `gorani-release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
+| `gorani-dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
 
 ## 각 스킬이 하는 일
 
-### docs-governance
+### gorani-docs-governance
 
 프로젝트를 먼저 읽고 실제 빌드·테스트 명령을 반영해 문서 11종을 만듭니다.
 
@@ -24,7 +24,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 
 기존 문서는 지우지 않고 빠진 섹션만 채웁니다. LICENSE, 신고 연락처, CODEOWNERS 핸들은 확인 없이 만들지 않고, 비대화형 실행이면 "확인 필요"로 남깁니다.
 
-### cve-scan
+### gorani-cve-scan
 
 `syft`로 SBOM을 만들고 `grype`로 대조한 뒤 `osv-scanner`와 `trivy`로 교차 확인합니다. 대상은 소스 의존성이고 컨테이너 이미지는 다루지 않습니다.
 
@@ -35,7 +35,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - 요청 시 결과: `docs/security/cve-report-YYYY-MM-DD.xlsx`와 같은 이름의 `.vex.json`
 - 패키지를 올리지는 않고 조치 목록만 제시
 
-### release-check
+### gorani-release-check
 
 `main...develop`(merge-base 기준) diff에서 커밋과 변경 파일을 모아 점검 항목을 만듭니다.
 
@@ -44,7 +44,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - 결과: `docs/qa/release-check-YYYY-MM-DD.xlsx`
 - 코드는 건드리지 않음
 
-### license-notice
+### gorani-license-notice
 
 SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지를 만듭니다. 기본 결과는 엑셀이 아니라 자기완결 HTML입니다.
 
@@ -55,7 +55,7 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - copyleft·복수 라이선스·미확인·전문 없음은 검토 목록으로 분리하고, 앱 페이지에는 내부 사유를 넣지 않음
 - `--xlsx` 또는 `--formats xlsx`를 주면 검토용 엑셀도 생성. 기본 경로는 openpyxl 없이 동작
 
-### release-note
+### gorani-release-note
 
 이전 릴리스 이후 변경을 고객이 읽을 문장으로 바꿉니다. 커밋을 그대로 나열하지 않고, 고객에게 보이는 변화만 골라 이점과 사용 방법을 설명합니다.
 
@@ -66,7 +66,7 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - `--strict`로 commit 매핑·지원 경로·링크를 검증
 - 앱스토어 글자 수 제한은 입력의 `limits`로 조정
 
-### dependency-update
+### gorani-dependency-update
 
 의존성 업데이트 방식을 세 가지로 나눠 사용자와 먼저 정합니다. 생태계별 스크립트를 두지 않고, 저장소의 패키지 매니저와 프레임워크 도구를 그대로 사용합니다.
 
@@ -94,7 +94,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in docs-governance cve-scan release-check license-notice release-note dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -104,14 +104,14 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in docs-governance cve-scan release-check license-notice release-note dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 여섯 스킬이 보입니다.
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `docs-governance`, `cve-scan`, `release-check`, `license-notice`, `release-note`, `dependency-update`를 넣습니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`를 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -122,33 +122,33 @@ PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 
 opencode — 프롬프트는 위치 인자로 넘깁니다. `-p`는 password 플래그라 쓰지 않습니다.
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); opencode run "$p"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="gorani-docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); opencode run "$p"
 ```
 
 ```bash
-S=docs-governance
+S=gorani-docs-governance
 opencode run "$(curl -fsSL https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md)"
 ```
 
 Claude Code — `-p`는 print(비대화형) 모드입니다.
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); claude -p "$p"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="gorani-docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); claude -p "$p"
 ```
 
 ```bash
-S=docs-governance
+S=gorani-docs-governance
 claude -p "$(curl -fsSL https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md)"
 ```
 
 Codex — 비대화형 실행은 `exec`입니다.
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); codex exec "$p"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="gorani-docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); codex exec "$p"
 ```
 
 ```bash
-S=docs-governance
+S=gorani-docs-governance
 codex exec "$(curl -fsSL https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md)"
 ```
 
@@ -157,7 +157,7 @@ codex exec "$(curl -fsSL https://raw.githubusercontent.com/allbegray/gorani/main
 opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--auto`를 쓸 수 있습니다. 명시적으로 거부하지 않은 모든 권한을 자동 승인하므로 신뢰하는 환경에서만 사용하세요.
 
 ```powershell
-[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); opencode run --auto "$p"
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $S="gorani-docs-governance"; $p=$(curl.exe -fsSL "https://raw.githubusercontent.com/allbegray/gorani/main/skills/$S/SKILL.md"); opencode run --auto "$p"
 ```
 
 ## 결과물 예시
@@ -182,18 +182,18 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 
 ## 스킬 추가
 
-1. `skills/<이름>/SKILL.md`를 만듭니다. frontmatter의 `name`은 폴더명과 같게, `description`은 언제 쓰는지를 앞세워 1-1024자로 씁니다.
+1. `skills/gorani-<이름>/SKILL.md`를 만듭니다. frontmatter의 `name`은 `gorani-<이름>`으로 폴더명과 같게, `description`은 언제 쓰는지를 앞세워 1-1024자로 씁니다. 스킬 ID 충돌을 피하기 위해 `gorani-` prefix를 붙입니다.
 2. 본문은 H1 + 역할 한 줄로 시작하고 `## 전제`, `## 절차`, `## 출력 형식`, `## 실패 처리`, `## 금지` 같은 섹션을 둡니다.
 3. 한국어로 쓰고, 코드 펜스 없이 인라인으로 표기하며, 다른 스킬이나 저장소 밖 파일을 참조하지 않습니다.
-4. 보조 스크립트가 필요하면 `skills/<이름>/scripts/`에 둡니다.
+4. 보조 스크립트가 필요하면 `skills/gorani-<이름>/scripts/`에 둡니다.
 5. 위 스킬 표에 한 줄 추가합니다.
 
 ## 저장소 구조
 
 ```
-skills/<이름>/SKILL.md      스킬 본문
-skills/<이름>/scripts/      스킬 전용 스크립트
-samples/<스킬>/             예시 입력과 결과물
+skills/gorani-<이름>/SKILL.md      스킬 본문
+skills/gorani-<이름>/scripts/      스킬 전용 스크립트
+samples/<스킬>/                    예시 입력과 결과물
 ```
 
 ## 문제 해결
@@ -201,17 +201,17 @@ samples/<스킬>/             예시 입력과 결과물
 | 증상 | 확인 |
 | --- | --- |
 | 스킬 목록에 안 보임 | `SKILL.md` 대문자 여부, frontmatter의 `name`이 폴더명과 같은지, 같은 이름의 스킬이 여러 위치에 있는지 |
-| 루트 `.md`가 `docs/`로 이동함 | docs-governance가 문서 세트 외 `.md`를 옮긴 것. 스킬 폴더는 대상이 아님 |
-| cve-scan이 도구가 없다고 함 | `brew install osv-scanner trivy syft grype` 후 재실행. 스킬은 도구를 임의 설치하지 않음 |
-| license-notice가 syft가 없다고 함 | `brew install syft` 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
+| 루트 `.md`가 `docs/`로 이동함 | gorani-docs-governance가 문서 세트 외 `.md`를 옮긴 것. 스킬 폴더는 대상이 아님 |
+| gorani-cve-scan이 도구가 없다고 함 | `brew install osv-scanner trivy syft grype` 후 재실행. 스킬은 도구를 임의 설치하지 않음 |
+| gorani-license-notice가 syft가 없다고 함 | `brew install syft` 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
 | VEX 엑셀 생성 실패 | VEX 보고서를 요청한 경우에만 openpyxl 필요. 요청하지 않았으면 생성하지 않으며, 필요할 때 `python3 -m pip install --user openpyxl` |
-| release-check가 브랜치를 못 찾음 | `git fetch origin` 후 `main`·`develop` 존재 확인. 다른 이름이면 스킬에 알려줄 것 |
-| license-notice에서 라이선스 전문이 비어 있음 | 대상 패키지가 설치되어 있는지 확인. `npm ci --omit=dev` 후 재수집. 원본에 LICENSE가 없으면 입력 JSON에 원문을 넣거나 검토 목록에 남김 |
+| gorani-release-check가 브랜치를 못 찾음 | `git fetch origin` 후 `main`·`develop` 존재 확인. 다른 이름이면 스킬에 알려줄 것 |
+| gorani-license-notice에서 라이선스 전문이 비어 있음 | 대상 패키지가 설치되어 있는지 확인. `npm ci --omit=dev` 후 재수집. 원본에 LICENSE가 없으면 입력 JSON에 원문을 넣거나 검토 목록에 남김 |
 | HTML이 앱 WebView에서 안 열림 | 파일을 앱 자산에 실제로 복사했는지, CSP·WebView의 JavaScript 설정 확인. 검색만 안 되고 목록은 보여야 정상 |
 | `--xlsx`에서 openpyxl 오류 | 선택한 다른 형식은 이미 생성됨. 엑셀이 필요할 때만 `python3 -m pip install --user openpyxl` |
-| release-note가 이전 태그를 못 찾음 | `git tag`로 릴리스 태그를 확인하고 `--from`을 지정. 태그가 없으면 임의로 만들지 않음 |
-| release-note `--strict`에서 note/reason 오류 | 포함 commit에는 `note`, 제외 commit에는 `reason`을 채움. 수집 직후에는 비어 있음 |
+| gorani-release-note가 이전 태그를 못 찾음 | `git tag`로 릴리스 태그를 확인하고 `--from`을 지정. 태그가 없으면 임의로 만들지 않음 |
+| gorani-release-note `--strict`에서 note/reason 오류 | 포함 commit에는 `note`, 제외 commit에는 `reason`을 채움. 수집 직후에는 비어 있음 |
 | 스토어 요약 글자 수 초과 | `short_summary`·`store_summary`를 줄이거나 `limits`를 조정. 제출 화면의 실제 제한을 확인 |
-| dependency-update에서 프레임워크 관리 판정이 애매함 | peerDependencies, BOM, SDK manifest, 공식 업데이트 도구를 근거로 삼고, 근거가 없으면 관리하지 않는 것으로 두고 가정을 기록 |
-| dependency-update에서 CVE 도구가 없음 | `osv-scanner` 또는 OSV API로 확인. 둘 다 불가능하면 "CVE 미확인"으로 남기고 없음으로 단정하지 않음 |
-| dependency-update 모드 3에서 peer 충돌 | `--force` 금지. 프레임워크 패밀리를 함께 올리거나 모드 1로 되돌리고 충돌 패키지를 보고 |
+| gorani-dependency-update에서 프레임워크 관리 판정이 애매함 | peerDependencies, BOM, SDK manifest, 공식 업데이트 도구를 근거로 삼고, 근거가 없으면 관리하지 않는 것으로 두고 가정을 기록 |
+| gorani-dependency-update에서 CVE 도구가 없음 | `osv-scanner` 또는 OSV API로 확인. 둘 다 불가능하면 "CVE 미확인"으로 남기고 없음으로 단정하지 않음 |
+| gorani-dependency-update 모드 3에서 peer 충돌 | `--force` 금지. 프레임워크 패밀리를 함께 올리거나 모드 1로 되돌리고 충돌 패키지를 보고 |

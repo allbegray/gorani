@@ -1,5 +1,5 @@
 ---
-name: docs-governance
+name: gorani-docs-governance
 description: GitHub 기본 문서 세트(README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CHANGELOG, 이슈/PR 템플릿, CODEOWNERS)를 생성·유지한다. 새 프로젝트의 문서 체계를 세팅하거나, 코드 변경 후 문서를 최신화하거나, push 전 문서 점검이 필요할 때 사용.
 ---
 

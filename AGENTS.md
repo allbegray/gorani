@@ -24,7 +24,7 @@
 
 ## 3. 스킬 계약
 
-### docs-governance
+### gorani-docs-governance
 
 | 항목 | 내용 |
 | --- | --- |
@@ -33,7 +33,7 @@
 | 금지 | 확인 전 LICENSE 선택, 신고 연락처·CODEOWNERS 핸들 생성 |
 | 검증 | scratch 저장소에서 11종 생성과 필수 섹션 확인 |
 
-### cve-scan
+### gorani-cve-scan
 
 | 항목 | 내용 |
 | --- | --- |
@@ -44,7 +44,7 @@
 | 스크립트 | `scripts/vex_xlsx.py`, openpyxl만 사용, 입력 JSON과 시트 구성 유지 |
 | 검증 | 샘플 lockfile로 네 도구 실행 + 요청 시 xlsx·OpenVEX 생성 확인 |
 
-### release-check
+### gorani-release-check
 
 | 항목 | 내용 |
 | --- | --- |
@@ -54,7 +54,7 @@
 | 스크립트 | openpyxl만 사용, 입력 JSON과 시트 구성 유지 |
 | 검증 | 샘플 JSON으로 xlsx 생성 후 시트 순서·ID·집계 확인 |
 
-### license-notice
+### gorani-license-notice
 
 | 항목 | 내용 |
 | --- | --- |
@@ -66,7 +66,7 @@
 | 스크립트 | `scripts/collect_licenses.py`, `scripts/notice_build.py`. HTML·md 는 표준 라이브러리만, xlsx는 `--formats xlsx` 또는 `--xlsx` + openpyxl |
 | 검증 | 샘플 입력으로 HTML·md·review 생성, 외부 요청 0건, 검토 파일 미포함 확인 |
 
-### release-note
+### gorani-release-note
 
 | 항목 | 내용 |
 | --- | --- |
@@ -78,7 +78,7 @@
 | 스크립트 | `scripts/notes_build.py`, 표준 라이브러리만. 앱스토어 제한은 입력 `limits` 로 조정 |
 | 검증 | 샘플 입력으로 고객용·내부용 생성, `--strict`, 글자 수, 외부 리소스 0건 확인 |
 
-### dependency-update
+### gorani-dependency-update
 
 | 항목 | 내용 |
 | --- | --- |
@@ -91,11 +91,12 @@
 
 ## 4. 스킬 형식
 
-- frontmatter: `name`(폴더명과 동일, 소문자·숫자·하이픈), `description`(1-1024자, 언제 쓰는지 중심)
+- frontmatter: `name`(`gorani-` prefix를 붙인 폴더명과 동일, 소문자·숫자·하이픈), `description`(1-1024자, 언제 쓰는지 중심)
+- 새 스킬 ID는 `gorani-` prefix를 붙여 다른 설치본과의 충돌을 피함
 - 본문: H1 + 역할 한 줄 → `## 전제`, `## 절차`, `## 출력 형식`, `## 실패 처리`, `## 금지` 같은 섹션
 - 한국어, 코드 펜스 없는 인라인 표기
 - 다른 스킬이나 저장소 밖 파일을 참조하지 않는 자체 완결 지시문
-- 스크립트는 `skills/<이름>/scripts/`에만 둠
+- 스크립트는 `skills/gorani-<이름>/scripts/`에만 둠
 
 ## 5. 검증과 기록
 
@@ -118,3 +119,4 @@
 | 2026-10-27 | `license-notice` 추가 (HTML 고지 페이지, 검토 목록 분리) | `.omo/evidence/2026-10-27-license-notice.md` |
 | 2026-10-27 | `release-note` 추가 (고객용 HTML·md·스토어 요약, 내부 매핑) | `.omo/evidence/2026-10-27-release-note.md` |
 | 2026-10-28 | `dependency-update` 추가 (3모드, 생태계별 수동 절차) | `.omo/evidence/2026-10-28-dependency-update.md` |
+| 2026-10-28 | 모든 스킬 ID에 `gorani-` prefix 적용 (v3.0.0) | `.omo/evidence/2026-10-28-skill-rename.md` |

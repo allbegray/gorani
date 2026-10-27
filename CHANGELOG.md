@@ -1,6 +1,27 @@
 # 변경 이력
 
-최신 버전은 2.3.0(2026-10-28)입니다. 2.3.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.0.0(2026-10-28)입니다. 3.0.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 3.0.0 · 2026-10-28
+
+스킬 ID에 `gorani-` prefix 적용
+
+**변경**
+
+- 모든 스킬 폴더와 frontmatter `name`을 `gorani-` prefix로 변경
+- `docs-governance` → `gorani-docs-governance`
+- `cve-scan` → `gorani-cve-scan`
+- `release-check` → `gorani-release-check`
+- `license-notice` → `gorani-license-notice`
+- `release-note` → `gorani-release-note`
+- `dependency-update` → `gorani-dependency-update`
+- README 설치 for 루프, 프롬프트 `S` 값, raw URL 경로, AGENTS 계약, samples 재생성 경로 갱신
+
+**마이그레이션**
+
+- 기존 심볼릭 링크(`~/.claude/skills/cve-scan`, `.opencode/skills/cve-scan` 등)를 삭제하고 새 ID로 다시 설치
+- 기존 raw URL(`skills/cve-scan/SKILL.md`)은 새 경로(`skills/gorani-cve-scan/SKILL.md`)로 교체
+- OpenCode는 `@gorani-cve-scan`, Claude Code는 `/gorani-cve-scan`으로 호출. `/gorani:cve-scan`은 플러그인 네임스페이스가 필요
 
 ## 2.3.0 · 2026-10-28
 

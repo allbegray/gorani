@@ -1,5 +1,5 @@
 ---
-name: release-check
+name: gorani-release-check
 description: 운영 배포 전 main 과 develop 브랜치 차이를 분석해 기능 점검 엑셀 보고서를 만든다. P0/P1/P2 우선순위와 QA/개발자 전용 구분을 적용하고, 개발자 전용 항목은 시트 하단에 배치한다. 릴리스 전 최종 점검, 배포 리스크 확인, 브랜치 간 변경 리뷰가 필요할 때 사용.
 ---
 
@@ -38,7 +38,7 @@ description: 운영 배포 전 main 과 develop 브랜치 차이를 분석해 �
 
 스크립트가 점검 항목을 정렬해 엑셀 워크북으로 만듭니다. 개발자 전용 항목은 항상 QA 항목 아래, 시트 하단에 배치됩니다.
 
-- 스크립트 위치: 이 스킬 폴더의 `scripts/release_xlsx.py`. 설치 경로 예: `.opencode/skills/release-check`, `~/.claude/skills/release-check`
+- 스크립트 위치: 이 스킬 폴더의 `scripts/release_xlsx.py`. 설치 경로 예: `.opencode/skills/gorani-release-check`, `~/.claude/skills/gorani-release-check`
 - 출력: `docs/qa/release-check-YYYY-MM-DD.xlsx`
 - 시트 구성
   - 요약: 프로젝트, 비교 브랜치, merge-base, 커밋·파일·증감 라인 수, P0/P1/P2 집계, QA·개발자 건수, 확인 결과 집계
