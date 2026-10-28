@@ -1,5 +1,7 @@
 # Gorani
 
+`Gorani`는 '관리(管理)'를 빠르게 타이핑하다 생긴 오타 '고나리'에서 온 이름입니다.
+
 AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills 표준(`SKILL.md`)을 따르므로 opencode와 Claude Code가 같은 파일을 읽습니다. 설치 없이 프롬프트로 넘길 수도 있습니다.
 
 ## 스킬
