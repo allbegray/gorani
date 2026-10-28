@@ -27,7 +27,7 @@ description: 기획서(PDF, DOCX, PPTX, HWP, XLSX, Markdown 등)를 markdown으�
 
 1. 입력을 확인합니다. 파일 형식, 페이지·슬라이드·시트 수, 언어, 문서 버전, 작성자, 관련 문서를 기록합니다.
 2. 작업 디렉터리와 임시 변환 디렉터리를 만듭니다. 기본 위치는 `docs/spec/<slug>/`이고, 원본은 그대로 둡니다. 이 단계에서 원문 보존 선택(`both`/`plain`/`trace`/`none`)과 ID·링크 작업 수준(`full`/`ids`/`none`)을 확인합니다.
-3. 형식에 맞는 도구로 임시 디렉터리에 `source.plain.md`와 `source.md`를 만듭니다. 원문의 제목·문단·목록·표를 그대로 옮기고, 선택한 파일만 작업 디렉터리로 복사합니다. `none`이면 복사하지 않습니다.
+3. 형식에 맞는 도구로 임시 디렉터리에 단순 변환본과 추적용 변환본을 만듭니다. 원문의 제목·문단·목록·표를 그대로 옮기고, 선택한 파일만 작업 디렉터리의 `source/`에 복사합니다. `none`이면 `source/`를 만들지 않습니다.
 4. 두 원문의 변환 충실도를 확인합니다. 페이지·슬라이드 수, 제목, 표, 이미지, 각주, 빈 페이지가 원본과 맞는지 대조합니다. 누락이 있으면 `warnings`에 적고 사용자에게 알립니다.
 5. 문서 구조를 파악합니다. 장·절·페이지·슬라이드 단위로 섹션 맵을 만들고, 요구사항·정책·데이터·화면·일정이 어디에 있는지 표시합니다.
 6. 용어를 추출합니다. 업무 용어, 액터, 상태, 이벤트, 규칙, 외부 시스템, 약어를 후보로 모으고 정의·동의어·충돌을 정리합니다.
@@ -37,7 +37,7 @@ description: 기획서(PDF, DOCX, PPTX, HWP, XLSX, Markdown 등)를 markdown으�
 10. 검증합니다. 용어·도메인·프로세스·요구사항·일관성·추적성을 점검하고 심각도별 finding을 만듭니다.
 11. 인덱스를 작성합니다. 문서 범위, 핵심 요약, 원문 보존 선택, ID·링크 작업 수준, 산출물 목록, 결정 필요 항목, 준비 상태를 한 페이지에 정리합니다.
 12. 사용자에게 unresolved 항목을 질문합니다. 답이 오면 문서를 갱신하고, 답이 없으면 `질문` 상태로 남깁니다.
-13. 원문 보존이 `none`이면 임시 변환 디렉터리를 삭제하고, `index.md`에 `원문 보존: none`과 삭제 확인을 적습니다.
+13. 원문 보존이 `none`이면 임시 변환 디렉터리와 빈 `source/` 디렉터리를 삭제하고, `index.md`에 `원문 보존: none`과 삭제 확인을 적습니다.
 
 ## 문서 변환
 
@@ -54,14 +54,14 @@ description: 기획서(PDF, DOCX, PPTX, HWP, XLSX, Markdown 등)를 markdown으�
 
 - 도구가 없으면 아래 `## 도구 설치` 원칙에 따라 자동 설치를 시도합니다. 설치를 거부하거나 실패하면 대체 도구를 쓰거나 사용자가 markdown·텍스트를 제공하도록 요청합니다.
 - PDF를 `read` 도구로 읽을 수 있으면 페이지별 텍스트를 확인하는 보조 수단으로 씁니다. 도구 지원 여부는 환경마다 다릅니다.
-- `source.plain.md`는 원문을 읽기 위한 단순 변환입니다. YAML frontmatter, 표 번호, 레이아웃 주석, 분석 문구를 넣지 않습니다.
-- `source.md`는 추적용 변환입니다. `source.plain.md`와 같은 본문에 페이지·슬라이드 표시, 표 번호, 이미지·레이아웃 메모, 변환 warnings를 더합니다.
+- `source/source.plain.md`는 원문을 읽기 위한 단순 변환입니다. YAML frontmatter, 표 번호, 레이아웃 주석, 분석 문구를 넣지 않습니다.
+- `source/source.md`는 추적용 변환입니다. `source/source.plain.md`와 같은 본문에 페이지·슬라이드 표시, 표 번호, 이미지·레이아웃 메모, 변환 warnings를 더합니다.
 - 표는 markdown 표로 옮기고, 병합 셀처럼 표현이 깨지는 부분은 원본 페이지를 병기합니다.
 - 이미지는 본문에 넣지 않되, 이미지 번호·캡션·원본 페이지를 기록하고 `warnings`에 남깁니다.
 - 페이지·슬라이드 표시는 `[p.12]`, `[slide 7]`, `[sheet:예약]`처럼 붙여 추적성을 유지합니다.
-- `source.md` 상단에 `source`, `format`, `pages`/`slides`, `converter`, `converted_at`, `warnings`를 기록합니다.
+- `source/source.md` 상단에 `source`, `format`, `pages`/`slides`, `converter`, `converted_at`, `warnings`를 기록합니다.
 - 변환된 markdown은 원문을 요약하지 않습니다. 분석은 별도 문서에서 합니다.
-- 입력이 Markdown이면 `source.plain.md`는 frontmatter를 제거한 본문으로 둡니다.
+- 입력이 Markdown이면 `source/source.plain.md`는 frontmatter를 제거한 본문으로 둡니다.
 
 ## 원문 보존 선택
 
@@ -69,15 +69,15 @@ description: 기획서(PDF, DOCX, PPTX, HWP, XLSX, Markdown 등)를 markdown으�
 
 | 선택 | 산출물 | 동작 |
 | --- | --- | --- |
-| both | `source.plain.md` + `source.md` | 기본. 단순 변환과 추적용 변환을 모두 남김 |
-| plain | `source.plain.md` | 단순 변환만 남김 |
-| trace | `source.md` | 추적용 변환만 남김 |
+| both | `source/source.plain.md` + `source/source.md` | 기본. 단순 변환과 추적용 변환을 모두 남김 |
+| plain | `source/source.plain.md` | 단순 변환만 남김 |
+| trace | `source/source.md` | 추적용 변환만 남김 |
 | none | 없음 | 임시 변환본으로 분석한 뒤 삭제. 분석 문서만 남김 |
 
 - 답이 없으면 `both`를 기본값으로 쓰고 `index.md`에 “원문 보존: both (기본값)”이라고 적습니다.
-- `none`이어도 분석은 임시 변환본으로 수행합니다. 원문 위치는 `[slide N]`처럼 인용하되, `source.md`/`source.plain.md` 링크는 만들지 않습니다.
+- `none`이어도 분석은 임시 변환본으로 수행합니다. 원문 위치는 `[slide N]`처럼 인용하되, `source/source.md`/`source/source.plain.md` 링크는 만들지 않습니다.
 - `index.md`에 `원문 보존: both|plain|trace|none`을 기록하고, 실제 존재하는 파일만 문서 지도와 산출물 목록에 넣습니다.
-- `plain`이면 `source.md` 링크를, `trace`이면 `source.plain.md` 링크를 만들지 않습니다.
+- `plain`이면 `source/source.md` 링크를, `trace`이면 `source/source.plain.md` 링크를 만들지 않습니다.
 - `none`이면 임시 변환 디렉터리를 분석 종료 후 삭제하고, 삭제 여부를 검증에 적습니다.
 - 사용자가 나중에 원문 보존을 요청하면 원본에서 다시 변환합니다. 임시 파일을 무기한 남기지 않습니다.
 - 원문에 민감정보가 있으면 기본값을 `both`로 두지 말고 사용자에게 다시 확인합니다.
@@ -221,8 +221,8 @@ AREA 코드:
 - `processes.md`의 각 프로세스는 대응 플로우와 finding으로 링크합니다.
 - `flows.md`의 각 플로우는 대응 프로세스와 finding으로 링크합니다.
 - `validation.md`의 각 finding은 관련 프로세스, 플로우, 도메인 섹션으로 링크합니다.
-- 원문을 읽을 때는 `source.plain.md`, 위치를 추적할 때는 `source.md`로 링크합니다. 보존하지 않은 파일에는 링크하지 않습니다.
-- `source.plain.md`와 `source.md`는 슬라이드 앵커에 의존하지 않고 파일 링크만 겁니다.
+- 원문을 읽을 때는 `source/source.plain.md`, 위치를 추적할 때는 `source/source.md`로 링크합니다. 보존하지 않은 파일에는 링크하지 않습니다.
+- `source/source.plain.md`와 `source/source.md`는 슬라이드 앵커에 의존하지 않고 파일 링크만 겁니다.
 
 링크 규칙:
 
@@ -236,7 +236,7 @@ AREA 코드:
 
 완료 전에 링크를 검사합니다.
 
-- 모든 상대 링크의 파일과 앵커가 존재하는지 확인합니다. 스킬 폴더의 `scripts/check_links.py`를 실행합니다. 예: `python3 <스킬 폴더>/scripts/check_links.py docs/spec/<slug>`.
+- 모든 상대 링크의 파일과 앵커가 존재하는지 확인합니다. `source/` 같은 하위 디렉터리의 markdown도 포함합니다. 스킬 폴더의 `scripts/check_links.py`를 실행합니다. 예: `python3 <스킬 폴더>/scripts/check_links.py docs/spec/<slug>`.
 - 깨진 링크가 하나라도 있으면 완료로 보고하지 않습니다.
 - 검사 결과(링크 수, 깨진 링크 0건)를 `validation.md`의 검증 방법에 적습니다.
 - Mermaid 안의 `click` 링크는 렌더러 지원이 다르므로 쓰지 않고, 도표 아래 텍스트 링크로 대신합니다.
@@ -276,12 +276,13 @@ Finding 형식:
 
 ## 출력 형식
 
-`docs/spec/<slug>/` 아래에 다음 파일을 만듭니다. 원문 보존 선택에 따라 `source.plain.md`·`source.md`는 생성하지 않을 수 있습니다.
+`docs/spec/<slug>/` 아래에 다음 파일을 만듭니다. 원문 보존 선택에 따라 `source/source.plain.md`·`source/source.md`는 생성하지 않을 수 있습니다.
 
 | 파일 | 내용 |
 | --- | --- |
-| `source.plain.md` | 단순 변환 원문. 보존 선택 `both`/`plain`일 때만 생성 |
-| `source.md` | 추적용 변환 원문. 보존 선택 `both`/`trace`일 때만 생성. 페이지·슬라이드 표시, 표 번호, 변환 도구, warnings |
+| `source/` | 단순·추적 변환 원문을 모아 두는 디렉터리. 보존 선택이 `none`이면 만들지 않음 |
+| `source/source.plain.md` | 단순 변환 원문. 보존 선택 `both`/`plain`일 때만 생성 |
+| `source/source.md` | 추적용 변환 원문. 보존 선택 `both`/`trace`일 때만 생성. 페이지·슬라이드 표시, 표 번호, 변환 도구, warnings |
 | `index.md` | 범위, 한 줄 요약, 원문 보존 선택, ID·링크 수준, 산출물 목록, (full이면) 문서 지도·Finding/Process/Flow Index·AREA 코드와 개수, blocker·major·질문, 준비 상태 |
 | `glossary.md` | 용어 사전 |
 | `domain.md` | 도메인 모델 표와 Mermaid 클래스 다이어그램 |
@@ -308,7 +309,7 @@ Finding 형식:
 - Mermaid 렌더링이 실패하면 노드를 줄이고 문법을 단순화합니다. 렌더링하지 못했으면 그 사실을 적습니다.
 - ID가 중복되거나 AREA 없이 붙으면 완료로 보고하지 않습니다. 같은 TYPE과 AREA 안에서 번호를 다시 매기고 `index.md`의 ID 규칙 표를 갱신합니다.
 - 상대 링크나 앵커가 깨지면 완료로 보고하지 않습니다. 파일·앵커를 고친 뒤 링크 검사를 다시 실행합니다.
-- `source.plain.md` 변환이 실패하면 빈 파일을 만들지 말고, `source.md`의 warnings에 실패 사실을 적고 원문 텍스트를 요청합니다.
+- `source/source.plain.md` 변환이 실패하면 빈 파일을 만들지 말고, `source/source.md`의 warnings에 실패 사실을 적고 원문 텍스트를 요청합니다.
 - `none` 선택 후 임시 변환본 삭제에 실패하면 완료로 보고하지 않고, 남은 파일 경로를 알립니다.
 - `full`에서 링크가 깨지면 완료로 보고하지 않습니다. `ids`/`none`에서는 링크 검사를 수행하지 않았음을 `validation.md`에 적습니다.
 - 카탈로그에 없는 AREA가 필요하면 `index.md`에 코드와 정의를 먼저 추가합니다. 정의 없는 코드를 즉석에서 쓰지 않습니다.

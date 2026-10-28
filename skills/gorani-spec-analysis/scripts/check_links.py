@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check relative Markdown links and anchors in a spec-analysis package.
+"""Check relative Markdown links and anchors in a spec-analysis package, recursively.
 
 Usage:
     python3 check_links.py <directory>
@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import pathlib
+import posixpath
 import re
 import sys
 
@@ -36,7 +37,11 @@ def collect_anchors(path: pathlib.Path) -> set[str]:
 
 
 def check(directory: pathlib.Path) -> list[str]:
-    files = {path.name: path for path in sorted(directory.glob("*.md"))}
+    root = directory.resolve()
+    files = {
+        path.relative_to(root).as_posix(): path
+        for path in sorted(root.rglob("*.md"))
+    }
     if not files:
         return [f"no markdown files in {directory}"]
 
@@ -44,15 +49,19 @@ def check(directory: pathlib.Path) -> list[str]:
     problems: list[str] = []
 
     for name, path in files.items():
+        base = posixpath.dirname(name)
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             for target in LINK_RE.findall(line):
                 if target.startswith(("http://", "https://", "mailto:", "#")):
                     continue
                 file_part, _, anchor = target.partition("#")
-                if file_part not in files:
+                if not file_part:
+                    continue
+                resolved = posixpath.normpath(posixpath.join(base, file_part))
+                if resolved not in files:
                     problems.append(f"{name}:{line_no}: missing file: {target}")
                     continue
-                if anchor and anchor not in anchors[file_part]:
+                if anchor and anchor not in anchors[resolved]:
                     problems.append(f"{name}:{line_no}: missing anchor: {target}")
 
     return problems
@@ -71,7 +80,7 @@ def main() -> int:
 
     count = sum(
         len(LINK_RE.findall(path.read_text(encoding="utf-8")))
-        for path in args.directory.glob("*.md")
+        for path in args.directory.rglob("*.md")
     )
     print(f"{count} relative link(s), 0 broken")
     return 0

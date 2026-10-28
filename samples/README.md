@@ -77,8 +77,8 @@ python3 skills/gorani-release-note/scripts/notes_build.py --input samples/releas
 
 | 파일 | 내용 |
 | --- | --- |
-| `source.plain.md` | 단순 변환 원문 예시 (frontmatter 없음) |
-| `source.md` | 추적용 변환 원문 예시 (frontmatter·페이지 표시) |
+| `source/source.plain.md` | 단순 변환 원문 예시 (frontmatter 없음) |
+| `source/source.md` | 추적용 변환 원문 예시 (frontmatter·페이지 표시) |
 | `index.md` | 분석 범위·핵심 발견·결정 필요 항목 |
 | `glossary.md` | 용어 사전과 동의어·충돌 |
 | `domain.md` | 도메인 모델과 Mermaid 클래스 다이어그램 |
