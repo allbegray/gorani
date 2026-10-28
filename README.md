@@ -93,6 +93,7 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - 결과: `docs/spec/<slug>/`에 분석 문서 6종과 `source/source.plain.md`, `source/source.md`
 - ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식으로, 접두사에서 내용 영역을 유추
 - 문서 상단 지도, Finding/Process/Flow Index, 상대 링크·앵커로 문서 간 이동
+- 프로세스·플로우·finding 제목을 ID로 써서 IntelliJ·GitHub에서 링크가 동작
 - [scripts/check_links.py](skills/gorani-spec-analysis/scripts/check_links.py)로 상대 링크와 앵커 검사
 - 원문에 없는 규칙은 사실로 쓰지 않고 `추론`·`질문`으로 분리
 - 변환 도구가 없으면 설치를 임의로 하지 않고 대체 도구나 markdown 입력을 안내

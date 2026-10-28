@@ -129,7 +129,7 @@ description: 기획서(PDF, DOCX, PPTX, HWP, XLSX, Markdown 등)를 markdown으�
 
 ## 프로세스 정의
 
-프로세스마다 아래 항목을 표로 정리합니다.
+프로세스마다 `## P-...` 제목을 쓰고, 제목 텍스트는 ID만으로 합니다. 이름은 다음 줄에 굵게 쓰고 아래 항목을 표로 정리합니다. 제목에 한글 이름을 붙이면 IntelliJ에서 `#p-...` 앵커를 찾지 못합니다.
 
 | 항목 | 내용 |
 | --- | --- |
@@ -155,7 +155,7 @@ description: 기획서(PDF, DOCX, PPTX, HWP, XLSX, Markdown 등)를 markdown으�
 
 ## 플로우차트
 
-- 프로세스마다 Mermaid `flowchart TD`를 만듭니다.
+- 프로세스마다 Mermaid `flowchart TD`를 만듭니다. 각 플로우는 `## F-...` 제목을 쓰고 제목 텍스트는 ID만으로 하며, 이름은 다음 줄에 굵게 씁니다.
 - 시작·종료, 액션, 결정, 예외를 구분합니다. 결정 노드에는 조건을 씁니다.
 - 정상 경로뿐 아니라 실패·취소·권한 없음·재시도 경로를 포함합니다.
 - 각 노드 ID는 프로세스 단계와 대응되게 붙입니다. 예: `CREATE01_START`, `CREATE01_CHECK_STOCK`, `CREATE01_NO_STOCK`. `START`와 `END`는 예약어입니다.
@@ -229,7 +229,9 @@ AREA 코드:
 - 상대 경로만 씁니다. `docs/spec/<slug>/` 기준으로 `[validation](validation.md#v-status-end-01)`처럼 씁니다.
 - 절대 경로, `file://`, 외부 URL을 넣지 않습니다.
 - 파일만 링크하지 말고 가능한 한 섹션 앵커까지 겁니다.
-- 프로세스·플로우·finding 앵커는 ID를 소문자로 바꿔 붙입니다. 예: `<a id="p-license-activate-01" name="p-license-activate-01"></a>`, `<a id="f-license-activate-01" name="f-license-activate-01"></a>`, `<a id="v-license-channel-01" name="v-license-channel-01"></a>`.
+- 프로세스·플로우·finding은 제목 텍스트를 ID만으로 써서 앵커를 만듭니다. 예: `## P-LICENSE-ACTIVATE-01`, `## F-LICENSE-ACTIVATE-01`, `#### V-LICENSE-CHANNEL-01`.
+- `<a id>`·`<a name>` HTML 앵커를 쓰지 않습니다. IntelliJ는 HTML 앵커를 header로 인식하지 않습니다.
+- 링크 대상 제목에 한글 이름을 붙이면 앵커가 `#p-...-한글...`로 바뀌므로, 제목은 ID만 씁니다.
 - `index.md`의 ID Index는 ID, 심각도·이름, 한 줄 요약, 문서 앵커를 포함합니다.
 - 링크 텍스트는 `여기`, `링크` 대신 대상 ID나 이름을 씁니다.
 - 문서 이름이나 앵커가 바뀌면 같은 변경에서 모든 링크를 갱신합니다.
@@ -256,8 +258,18 @@ AREA 코드:
 
 Finding 형식:
 
-| ID | 심각도 | 영역 | 발견 내용 | 근거·출처 | 권장 조치 | 담당 | 상태 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+`## Findings` 아래에 심각도별 `### Blocker`·`### Major`·`### Minor`·`### Question`으로 묶고, 각 finding은 `#### V-...` 제목 아래 2열 표로 씁니다. 제목 텍스트는 ID만 씁니다.
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | blocker |
+| 영역 | 권한 |
+| 발견 내용 | ... |
+| 근거·출처 | `[slide 4]` |
+| 권장 조치 | ... |
+| 담당 | 제품 |
+| 상태 | open |
+| 관련 | [P-...](processes.md#p-...) |
 
 심각도:
 
@@ -288,7 +300,7 @@ Finding 형식:
 | `domain.md` | 도메인 모델 표와 Mermaid 클래스 다이어그램 |
 | `processes.md` | 프로세스 정의 표, 대응 플로우·finding 링크 |
 | `flows.md` | 프로세스별 Mermaid 플로우차트, 대응 프로세스·finding 링크 |
-| `validation.md` | 검증 요약, finding 표, 관련 문서 링크, 추적성, 링크 검사 결과, 미해결 질문 |
+| `validation.md` | 검증 요약, finding 섹션, 관련 문서 링크, 추적성, 링크 검사 결과, 미해결 질문 |
 
 `index.md`의 준비 상태:
 

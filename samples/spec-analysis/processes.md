@@ -4,8 +4,9 @@
 
 AS-IS는 메신저와 엑셀을 사용하고, TO-BE는 웹 화면에서 예약·승인·대여·반납을 처리합니다. 원문에는 TO-BE 흐름만 구체적으로 기술되어 있습니다.
 
-<a id="p-reservation-create-01" name="p-reservation-create-01"></a>
-## P-RESERVATION-CREATE-01 예약 신청
+## P-RESERVATION-CREATE-01
+
+**예약 신청**
 
 | 항목 | 내용 |
 | --- | --- |
@@ -24,8 +25,9 @@ AS-IS는 메신저와 엑셀을 사용하고, TO-BE는 웹 화면에서 예약·
 | 출처 | p.3 |
 | 관련 문서 | [플로우 F-RESERVATION-CREATE-01](flows.md#f-reservation-create-01), [검증 V-DATA-INVENTORY-01](validation.md#v-data-inventory-01) |
 
-<a id="p-reservation-approve-01" name="p-reservation-approve-01"></a>
-## P-RESERVATION-APPROVE-01 예약 승인
+## P-RESERVATION-APPROVE-01
+
+**예약 승인**
 
 | 항목 | 내용 |
 | --- | --- |
@@ -47,8 +49,9 @@ AS-IS는 메신저와 엑셀을 사용하고, TO-BE는 웹 화면에서 예약·
 - 승인자 역할, 승인 SLA, 반려 사유 코드가 정의되지 않았습니다.
 - 미응답 시 자동 승인·자동 반려·에스컬레이션 중 무엇을 할지 정해야 합니다.
 
-<a id="p-reservation-checkout-01" name="p-reservation-checkout-01"></a>
-## P-RESERVATION-CHECKOUT-01 장비 수령·대여
+## P-RESERVATION-CHECKOUT-01
+
+**장비 수령·대여**
 
 | 항목 | 내용 |
 | --- | --- |
@@ -69,8 +72,9 @@ AS-IS는 메신저와 엑셀을 사용하고, TO-BE는 웹 화면에서 예약·
 
 - 원문은 "운영자에게서 장비를 수령한다"만 기술하고, 상태 변경 주체와 확인 절차를 명시하지 않았습니다.
 
-<a id="p-reservation-return-01" name="p-reservation-return-01"></a>
-## P-RESERVATION-RETURN-01 반납
+## P-RESERVATION-RETURN-01
+
+**반납**
 
 | 항목 | 내용 |
 | --- | --- |
@@ -92,8 +96,9 @@ AS-IS는 메신저와 엑셀을 사용하고, TO-BE는 웹 화면에서 예약·
 - 반납 절차, 상태 전이, 연체 판정, 파손·분실 처리, 알림 정책이 없습니다.
 - 이 프로세스가 비어 있어 예약 생명주기를 닫을 수 없습니다.
 
-<a id="p-reservation-cancel-01" name="p-reservation-cancel-01"></a>
-## P-RESERVATION-CANCEL-01 취소·변경·노쇼
+## P-RESERVATION-CANCEL-01
+
+**취소·변경·노쇼**
 
 | 항목 | 내용 |
 | --- | --- |

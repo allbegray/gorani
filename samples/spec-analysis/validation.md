@@ -15,18 +15,144 @@
 
 ## Findings
 
-| ID | 심각도 | 영역 | 발견 내용 | 근거·출처 | 권장 조치 | 담당 | 상태 | 관련 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| <a id="v-proc-return-01" name="v-proc-return-01"></a>V-PROC-RETURN-01 | blocker | 프로세스·도메인 | 반납 프로세스와 상태 전이가 정의되지 않음. "운영자가 처리한다"만 있음 | p.3, p.5 | 반납 단계, 확인 항목, 상태 전이, 파손·분실 처리를 정의 | 운영 | open | [P](processes.md#p-reservation-return-01) |
-| <a id="v-status-overdue-01" name="v-status-overdue-01"></a>V-STATUS-OVERDUE-01 | blocker | 정책 | 연체를 정의만 하고 판정 기준·알림·제재가 없음 | p.3, p.5 | 연체 기준, 알림 시점, 제재·예외 정책 결정 | 운영 | open | [P](processes.md#p-reservation-return-01) |
-| <a id="v-perm-approver-01" name="v-perm-approver-01"></a>V-PERM-APPROVER-01 | major | 역할 | 승인자 역할의 범위·권한·위임 규칙이 없음 | p.2 | 승인자 지정 방식, 운영자 겸임 여부, 권한 범위 정의 | 제품 | open | [P](processes.md#p-reservation-approve-01), [F](flows.md#f-reservation-approve-01) |
-| <a id="v-term-reservation-01" name="v-term-reservation-01"></a>V-TERM-RESERVATION-01 | major | 용어·도메인 | 예약과 대여를 같은 뜻으로 쓰는 문장이 있어 상태 모델이 모호함 | p.2, p.3 | 예약=신청, 대여=수령 상태로 용어를 고정하고 문서 전체 수정 | 제품 | open | [P](processes.md#p-reservation-checkout-01), [F](flows.md#f-reservation-checkout-01) |
-| <a id="v-data-inventory-01" name="v-data-inventory-01"></a>V-DATA-INVENTORY-01 | major | 데이터 | 예약 화면에는 수량이 있지만 예약 데이터 모델에는 수량이 없음. 장비 상태·재고 기준도 불명확 | p.4, p.5 | 수량 모델, 기간별 재고, 장비 상태 전이를 정의 | 개발 | open | [P](processes.md#p-reservation-create-01), [F](flows.md#f-reservation-create-01) |
-| <a id="v-proc-cancel-01" name="v-proc-cancel-01"></a>V-PROC-CANCEL-01 | major | 정책 | 취소·변경·노쇼 정책이 없음 | p.3, p.5 | 1차 출시 포함 여부와 가능 시점·상태·페널티 결정 | 제품 | open | [P](processes.md#p-reservation-cancel-01) |
-| <a id="v-term-equipment-01" name="v-term-equipment-01"></a>V-TERM-EQUIPMENT-01 | minor | 용어 | 장비와 자산을 같은 뜻으로 쓰지만 화면·API 이름이 정해지지 않음 | p.2 | `equipment`로 통일하고 화면·API·DB 매핑 표 추가 | 개발 | open | [P](processes.md#p-reservation-create-01) |
-| <a id="v-int-calendar-01" name="v-int-calendar-01"></a>V-INT-CALENDAR-01 | question | 연동 | 외부 캘린더 연동 실패 시 예약 화면 동작이 없음 | p.4 | 실패 시 예약 차단·캐시·재시도 중 하나 결정 | 제품 | open | [P](processes.md#p-reservation-create-01) |
-| <a id="v-data-retention-01" name="v-data-retention-01"></a>V-DATA-RETENTION-01 | question | 데이터 | 예약 데이터 보존 기간이 없음 | p.5 | 보존 기간과 파기·감사 로그 정책 결정 | 보안 | open | [P](processes.md#p-reservation-create-01) |
-| <a id="v-proc-approval-01" name="v-proc-approval-01"></a>V-PROC-APPROVAL-01 | question | 프로세스 | 승인 SLA, 미응답 처리, 반려 사유 코드가 없음 | p.2, p.5 | SLA, 자동 처리, 사유 코드 결정 | 제품 | open | [P](processes.md#p-reservation-approve-01), [F](flows.md#f-reservation-approve-01) |
+### Blocker
+
+#### V-PROC-RETURN-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | blocker |
+| 영역 | 프로세스·도메인 |
+| 발견 내용 | 반납 프로세스와 상태 전이가 정의되지 않음. "운영자가 처리한다"만 있음 |
+| 근거·출처 | p.3, p.5 |
+| 권장 조치 | 반납 단계, 확인 항목, 상태 전이, 파손·분실 처리를 정의 |
+| 담당 | 운영 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-return-01) |
+
+#### V-STATUS-OVERDUE-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | blocker |
+| 영역 | 정책 |
+| 발견 내용 | 연체를 정의만 하고 판정 기준·알림·제재가 없음 |
+| 근거·출처 | p.3, p.5 |
+| 권장 조치 | 연체 기준, 알림 시점, 제재·예외 정책 결정 |
+| 담당 | 운영 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-return-01) |
+
+### Major
+
+#### V-PERM-APPROVER-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | major |
+| 영역 | 역할 |
+| 발견 내용 | 승인자 역할의 범위·권한·위임 규칙이 없음 |
+| 근거·출처 | p.2 |
+| 권장 조치 | 승인자 지정 방식, 운영자 겸임 여부, 권한 범위 정의 |
+| 담당 | 제품 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-approve-01), [F](flows.md#f-reservation-approve-01) |
+
+#### V-TERM-RESERVATION-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | major |
+| 영역 | 용어·도메인 |
+| 발견 내용 | 예약과 대여를 같은 뜻으로 쓰는 문장이 있어 상태 모델이 모호함 |
+| 근거·출처 | p.2, p.3 |
+| 권장 조치 | 예약=신청, 대여=수령 상태로 용어를 고정하고 문서 전체 수정 |
+| 담당 | 제품 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-checkout-01), [F](flows.md#f-reservation-checkout-01) |
+
+#### V-DATA-INVENTORY-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | major |
+| 영역 | 데이터 |
+| 발견 내용 | 예약 화면에는 수량이 있지만 예약 데이터 모델에는 수량이 없음. 장비 상태·재고 기준도 불명확 |
+| 근거·출처 | p.4, p.5 |
+| 권장 조치 | 수량 모델, 기간별 재고, 장비 상태 전이를 정의 |
+| 담당 | 개발 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-create-01), [F](flows.md#f-reservation-create-01) |
+
+#### V-PROC-CANCEL-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | major |
+| 영역 | 정책 |
+| 발견 내용 | 취소·변경·노쇼 정책이 없음 |
+| 근거·출처 | p.3, p.5 |
+| 권장 조치 | 1차 출시 포함 여부와 가능 시점·상태·페널티 결정 |
+| 담당 | 제품 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-cancel-01) |
+
+### Minor
+
+#### V-TERM-EQUIPMENT-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | minor |
+| 영역 | 용어 |
+| 발견 내용 | 장비와 자산을 같은 뜻으로 쓰지만 화면·API 이름이 정해지지 않음 |
+| 근거·출처 | p.2 |
+| 권장 조치 | `equipment`로 통일하고 화면·API·DB 매핑 표 추가 |
+| 담당 | 개발 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-create-01) |
+
+### Question
+
+#### V-INT-CALENDAR-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | question |
+| 영역 | 연동 |
+| 발견 내용 | 외부 캘린더 연동 실패 시 예약 화면 동작이 없음 |
+| 근거·출처 | p.4 |
+| 권장 조치 | 실패 시 예약 차단·캐시·재시도 중 하나 결정 |
+| 담당 | 제품 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-create-01) |
+
+#### V-DATA-RETENTION-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | question |
+| 영역 | 데이터 |
+| 발견 내용 | 예약 데이터 보존 기간이 없음 |
+| 근거·출처 | p.5 |
+| 권장 조치 | 보존 기간과 파기·감사 로그 정책 결정 |
+| 담당 | 보안 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-create-01) |
+
+#### V-PROC-APPROVAL-01
+
+| 항목 | 내용 |
+| --- | --- |
+| 심각도 | question |
+| 영역 | 프로세스 |
+| 발견 내용 | 승인 SLA, 미응답 처리, 반려 사유 코드가 없음 |
+| 근거·출처 | p.2, p.5 |
+| 권장 조치 | SLA, 자동 처리, 사유 코드 결정 |
+| 담당 | 제품 |
+| 상태 | open |
+| 관련 | [P](processes.md#p-reservation-approve-01), [F](flows.md#f-reservation-approve-01) |
+
 
 ## 추적성
 

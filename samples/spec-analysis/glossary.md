@@ -16,5 +16,5 @@
 | 연체 | 반납 예정일을 넘긴 상태 | - | p.3 | 확정 | 연체 판정·알림·제재는 미정의 | [P](processes.md#p-reservation-return-01), [V](validation.md#v-status-overdue-01) |
 | 재고 | 특정 기간에 예약 가능한 장비 수량 | 가용성 | p.3 | 미정의 | 기간·수량 기준이 명시되지 않음 | [P](processes.md#p-reservation-create-01), [V](validation.md#v-data-inventory-01) |
 | 대기 예약 | 재고가 없을 때 만드는 예약 | 대기열 | p.3 | 미정의 | 생성·해제·우선순위 규칙 없음 | — |
-| 예약 상태 | 신청, 승인, 반려, 대여, 반납 | - | p.5 | 모호 | 취소·연체·노쇼 상태가 없음 | [V](validation.md#v-status-overdue-01), [상태 전이](domain.md#domain-status) |
+| 예약 상태 | 신청, 승인, 반려, 대여, 반납 | - | p.5 | 모호 | 취소·연체·노쇼 상태가 없음 | [V](validation.md#v-status-overdue-01), [상태 전이](domain.md#상태-전이) |
 | 노쇼 | 예약 후 수령하지 않은 상태 | - | p.5 | 미정의 | 미정 사항에만 언급 | [V](validation.md#v-proc-cancel-01) |

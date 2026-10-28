@@ -155,3 +155,4 @@
 | 2026-10-28 | `source.plain.md`·원문 보존 선택 추가 (v3.2.0) | `.omo/evidence/2026-10-28-spec-analysis.md` |
 | 2026-10-28 | 모든 스킬에 도구 자동 설치 원칙 추가 (v3.3.0) | `.omo/evidence/2026-10-28-tool-install.md` |
 | 2026-10-28 | `source/` 디렉터리로 소스 파일 분리 (v3.4.0) | `.omo/evidence/2026-10-28-source-dir.md` |
+| 2026-10-28 | IntelliJ 호환 제목 앵커로 전환 (v3.5.0) | `.omo/evidence/2026-10-28-intellij-links.md` |

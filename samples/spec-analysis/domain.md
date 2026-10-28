@@ -2,7 +2,6 @@
 
 > 문서 지도: [index](index.md) · [source.plain](source/source.plain.md) · [source](source/source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
 
-<a id="domain-entities" name="domain-entities"></a>
 ## 엔티티·값 객체
 
 | 구성요소 | 이름 | 속성·책임 | 관계·불변식 | 출처 | 확실성 |
@@ -15,7 +14,6 @@
 | 값 객체 | EquipmentCategory | 노트북, 프로젝터, 카메라 | 분류 목록은 예시이며 전체 목록 미정의 | p.2 | 모호 |
 | 열거형 | ReservationStatus | REQUESTED, APPROVED, REJECTED, CHECKED_OUT, RETURNED | 취소·연체·노쇼 상태 없음 | p.5 | 확정 |
 | 열거형 | EquipmentStatus | 사용 가능, 예약됨, 대여 중 | 상태 목록과 전이 조건 미정의 | p.4, p.5 | 모호 |
-<a id="domain-relations" name="domain-relations"></a>
 ## 관계
 
 - User 1 : N Reservation (생성자)
@@ -25,7 +23,6 @@
 - Reservation은 하나의 ReservationStatus를 가진다.
 - Equipment는 하나의 EquipmentStatus를 가진다.
 
-<a id="domain-status" name="domain-status"></a>
 ## 상태 전이
 
 | 현재 | 이벤트 | 다음 | 조건 | 출처 | 확실성 | 관련 |
@@ -38,7 +35,6 @@
 | CHECKED_OUT | 기한 초과 | OVERDUE | 연체 정책 필요 | p.3 | 미정의 | [V](validation.md#v-status-overdue-01) |
 | APPROVED | 미수령 | NO_SHOW | 노쇼 정책 필요 | p.5 | 미정의 | [V](validation.md#v-proc-cancel-01) |
 
-<a id="domain-invariants" name="domain-invariants"></a>
 ## 불변식
 
 - 같은 장비에 승인·대여 상태의 예약이 기간상 겹치면 안 된다. [p.3]
@@ -47,7 +43,6 @@
 - 종료일은 시작일보다 빠를 수 없다. [추론]
 - 예약 화면에는 수량 입력이 있지만 예약 데이터 모델에는 수량이 없다. 데이터 모델 보완이 필요하다. [p.4, p.5]
 
-<a id="domain-mermaid" name="domain-mermaid"></a>
 ## Mermaid 클래스 다이어그램
 
 ```mermaid

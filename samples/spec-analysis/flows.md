@@ -2,8 +2,9 @@
 
 > 문서 지도: [index](index.md) · [source.plain](source/source.plain.md) · [source](source/source.md) · [glossary](glossary.md) · [domain](domain.md) · [processes](processes.md) · [flows](flows.md) · [validation](validation.md)
 
-<a id="f-reservation-create-01" name="f-reservation-create-01"></a>
-## F-RESERVATION-CREATE-01 예약 신청 (P-RESERVATION-CREATE-01)
+## F-RESERVATION-CREATE-01
+
+**예약 신청 (P-RESERVATION-CREATE-01)**
 
 - 관련: [프로세스 P-RESERVATION-CREATE-01](processes.md#p-reservation-create-01), [검증 V-DATA-INVENTORY-01](validation.md#v-data-inventory-01)
 
@@ -25,8 +26,9 @@ flowchart TD
 - 원문에 없는 취소·변경 분기는 넣지 않았습니다.
 - `대기 예약`의 생성·해제 규칙은 원문에 없어 안내에서 멈춥니다.
 
-<a id="f-reservation-approve-01" name="f-reservation-approve-01"></a>
-## F-RESERVATION-APPROVE-01 예약 승인 (P-RESERVATION-APPROVE-01)
+## F-RESERVATION-APPROVE-01
+
+**예약 승인 (P-RESERVATION-APPROVE-01)**
 
 - 관련: [프로세스 P-RESERVATION-APPROVE-01](processes.md#p-reservation-approve-01), [검증 V-PERM-APPROVER-01](validation.md#v-perm-approver-01), [검증 V-PROC-APPROVAL-01](validation.md#v-proc-approval-01)
 
@@ -47,8 +49,9 @@ flowchart TD
 - 승인자 역할과 미응답 처리(SLA)가 없어 마지막 분기는 질문으로 끝납니다.
 - 반려 사유 코드는 원문에 없습니다.
 
-<a id="f-reservation-checkout-01" name="f-reservation-checkout-01"></a>
-## F-RESERVATION-CHECKOUT-01 장비 수령·대여 (P-RESERVATION-CHECKOUT-01, 부분 정의)
+## F-RESERVATION-CHECKOUT-01
+
+**장비 수령·대여 (P-RESERVATION-CHECKOUT-01, 부분 정의)**
 
 - 관련: [프로세스 P-RESERVATION-CHECKOUT-01](processes.md#p-reservation-checkout-01), [검증 V-TERM-RESERVATION-01](validation.md#v-term-reservation-01)
 
@@ -63,15 +66,17 @@ flowchart TD
 - 원문은 "임직원이 운영자에게서 장비를 수령한다"만 기술합니다.
 - 상태 변경 주체, 수령 확인, 미수령 처리는 추론하지 않았습니다.
 
-<a id="f-reservation-return-01" name="f-reservation-return-01"></a>
-## F-RESERVATION-RETURN-01 반납 (P-RESERVATION-RETURN-01, 미정의)
+## F-RESERVATION-RETURN-01
+
+**반납 (P-RESERVATION-RETURN-01, 미정의)**
 
 - 관련: [프로세스 P-RESERVATION-RETURN-01](processes.md#p-reservation-return-01), [검증 V-PROC-RETURN-01](validation.md#v-proc-return-01), [검증 V-STATUS-OVERDUE-01](validation.md#v-status-overdue-01)
 
 프로세스가 미정의되어 플로우차트를 그리지 않았습니다. 원문에는 "반납은 운영자가 처리한다"만 있습니다. 반납 단계, 연체 판정, 파손·분실 처리가 정의된 뒤 다이어그램을 추가해야 합니다.
 
-<a id="f-reservation-cancel-01" name="f-reservation-cancel-01"></a>
-## F-RESERVATION-CANCEL-01 취소·변경·노쇼 (P-RESERVATION-CANCEL-01, 미정의)
+## F-RESERVATION-CANCEL-01
+
+**취소·변경·노쇼 (P-RESERVATION-CANCEL-01, 미정의)**
 
 - 관련: [프로세스 P-RESERVATION-CANCEL-01](processes.md#p-reservation-cancel-01), [검증 V-PROC-CANCEL-01](validation.md#v-proc-cancel-01)
 
