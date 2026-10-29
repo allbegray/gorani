@@ -186,6 +186,20 @@ def runtime_packages(path):
     return found
 
 
+def local_repository(directory):
+    path = directory / "package.json"
+    if not path.is_file():
+        return ""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    value = data.get("repository")
+    if isinstance(value, dict):
+        value = value.get("url", "")
+    return str(value or "").strip()
+
+
 def repository_url(component):
     references = component.get("externalReferences") or []
     ranked = sorted(
@@ -232,7 +246,10 @@ def main():
         license_text = ""
         license_source = ""
         notice_text = ""
+        repository = ""
         for directory in candidate_dirs(root, name, version):
+            if not repository:
+                repository = local_repository(directory)
             license_path, notice_path = find_files(directory)
             if license_path:
                 license_text = read_text(license_path)
@@ -268,7 +285,7 @@ def main():
                 "license": license_value,
                 "copyright": "\n".join(copyrights),
                 "purl": purl,
-                "repository": repository_url(component),
+                "repository": repository or repository_url(component),
                 "scope": scope,
                 "dependency": "direct" if name in direct else "transitive",
                 "license_text": license_text,

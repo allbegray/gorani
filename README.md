@@ -12,7 +12,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
 | `gorani-release-check` | 운영 배포 전 브랜치·리비전 차이를 볼 때 | P0~P4 점검 엑셀 |
 | `gorani-api-contract-diff` | API 스펙 변경이 클라이언트를 깨뜨리는지 볼 때 | API별 변경 리포트, 배포 전·테스트 체크리스트 |
-| `gorani-license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀 |
+| `gorani-license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀, 간소화 링크 페이지 |
 | `gorani-release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
 | `gorani-dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
 | `gorani-spec-analysis` | 기획서를 정리·검토할 때, 용어·도메인·프로세스·흐름을 뽑을 때 | markdown 원문, 용어 사전, 도메인 모델, 프로세스·플로우, 검증 리포트 |
@@ -81,6 +81,8 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - 산출물은 `--formats`로 선택: `html`, `md`, `review`, `xlsx`. 기본은 `html,md,review`
 - copyleft·복수 라이선스·미확인·전문 없음은 검토 목록으로 분리하고, 앱 페이지에는 내부 사유를 넣지 않음
 - `--xlsx` 또는 `--formats xlsx`를 주면 검토용 엑셀도 생성. 기본 경로는 openpyxl 없이 동작
+- `--simple`은 의존성 이름·버전·GitHub 라이선스 링크만 담은 `third-party-notices-simple.html`·`.md`를 생성
+- 간소화 페이지는 전체 고지 의무를 대체하지 않으므로 배포에는 전체 HTML을 사용
 
 ### gorani-release-note
 

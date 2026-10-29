@@ -75,10 +75,11 @@
 | 수집 | `syft` CycloneDX + 설치된 패키지의 LICENSE·NOTICE. npm·pnpm·pub·python 경로만 자동 수집 |
 | 기본 출력 | 자기완결 HTML + md. 외부 CSS·JS·폰트·이미지 금지, CSP `default-src 'none'` |
 | 산출물 선택 | `--formats html,md,review,xlsx`. 기본 `html,md,review`. xlsx는 선택 시에만 openpyxl 사용 |
+| 간소화 | `--simple`은 `third-party-notices-simple.html`·`.md`에 의존성 이름·버전·GitHub 라이선스 링크만 기록. 전체 고지 의무 대체 아님 |
 | 검토 분리 | copyleft·복수 라이선스·unknown·전문 없음·dev 는 `-review.md`(필요 시 xlsx). HTML·md 에 내부 사유 금지 |
 | 분류 | none/notice/weak/strong/network/unknown, OR=약한 쪽, AND=강한 쪽 |
 | 스크립트 | `scripts/collect_licenses.py`, `scripts/notice_build.py`. HTML·md 는 표준 라이브러리만, xlsx는 `--formats xlsx` 또는 `--xlsx` + openpyxl |
-| 검증 | 샘플 입력으로 HTML·md·review 생성, 외부 요청 0건, 검토 파일 미포함 확인 |
+| 검증 | 샘플 입력으로 HTML·md·review·간소화 페이지 생성, 외부 요청 0건, 검토 파일 미포함 확인 |
 
 ### gorani-release-note
 
@@ -175,3 +176,4 @@
 | 2026-10-29 | `release-check` 역할 컬럼·비개발자 문장 추가 (v3.8.0) | `.omo/evidence/2026-10-29-release-roles.md` |
 | 2026-10-29 | `api-contract-diff` 추가 (v3.9.0) | `.omo/evidence/2026-10-29-api-contract-diff.md` |
 | 2026-10-30 | `release-check` 우선순위 P0~P4 조정 (v3.10.0) | `.omo/evidence/2026-10-30-release-check-priority.md` |
+| 2026-10-30 | `license-notice` 간소화 페이지 옵션 추가 (v3.11.0) | `.omo/evidence/2026-10-30-license-notice-simple.md` |

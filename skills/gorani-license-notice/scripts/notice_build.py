@@ -4,7 +4,8 @@
 입력: 정규화된 라이선스 JSON (SKILL.md 의 입력 형식 참고)
 출력: third-party-notices.html, third-party-notices.md,
       검토 항목이 있으면 third-party-notices-review.md,
-      --xlsx 를 주면 third-party-notices.xlsx
+      --xlsx 를 주면 third-party-notices.xlsx,
+      --simple 이면 third-party-notices-simple.html, third-party-notices-simple.md
 """
 
 import argparse
@@ -17,6 +18,7 @@ import sys
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 STATUS_LABELS = {
     "none": "고지 불필요",
@@ -85,7 +87,9 @@ ALIASES = {
 
 EXCEL_TEXT_LIMIT = 30_000
 OUTPUT_FORMATS = ("html", "md", "review", "xlsx")
+SIMPLE_FORMATS = ("html", "md")
 DEFAULT_FORMATS = "html,md,review"
+GITHUB_REPO_RE = re.compile(r"^https?://(?:www\.)?github\.com/([^/]+)/([^/]+?)(?:\.git)?(?:/.*)?$", re.I)
 UNKNOWN_LICENSE = "Unknown license"
 PAGE_TITLE = "Third-Party Notices"
 COPYRIGHT_LINE_RE = re.compile(r"^\s*copyright\b|\(c\)|©", re.I)
@@ -99,10 +103,17 @@ def parse_args():
     parser.add_argument("--name", default="third-party-notices", help="출력 파일 기본 이름")
     parser.add_argument(
         "--formats",
-        default=DEFAULT_FORMATS,
-        help=f"생성할 산출물: {','.join(OUTPUT_FORMATS)} (기본: {DEFAULT_FORMATS})",
+        default=None,
+        help=f"생성할 산출물: {','.join(OUTPUT_FORMATS)} (기본: {DEFAULT_FORMATS}, --simple: html,md)",
     )
     parser.add_argument("--xlsx", action="store_true", help="--formats 에 xlsx 추가 (openpyxl 필요)")
+    parser.add_argument(
+        "--simple",
+        "--minimal",
+        dest="simple",
+        action="store_true",
+        help="라이선스 전문 없이 이름·버전·GitHub 라이선스 링크만 담은 간소화 페이지 생성",
+    )
     parser.add_argument("--exclude-dev", action="store_true", help="scope 가 dev 인 패키지 제외")
     parser.add_argument(
         "--fail-on-review",
@@ -110,8 +121,15 @@ def parse_args():
         help="검토 필요 항목이 있으면 종료 코드 1",
     )
     args = parser.parse_args()
-    formats = [item.strip().lower() for item in args.formats.split(",") if item.strip()]
-    unknown = [item for item in formats if item not in OUTPUT_FORMATS]
+    if args.simple and args.xlsx:
+        parser.error("--simple 과 --xlsx 는 함께 쓸 수 없습니다.")
+    if args.formats is None:
+        raw_formats = "html,md" if args.simple else DEFAULT_FORMATS
+    else:
+        raw_formats = args.formats
+    formats = [item.strip().lower() for item in raw_formats.split(",") if item.strip()]
+    allowed = SIMPLE_FORMATS if args.simple else OUTPUT_FORMATS
+    unknown = [item for item in formats if item not in allowed]
     if unknown:
         parser.error(f"지원하지 않는 형식입니다: {', '.join(unknown)}")
     if not formats:
@@ -219,6 +237,7 @@ def normalize_packages(raw_packages):
                 "license": license_value,
                 "copyright": str(item.get("copyright", "")).strip(),
                 "repository": str(item.get("repository", "")).strip(),
+                "license_url": str(item.get("license_url", "")).strip(),
                 "scope": str(item.get("scope", "unknown")).strip().lower() or "unknown",
                 "dependency": str(item.get("dependency", "")).strip(),
                 "license_text": str(item.get("license_text", "")),
@@ -233,7 +252,7 @@ def normalize_packages(raw_packages):
                 entry["license"] = (
                     f"{entry['license']} OR {license_value}" if entry["license"] else license_value
                 )
-            for field in ("copyright", "repository", "license_source"):
+            for field in ("copyright", "repository", "license_url", "license_source"):
                 if not entry[field] and item.get(field):
                     entry[field] = str(item[field]).strip()
             if not entry["license_text"] and item.get("license_text"):
@@ -375,6 +394,137 @@ def fence(text):
     longest = max((len(match.group(0)) for match in re.finditer(r"`+", text)), default=0)
     marker = "`" * max(3, longest + 1)
     return f"{marker}\n{text.rstrip()}\n{marker}"
+
+
+def github_repository_url(repository: str) -> str:
+    text = str(repository or "").strip()
+    if not text:
+        return ""
+    text = text.split("#", 1)[0].strip()
+    if text.startswith("git+"):
+        text = text[4:]
+    if text.startswith("git@github.com:"):
+        text = "https://github.com/" + text[len("git@github.com:") :]
+    elif text.startswith("ssh://git@github.com/"):
+        text = "https://github.com/" + text[len("ssh://git@github.com/") :]
+    elif text.startswith("git://github.com/"):
+        text = "https://github.com/" + text[len("git://github.com/") :]
+    elif text.startswith("github:"):
+        text = "https://github.com/" + text[len("github:") :]
+    elif re.match(r"^[\w.-]+/[\w.-]+$", text):
+        text = "https://github.com/" + text
+    if text.startswith("github.com/"):
+        text = "https://" + text
+    text = text.rstrip("/")
+    match = GITHUB_REPO_RE.match(text)
+    if not match:
+        return ""
+    owner, repo = match.group(1), match.group(2)
+    if repo.endswith(".git"):
+        repo = repo[:-4]
+    return f"https://github.com/{owner}/{repo}"
+
+
+def license_file_name(package: dict) -> str:
+    source = str(package.get("license_source", "")).strip()
+    if source:
+        name = Path(source).name
+        if name:
+            return name
+    return "LICENSE"
+
+
+def github_license_url(package: dict) -> str:
+    explicit = str(package.get("license_url", "")).strip()
+    if explicit:
+        return explicit
+    base = github_repository_url(package.get("repository", ""))
+    if not base:
+        return ""
+    return f"{base}/blob/HEAD/{quote(license_file_name(package), safe='')}"
+
+
+def build_simple_markdown(data, packages):
+    project = str(data.get("project", ""))
+    version = str(data.get("app_version", ""))
+    generated_at = str(data.get("generated_at", ""))[:10]
+    title = " ".join(part for part in (project, version) if part)
+    lines = [f"# {PAGE_TITLE}", ""]
+    if title:
+        lines.extend([f"**{title}**", ""])
+    if generated_at:
+        lines.extend([f"Generated: {generated_at}", ""])
+    lines.extend(["| Dependency | Version | License |", "| --- | --- | --- |"])
+    for package in packages:
+        name = str(package["name"]).replace("|", "\\|").replace("\n", " ")
+        package_version = str(package["version"]).replace("|", "\\|").replace("\n", " ")
+        url = github_license_url(package)
+        license_link = f"[LICENSE]({url})" if url else "-"
+        lines.append(f"| {name} | {package_version} | {license_link} |")
+    return "\n".join(lines) + "\n"
+
+
+def build_simple_html(data, packages):
+    project = str(data.get("project", ""))
+    version = str(data.get("app_version", ""))
+    generated_at = str(data.get("generated_at", ""))[:10]
+    app_title = " ".join(part for part in (project, version) if part)
+    document_title = f"{PAGE_TITLE} — {app_title}" if app_title else PAGE_TITLE
+    meta_parts = [app_title] if app_title else []
+    if generated_at:
+        meta_parts.append(f"Generated {generated_at}")
+    meta = " · ".join(meta_parts)
+    css = """
+:root { color-scheme: light dark; --bg: #fff; --fg: #17181c; --muted: #5c6270; --line: #e2e5ea; --panel: #f6f7f9; --accent: #1f5fbf; }
+@media (prefers-color-scheme: dark) { :root { --bg: #111216; --fg: #e8eaee; --muted: #9aa1ae; --line: #2a2d35; --panel: #181a20; --accent: #9db8e8; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif; }
+main { max-width: 56rem; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+h1 { font-size: 1.5rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
+.meta { color: var(--muted); font-size: .875rem; margin: 0 0 1.5rem; }
+.wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: .5rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { background: var(--panel); color: var(--muted); font-size: .8125rem; font-weight: 600; }
+td.version { color: var(--muted); white-space: nowrap; }
+a { color: var(--accent); }
+""".strip()
+    parts = [
+        "<!doctype html>",
+        '<html lang="en">',
+        "<head>",
+        '<meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'\">",
+        f"<title>{html.escape(document_title)}</title>",
+        f"<style>{css}</style>",
+        "</head>",
+        "<body>",
+        "<main>",
+        f"<h1>{PAGE_TITLE}</h1>",
+    ]
+    if meta:
+        parts.append(f'<p class="meta">{html.escape(meta)}</p>')
+    parts.extend(
+        [
+            '<div class="wrap"><table>',
+            "<thead><tr><th>Dependency</th><th>Version</th><th>License</th></tr></thead>",
+            "<tbody>",
+        ]
+    )
+    for package in packages:
+        name = html.escape(str(package["name"]))
+        package_version = html.escape(str(package["version"]))
+        url = github_license_url(package)
+        link = (
+            f'<a href="{html.escape(url, quote=True)}" rel="noopener noreferrer">LICENSE</a>'
+            if url
+            else "-"
+        )
+        parts.append(f'<tr><td>{name}</td><td class="version">{package_version}</td><td>{link}</td></tr>')
+    parts.extend(["</tbody>", "</table></div>", "</main>", "</body>", "</html>"])
+    return "\n".join(parts) + "\n"
 
 
 def build_markdown(data, groups):
@@ -971,10 +1121,33 @@ def main():
         sys.exit("정규화된 패키지가 없습니다. 입력 형식을 확인하세요.")
     data.setdefault("generated_at", datetime.now().astimezone().isoformat(timespec="seconds"))
     review = review_items(packages)
-    groups = group_notices(packages)
 
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
+
+    if args.simple:
+        simple_html_path = outdir / f"{args.name}-simple.html"
+        simple_md_path = outdir / f"{args.name}-simple.md"
+        if "html" in args.formats:
+            simple_html_path.write_text(build_simple_html(data, packages), encoding="utf-8")
+        if "md" in args.formats:
+            simple_md_path.write_text(build_simple_markdown(data, packages), encoding="utf-8")
+        missing_links = sum(1 for package in packages if not github_license_url(package))
+        simple_summary = {
+            "mode": "simple",
+            "formats": [item for item in SIMPLE_FORMATS if item in args.formats],
+            "simple_html": str(simple_html_path) if "html" in args.formats else "",
+            "simple_md": str(simple_md_path) if "md" in args.formats else "",
+            "packages": len(packages),
+            "missing_github_links": missing_links,
+            "review_items": len(review),
+        }
+        print(json.dumps(simple_summary, ensure_ascii=False))
+        if args.fail_on_review and review:
+            sys.exit(1)
+        return
+
+    groups = group_notices(packages)
     html_path = outdir / f"{args.name}.html"
     md_path = outdir / f"{args.name}.md"
     review_path = outdir / f"{args.name}-review.md"

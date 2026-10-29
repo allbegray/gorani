@@ -58,14 +58,17 @@ python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-co
 | `third-party-notices.html` | 앱·백엔드에 게시하는 자기완결 고지 페이지 |
 | `third-party-notices.md` | 같은 내용의 평문 |
 | `third-party-notices-review.md` | 검토 필요 목록 (내부용, 배포 제외) |
+| `third-party-notices-simple.html` | 이름·버전·GitHub 라이선스 링크만 담은 간소화 페이지 |
+| `third-party-notices-simple.md` | 같은 내용의 markdown |
 
 재생성:
 
 ```bash
 python3 skills/gorani-license-notice/scripts/notice_build.py --input samples/license-notice/license-input.json --outdir samples/license-notice --name third-party-notices --formats html,md,review
+python3 skills/gorani-license-notice/scripts/notice_build.py --input samples/license-notice/license-input.json --outdir samples/license-notice --name third-party-notices --simple
 ```
 
-샘플 프로젝트와 `legacy-widget` 패키지는 가상입니다. 라이선스 원문은 실제 npm 패키지에서 가져왔고, unknown·전문 없음·copyleft 검토 항목을 함께 보여 줍니다.
+샘플 프로젝트와 `legacy-widget` 패키지는 가상입니다. 라이선스 원문은 실제 npm 패키지에서 가져왔고, unknown·전문 없음·copyleft 검토 항목을 함께 보여 줍니다. 간소화 샘플에서는 `legacy-widget`만 GitHub 저장소가 없어 링크가 `-`로 표시됩니다.
 
 샘플은 `html,md,review` 기본 형식으로 생성합니다. 엑셀은 `--formats xlsx`를 추가했을 때만 만듭니다.
 

@@ -1,6 +1,22 @@
 # 변경 이력
 
-최신 버전은 3.10.0(2026-10-30)입니다. 3.10.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.11.0(2026-10-30)입니다. 3.11.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 3.11.0 · 2026-10-30
+
+`gorani-license-notice` 간소화 페이지 옵션 추가
+
+**추가**
+
+- `--simple`/`--minimal`: 의존성 이름·버전·GitHub 라이선스 링크만 담은 `third-party-notices-simple.html`·`.md` 생성
+- GitHub 저장소 URL 정규화와 `blob/HEAD/<license file>` 링크 생성. `license_source` 파일명을 사용하고 없으면 `LICENSE`
+- GitHub 링크가 없는 패키지는 `-`로 표시하고 `missing_github_links`로 집계
+- `collect_licenses.py`가 SBOM에 저장소가 없을 때 설치된 `package.json`의 `repository`를 보조로 사용
+- `samples/license-notice/` 간소화 HTML·md 샘플
+
+**변경**
+
+- README·AGENTS·samples/README에 간소화 옵션과 전체 고지 의무 대체 불가 주의 추가
 
 ## 3.10.0 · 2026-10-30
 

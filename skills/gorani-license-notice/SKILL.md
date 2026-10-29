@@ -1,6 +1,6 @@
 ---
 name: gorani-license-notice
-description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 SBOM과 패키지의 LICENSE·NOTICE 원문에서 자동 생성한다. 앱 배포 전 고지 의무 확인, 서드파티 라이선스 목록 작성, copyleft 검토가 필요할 때 사용.
+description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 SBOM과 패키지의 LICENSE·NOTICE 원문에서 자동 생성한다. 전체 고지 페이지와 이름·버전·GitHub 라이선스 링크만 담은 간소화 페이지를 지원한다. 앱 배포 전 고지 의무 확인, 서드파티 라이선스 목록 작성, copyleft 검토가 필요할 때 사용.
 ---
 
 # 오픈소스 고지 페이지 생성
@@ -18,7 +18,7 @@ description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 S
 
 ## 절차
 
-1. 대상 앱과 패키지 매니저를 확인합니다. 모노레포라면 저장소 루트가 아니라 앱 디렉터리에서 수집합니다. 앱 버전을 확인할 수 없으면 추측하지 말고 사용자에게 묻습니다. 함께 생성할 산출물(html, md, review, xlsx)도 확인합니다.
+1. 대상 앱과 패키지 매니저를 확인합니다. 모노레포라면 저장소 루트가 아니라 앱 디렉터리에서 수집합니다. 앱 버전을 확인할 수 없으면 추측하지 말고 사용자에게 묻습니다. 함께 생성할 산출물(html, md, review, xlsx)과 간소화 페이지(`--simple`) 여부도 확인합니다.
 2. 작업 디렉터리를 만듭니다. SBOM 과 중간 JSON 은 `.legal/` 에 두고, 저장소 정책에 따라 `.gitignore` 에 추가합니다. 이미 커밋된 파일은 건드리지 않습니다.
 3. SBOM 을 만듭니다. `syft dir:. -o cyclonedx-json=.legal/sbom.cdx.json`
 4. 운영 범위를 기록합니다. npm 이면 `npm ls --omit=dev --all --json > .legal/runtime.json` 을 실행합니다. peer 의존성 문제로 종료 코드가 1이어도 JSON 이 만들어졌는지 먼저 확인합니다.
@@ -28,6 +28,7 @@ description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 S
    - `unknown_license` 가 0보다 크면 패키지 메타데이터나 원본 저장소에서 확인해 입력 JSON 의 `license` 를 보정합니다. 확인할 수 없으면 unknown 으로 남깁니다.
    - 개발 의존성이 섞였으면 `--runtime` 을 지정해 다시 수집하거나, 생성 단계에서 `--exclude-dev` 를 씁니다.
 7. 고지 페이지를 생성합니다. `python3 <스킬 폴더>/scripts/notice_build.py --input .legal/licenses-input.json --outdir docs/licenses --name third-party-notices --formats html,md,review`. 사용자가 고른 형식만 `--formats`에 넣습니다.
+   - 간소화 페이지: 같은 명령에 `--simple`을 붙입니다. 기본은 `third-party-notices-simple.html`, `.md`이고, `--formats html` 또는 `--formats md`로 하나만 만들 수 있습니다.
 8. 앱이나 백엔드에 연결합니다. HTML 은 외부 요청 없이 동작하므로 앱 자산에 넣거나 정적 파일로 제공합니다.
 9. 검증합니다. 브라우저에서 데스크톱·모바일 폭으로 열어 검색과 라이선스 전문 표시를 확인하고, 네트워크 요청이 없는지 확인합니다.
 10. 의존성이 바뀔 때마다 다시 생성합니다. 릴리스 체크리스트나 CI 에 `--fail-on-review` 를 넣으면 검토 항목이 있는 상태로 배포되는 것을 막을 수 있습니다.
@@ -38,7 +39,8 @@ description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 S
 
 - 최상위: `project`, `app_version`, `generated_at`, `ecosystem`, `packages`, `logs`
 - 패키지 필수: `name`, `version`, `license`, `license_text`
-- 패키지 선택: `copyright`, `purl`, `repository`, `scope`(runtime/dev/unknown), `dependency`(direct/transitive), `license_source`, `notice_text`
+- 패키지 선택: `copyright`, `purl`, `repository`, `scope`(runtime/dev/unknown), `dependency`(direct/transitive), `license_source`, `license_url`, `notice_text`
+- `repository`는 간소화 페이지의 GitHub 링크를 만드는 데 씁니다. `license_source`는 링크에 넣을 라이선스 파일명을 정하는 데 씁니다.
 - `license` 는 SPDX 식별자를 우선 사용합니다. `MIT OR Apache-2.0` 같은 표현을 지원합니다.
 - `license_text` 는 원문 그대로 둡니다. 요약·번역·형식 변경 금지.
 - `copyright` 는 여러 줄을 허용합니다. 수집기는 최대 3줄을 추출합니다.
@@ -77,6 +79,19 @@ description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 S
 - 선택한 형식만 생성하거나 갱신합니다. 선택하지 않은 기존 파일은 건드리지 않습니다.
 - `--xlsx`는 `--formats`에 xlsx를 추가하는 별칭으로 계속 쓸 수 있습니다.
 - `review` 없이 `html`만 선택해도 검토 항목 수는 요약에 표시됩니다. 검토 사유가 필요하면 `review`를 포함합니다.
+
+### 간소화 페이지
+
+`--simple`(또는 `--minimal`)을 붙이면 라이선스 전문·저작권·검토 목록 없이 **의존성 이름, 버전, GitHub 라이선스 링크**만 담은 페이지를 만듭니다.
+
+- 출력: `third-party-notices-simple.html`, `third-party-notices-simple.md`
+- 기본은 두 형식입니다. `--formats html` 또는 `--formats md`로 하나만 선택할 수 있습니다.
+- 각 행은 의존성 이름, 버전, GitHub의 라이선스 파일 링크만 포함합니다.
+- `license_url`이 있으면 그 링크를 우선 사용합니다. 없으면 `repository`가 GitHub URL일 때 `https://github.com/<owner>/<repo>/blob/HEAD/<license file>`로 만듭니다.
+- `<license file>`은 `license_source`의 파일명을 쓰고, 없으면 `LICENSE`를 씁니다.
+- GitHub 저장소가 없거나 GitHub URL이 아니면 링크를 `-`로 표시하고, 출력 요약의 `missing_github_links`에 집계합니다.
+- `--simple`은 `review`·`xlsx`와 함께 쓸 수 없습니다. `--fail-on-review`는 계속 동작합니다.
+- 간소화 페이지는 전체 고지 의무를 대체하지 않습니다. 배포에는 전체 HTML을 사용하고, 간소화 페이지는 사내 목록이나 링크 모음 용도로만 씁니다.
 
 HTML:
 
@@ -126,6 +141,7 @@ xlsx:
 - SBOM 의 런타임 패키지 수와 페이지의 패키지 수가 같은지 확인합니다. `--exclude-dev` 를 썼다면 차이를 설명할 수 있어야 합니다.
 - 검토 파일의 항목이 모두 처리되었거나, 남긴 항목은 담당자와 사유를 기록했는지 확인합니다.
 - `--fail-on-review` 로 CI 에서 종료 코드 1이 나오는지 한 번 확인합니다.
+- 간소화 페이지는 행마다 이름·버전·GitHub 링크만 있는지, 링크 없는 패키지가 `-`와 `missing_github_links`로 표시되는지 확인합니다.
 - 앱 WebView 에서 JavaScript 가 꺼져 있어도 목록과 전문은 보여야 합니다. 검색만 동작하지 않습니다.
 
 ## 실패 처리
@@ -138,6 +154,7 @@ xlsx:
 - `xlsx`를 선택했는데 openpyxl 이 없으면 아래 `## 도구 설치` 원칙에 따라 자동 설치를 시도합니다. 설치를 거부하거나 실패하면 xlsx만 건너뛰고, 선택한 다른 형식은 그대로 사용합니다.
 - `--fail-on-review` 로 종료 코드 1이 나오면 실패가 아니라 검토가 필요하다는 뜻입니다. 검토 파일을 확인하고, 남길 항목은 사유를 기록합니다.
 - HTML 이 WebView 에서 깨지면 CSP 위반과 JavaScript 비활성 여부를 확인합니다. 정적 내용은 JavaScript 없이도 보여야 합니다.
+- 간소화 페이지의 GitHub 링크가 비어 있으면 `repository`가 수집됐는지와 GitHub URL인지 확인합니다. 저장소를 확인할 수 없으면 링크를 만들지 말고 `-`로 둡니다.
 
 ## 도구 설치
 
@@ -161,6 +178,7 @@ xlsx:
 - 사용자 지시 없이 커밋·푸시·PR 을 만들지 않습니다.
 - `-review.md` 와 `.xlsx` 를 앱 자산이나 공개 페이지에 포함하지 않습니다.
 - 고지 페이지에 내부 URL, 시크릿, 고객 정보를 넣지 않습니다.
+- 간소화 페이지를 전체 라이선스 고지 의무의 대체물로 배포하지 않습니다. 이름·버전·링크만으로는 저작권·전문 수록 의무를 충족하지 못할 수 있습니다.
 - 외부 CDN, 웹폰트, 원격 스크립트를 넣지 않습니다. 자기완결성을 깨뜨립니다.
 - copyleft 라이선스를 법무 검토 없이 "사용 가능"으로 단정하지 않습니다.
 - 무관한 도구·패키지 설치, 출처 불명 설치를 하지 않습니다.
