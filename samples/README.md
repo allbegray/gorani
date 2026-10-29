@@ -24,7 +24,7 @@ python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-
 
 | 파일 | 내용 |
 | --- | --- |
-| `release-check-input.json` | 브랜치 diff 점검 항목 입력 |
+| `release-check-input.json` | 브랜치·리비전 diff 점검 항목 입력 (샘플은 branch-merge-base) |
 | `release-check-sample.xlsx` | 릴리스 점검 엑셀 보고서 (요약, 점검 항목, 변경 파일, 커밋, 실행 로그) |
 
 재생성:
@@ -32,6 +32,8 @@ python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-
 ```bash
 python3 skills/gorani-release-check/scripts/release_xlsx.py --input samples/release-check/release-check-input.json --outdir samples/release-check --name release-check-sample
 ```
+
+리비전 비교 컨텍스트는 `compare_revisions.py --mode revision --from <ref> --to <ref> --out .qa/release-check-input.json`로 만듭니다. 샘플 JSON은 브랜치 merge-base 모드입니다.
 
 ## gorani-license-notice
 

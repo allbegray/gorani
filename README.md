@@ -10,7 +10,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | --- | --- | --- |
 | `gorani-docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
 | `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
-| `gorani-release-check` | 운영 배포 전 운영·개발 브랜치 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
+| `gorani-release-check` | 운영 배포 전 브랜치·리비전 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
 | `gorani-license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀 |
 | `gorani-release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
 | `gorani-dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
@@ -40,8 +40,11 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 
 ### gorani-release-check
 
-`main...develop`(merge-base 기준) diff에서 커밋과 변경 파일을 모아 점검 항목을 만듭니다.
+브랜치 diff 또는 두 리비전 사이의 diff에서 커밋과 변경 파일을 모아 점검 항목을 만듭니다.
 
+- 브랜치: `main...develop` merge-base 기본, `--tip`으로 tip 대 tip 비교
+- 리비전: `v1.0.0..v1.2.0` 직접 비교, `--merge-base`로 공통 조상 기준 비교
+- `compare_revisions.py`가 커밋·파일·통계 JSON을 만들고, `release_xlsx.py`가 엑셀을 생성
 - P0 배포 차단 / P1 주요 기능 / P2 경미
 - QA가 확인할 항목과 개발자만 확인할 항목을 나누고, 개발자 항목은 시트 하단에 배치
 - 결과: `docs/qa/release-check-YYYY-MM-DD.xlsx`
@@ -238,7 +241,7 @@ samples/<스킬>/                    예시 입력과 결과물
 | gorani-cve-scan이 도구가 없다고 함 | 스킬이 `## 도구 설치` 원칙에 따라 자동 설치를 시도. 실패하면 표시된 명령으로 수동 설치 후 재실행 |
 | gorani-license-notice가 syft가 없다고 함 | 스킬이 자동 설치를 시도. 실패하면 표시된 명령으로 수동 설치 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
 | VEX 엑셀 생성 실패 | VEX 보고서를 요청한 경우에만 openpyxl 필요. 요청하지 않았으면 생성하지 않으며, 필요할 때 스킬이 자동 설치를 시도 |
-| gorani-release-check가 브랜치를 못 찾음 | `git fetch origin` 후 `main`·`develop` 존재 확인. 다른 이름이면 스킬에 알려줄 것 |
+| gorani-release-check가 ref를 못 찾음 | 브랜치면 `git fetch origin`, 태그·리비전이면 `git fetch --tags origin` 후 ref 확인. 없으면 추측하지 말고 중단 |
 | gorani-license-notice에서 라이선스 전문이 비어 있음 | 대상 패키지가 설치되어 있는지 확인. `npm ci --omit=dev` 후 재수집. 원본에 LICENSE가 없으면 입력 JSON에 원문을 넣거나 검토 목록에 남김 |
 | HTML이 앱 WebView에서 안 열림 | 파일을 앱 자산에 실제로 복사했는지, CSP·WebView의 JavaScript 설정 확인. 검색만 안 되고 목록은 보여야 정상 |
 | `--xlsx`에서 openpyxl 오류 | 선택한 다른 형식은 이미 생성됨. 엑셀이 필요할 때만 스킬이 자동 설치를 시도 |

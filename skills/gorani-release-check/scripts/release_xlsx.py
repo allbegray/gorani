@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""브랜치 diff 점검 항목을 릴리스 점검 엑셀 보고서로 변환한다.
+"""브랜치·리비전 diff 점검 항목을 릴리스 점검 엑셀 보고서로 변환한다.
 
 입력: 정규화된 release-check JSON (SKILL.md 의 입력 JSON 형식 참고)
 출력: release-check-YYYY-MM-DD.xlsx
@@ -19,13 +19,19 @@ try:
     from openpyxl.worksheet.datavalidation import DataValidation
 except ImportError:
     sys.exit(
-        "openpyxl 이 필요합니다. 'python3 -m pip install --user openpyxl' 실행 후 다시 시도하세요."
+        "openpyxl 이 필요합니다. 스킬의 도구 설치 원칙에 따라 설치한 뒤 다시 시도하세요."
     )
 
 PRIORITIES = ["P0", "P1", "P2"]
 AUDIENCES = ["qa", "dev"]
 AUDIENCE_LABELS = {"qa": "QA", "dev": "개발자"}
 RESULTS = ["미확인", "통과", "실패", "해당 없음"]
+COMPARISON_LABELS = {
+    "branch-merge-base": "브랜치 merge-base",
+    "branch-tip": "브랜치 tip",
+    "revision": "리비전 직접",
+    "revision-merge-base": "리비전 merge-base",
+}
 
 HEADER_FILL = PatternFill("solid", fgColor="1F3864")
 HEADER_FONT = Font(color="FFFFFF", bold=True)
@@ -119,18 +125,20 @@ def style_header(ws, columns):
 
 
 def write_summary(ws, data, items, generated_at):
-    ws["A1"] = "릴리스 전 브랜치 diff 점검 보고서"
+    ws["A1"] = "릴리스 전 diff 점검 보고서"
     ws["A1"].font = TITLE_FONT
     ws.merge_cells("A1:D1")
 
     base = data.get("base", "")
     head = data.get("head", "")
     stats = data.get("stats", {})
+    mode = data.get("comparison_mode", "branch-merge-base")
     rows = [
         ("프로젝트", data.get("project", "")),
         ("배포 버전", data.get("release_version", "")),
-        ("비교 브랜치", f"{base} → {head}"),
-        ("merge-base", data.get("merge_base", "")),
+        ("비교 방식", COMPARISON_LABELS.get(mode, mode)),
+        ("비교 기준", f"{base} → {head}"),
+        ("merge-base", data.get("merge_base") or "-"),
         ("생성 시각", data.get("generated_at", generated_at)),
         ("커밋 수", stats.get("commits", "")),
         ("변경 파일 수", stats.get("files", "")),
@@ -273,9 +281,12 @@ def write_files(ws, files):
     for entry in files:
         additions = entry.get("additions", 0)
         deletions = entry.get("deletions", 0)
+        path = entry.get("path", "")
+        if entry.get("old_path"):
+            path = f"{entry['old_path']} → {path}"
         ws.append(
             [
-                entry.get("path", ""),
+                path,
                 entry.get("status", ""),
                 f"+{additions} / -{deletions}",
                 entry.get("area", ""),

@@ -48,11 +48,11 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 비교 기준 | `git merge-base` 기반 `main...develop`, 브랜치가 없으면 추측하지 말고 중단 |
+| 비교 기준 | 브랜치 merge-base(`main...develop`)·브랜치 tip·리비전 직접·리비전 merge-base. ref가 없으면 추측하지 말고 중단 |
 | 우선순위 | P0는 배포 차단 사유가 명확할 때만 |
 | 배치 | `dev` 항목은 항상 QA 아래 하단, `scripts/release_xlsx.py`가 정렬 강제 |
-| 스크립트 | openpyxl만 사용, 입력 JSON과 시트 구성 유지 |
-| 검증 | 샘플 JSON으로 xlsx 생성 후 시트 순서·ID·집계 확인 |
+| 스크립트 | `compare_revisions.py`는 표준 라이브러리+git, `release_xlsx.py`는 openpyxl 사용. 입력 JSON과 시트 구성 유지 |
+| 검증 | 브랜치·리비전 JSON으로 xlsx 생성 후 시트 순서·ID·집계 확인 |
 
 ### gorani-license-notice
 
@@ -157,3 +157,4 @@
 | 2026-10-28 | `source/` 디렉터리로 소스 파일 분리 (v3.4.0) | `.omo/evidence/2026-10-28-source-dir.md` |
 | 2026-10-28 | IntelliJ 호환 제목 앵커로 전환 (v3.5.0) | `.omo/evidence/2026-10-28-intellij-links.md` |
 | 2026-10-28 | MIT 라이선스 추가 (v3.6.0) | `.omo/evidence/2026-10-28-license.md` |
+| 2026-10-29 | `release-check` 리비전 비교 추가 (v3.7.0) | `.omo/evidence/2026-10-29-release-revisions.md` |

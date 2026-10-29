@@ -1,6 +1,7 @@
 {
   "project": "todo-cli",
   "release_version": "v1.4.0",
+  "comparison_mode": "branch-merge-base",
   "base": "main",
   "head": "develop",
   "merge_base": "a1b2c3d4",

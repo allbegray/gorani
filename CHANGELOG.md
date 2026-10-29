@@ -1,6 +1,23 @@
 # 변경 이력
 
-최신 버전은 3.6.0(2026-10-28)입니다. 3.6.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.7.0(2026-10-29)입니다. 3.7.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 3.7.0 · 2026-10-29
+
+`gorani-release-check` 리비전 비교 추가
+
+**추가**
+
+- `compare_revisions.py`: 브랜치·리비전 diff 컨텍스트와 점검 JSON 골격 생성
+- 비교 모드: `branch-merge-base`, `branch-tip`, `revision`, `revision-merge-base`
+- `comparison_mode`, `base_commit`, `head_commit`, `old_path` 입력 필드
+- 엑셀 요약에 비교 방식·비교 기준 표시
+
+**변경**
+
+- SKILL.md를 브랜치/리비전 모드로 확장
+- README·AGENTS·samples/README 갱신
+- 샘플 JSON에 `comparison_mode` 추가, 샘플 xlsx 재생성
 
 ## 3.6.0 · 2026-10-28
 
