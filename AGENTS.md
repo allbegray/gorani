@@ -50,6 +50,8 @@
 | --- | --- |
 | 비교 기준 | 브랜치 merge-base(`main...develop`)·브랜치 tip·리비전 직접·리비전 merge-base. ref가 없으면 추측하지 말고 중단 |
 | 우선순위 | P0는 배포 차단 사유가 명확할 때만 |
+| 역할 | `items.role` 코드(`ADMIN`/`PM`/`QA`/`DEV`/`OPS`/`SEC`/`DATA`/`DESIGN`/`ETC`)를 엑셀 역할 열에 한국어로 표시 |
+| 문장 | 점검 항목·기대 결과는 비개발자도 이해할 수 있는 사용자 관점 문장으로 작성. 기술 근거는 `items.evidence`에만 두고 엑셀에는 표시하지 않음 |
 | 배치 | `dev` 항목은 항상 QA 아래 하단, `scripts/release_xlsx.py`가 정렬 강제 |
 | 스크립트 | `compare_revisions.py`는 표준 라이브러리+git, `release_xlsx.py`는 openpyxl 사용. 입력 JSON과 시트 구성 유지 |
 | 검증 | 브랜치·리비전 JSON으로 xlsx 생성 후 시트 순서·ID·집계 확인 |
@@ -158,3 +160,4 @@
 | 2026-10-28 | IntelliJ 호환 제목 앵커로 전환 (v3.5.0) | `.omo/evidence/2026-10-28-intellij-links.md` |
 | 2026-10-28 | MIT 라이선스 추가 (v3.6.0) | `.omo/evidence/2026-10-28-license.md` |
 | 2026-10-29 | `release-check` 리비전 비교 추가 (v3.7.0) | `.omo/evidence/2026-10-29-release-revisions.md` |
+| 2026-10-29 | `release-check` 역할 컬럼·비개발자 문장 추가 (v3.8.0) | `.omo/evidence/2026-10-29-release-roles.md` |

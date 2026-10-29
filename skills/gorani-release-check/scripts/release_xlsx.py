@@ -26,6 +26,19 @@ PRIORITIES = ["P0", "P1", "P2"]
 AUDIENCES = ["qa", "dev"]
 AUDIENCE_LABELS = {"qa": "QA", "dev": "개발자"}
 RESULTS = ["미확인", "통과", "실패", "해당 없음"]
+ROLE_LABELS = {
+    "ADMIN": "관리자",
+    "PM": "PM",
+    "QA": "QA",
+    "DEV": "개발",
+    "OPS": "운영",
+    "SEC": "보안",
+    "DATA": "데이터",
+    "DESIGN": "디자인",
+    "ETC": "기타",
+    "UNASSIGNED": "미지정",
+}
+ROLE_CODES = list(ROLE_LABELS)
 COMPARISON_LABELS = {
     "branch-merge-base": "브랜치 merge-base",
     "branch-tip": "브랜치 tip",
@@ -82,10 +95,13 @@ def normalize_items(items):
         result = str(item.get("status") or "미확인").strip()
         if result not in RESULTS:
             result = "미확인"
+        role = str(item.get("role") or "UNASSIGNED").strip().upper()
         normalized.append(
             {
                 "priority": priority,
                 "audience": audience,
+                "role": role,
+                "role_label": ROLE_LABELS.get(role, role),
                 "area": str(item.get("area", "")).strip(),
                 "item": str(item.get("item", "")).strip(),
                 "expected": str(item.get("expected", "")).strip(),
@@ -199,10 +215,10 @@ def write_items(ws, items):
     headers = [
         "ID",
         "우선순위",
+        "역할",
         "영역",
         "점검 항목",
         "기대 결과",
-        "변경 근거",
         "구분",
         "확인 결과",
         "확인자",
@@ -210,17 +226,17 @@ def write_items(ws, items):
         "비고",
     ]
     ws.append(headers)
-    style_header(ws, [18, 10, 18, 52, 40, 42, 10, 12, 12, 12, 30])
+    style_header(ws, [18, 10, 12, 18, 52, 40, 10, 12, 12, 12, 30])
 
     def append_item(item):
         ws.append(
             [
                 item["id"],
                 item["priority"],
+                item["role_label"],
                 item["area"],
                 item["item"],
                 item["expected"],
-                item["evidence"],
                 AUDIENCE_LABELS[item["audience"]],
                 item["status"],
                 item["owner"],
@@ -259,18 +275,31 @@ def write_items(ws, items):
     result_validation = DataValidation(
         type="list", formula1='"' + ",".join(RESULTS) + '"', allow_blank=False
     )
+    role_validation = DataValidation(
+        type="list", formula1='"' + ",".join(ROLE_CODES) + '"', allow_blank=True
+    )
     ws.add_data_validation(priority_validation)
     ws.add_data_validation(result_validation)
+    ws.add_data_validation(role_validation)
     qa_end = 1 + len(qa_items)
     dev_start = qa_end + 2 if dev_items else qa_end + 1
     last_row = ws.max_row
     ranges = []
     if qa_items:
-        ranges += [f"B2:B{qa_end}", f"H2:H{qa_end}"]
+        ranges += [f"B2:B{qa_end}", f"C2:C{qa_end}", f"H2:H{qa_end}"]
     if dev_items:
-        ranges += [f"B{dev_start}:B{last_row}", f"H{dev_start}:H{last_row}"]
+        ranges += [
+            f"B{dev_start}:B{last_row}",
+            f"C{dev_start}:C{last_row}",
+            f"H{dev_start}:H{last_row}",
+        ]
     for range_ref in ranges:
-        target = priority_validation if range_ref.startswith("B") else result_validation
+        if range_ref.startswith("B"):
+            target = priority_validation
+        elif range_ref.startswith("C"):
+            target = role_validation
+        else:
+            target = result_validation
         target.add(range_ref)
 
 

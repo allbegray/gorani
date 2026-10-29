@@ -25,7 +25,7 @@ python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-
 | 파일 | 내용 |
 | --- | --- |
 | `release-check-input.json` | 브랜치·리비전 diff 점검 항목 입력 (샘플은 branch-merge-base) |
-| `release-check-sample.xlsx` | 릴리스 점검 엑셀 보고서 (요약, 점검 항목, 변경 파일, 커밋, 실행 로그) |
+| `release-check-sample.xlsx` | 릴리스 점검 엑셀 보고서 (역할·점검 항목, 변경 파일, 커밋, 실행 로그) |
 
 재생성:
 
