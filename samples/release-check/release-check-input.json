@@ -34,7 +34,7 @@
       "additions": 60,
       "deletions": 12,
       "area": "인증",
-      "related_items": ["P0-QA-01", "P0-DEV-01"]
+      "related_items": ["P2-QA-01", "P1-DEV-02"]
     },
     {
       "path": "src/api/share.js",
@@ -42,7 +42,7 @@
       "additions": 120,
       "deletions": 0,
       "area": "API",
-      "related_items": ["P1-QA-01", "P1-DEV-01"]
+      "related_items": ["P1-QA-01", "P2-DEV-01"]
     },
     {
       "path": "db/migrations/0042_share.sql",
@@ -50,7 +50,7 @@
       "additions": 20,
       "deletions": 0,
       "area": "DB",
-      "related_items": ["P0-DEV-02"]
+      "related_items": ["P1-DEV-01"]
     },
     {
       "path": "README.md",
@@ -58,12 +58,12 @@
       "additions": 5,
       "deletions": 3,
       "area": "문서",
-      "related_items": ["P2-QA-01"]
+      "related_items": ["P4-QA-01"]
     }
   ],
   "items": [
     {
-      "priority": "P0",
+      "priority": "P1",
       "audience": "dev",
       "role": "DEV",
       "area": "DB",
@@ -83,7 +83,7 @@
       "status": "미확인"
     },
     {
-      "priority": "P0",
+      "priority": "P2",
       "audience": "qa",
       "role": "SEC",
       "area": "인증",
@@ -93,7 +93,7 @@
       "status": "미확인"
     },
     {
-      "priority": "P2",
+      "priority": "P4",
       "audience": "qa",
       "role": "PM",
       "area": "문서",
@@ -103,7 +103,7 @@
       "status": "해당 없음"
     },
     {
-      "priority": "P1",
+      "priority": "P2",
       "audience": "dev",
       "role": "DEV",
       "area": "API",
@@ -113,7 +113,7 @@
       "status": "미확인"
     },
     {
-      "priority": "P0",
+      "priority": "P1",
       "audience": "dev",
       "role": "DEV",
       "area": "인증",

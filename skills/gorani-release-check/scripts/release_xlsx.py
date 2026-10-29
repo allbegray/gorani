@@ -22,7 +22,7 @@ except ImportError:
         "openpyxl 이 필요합니다. 스킬의 도구 설치 원칙에 따라 설치한 뒤 다시 시도하세요."
     )
 
-PRIORITIES = ["P0", "P1", "P2"]
+PRIORITIES = ["P0", "P1", "P2", "P3", "P4"]
 AUDIENCES = ["qa", "dev"]
 AUDIENCE_LABELS = {"qa": "QA", "dev": "개발자"}
 RESULTS = ["미확인", "통과", "실패", "해당 없음"]
@@ -54,9 +54,11 @@ SEPARATOR_FILL = PatternFill("solid", fgColor="D9E1F2")
 THIN = Side(style="thin", color="BFBFBF")
 BORDER = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
 PRIORITY_FILLS = {
-    "P0": PatternFill("solid", fgColor="F8CBAD"),
-    "P1": PatternFill("solid", fgColor="FFE699"),
-    "P2": PatternFill("solid", fgColor="E2EFDA"),
+    "P0": PatternFill("solid", fgColor="F4B183"),
+    "P1": PatternFill("solid", fgColor="F8CBAD"),
+    "P2": PatternFill("solid", fgColor="FFE699"),
+    "P3": PatternFill("solid", fgColor="E2EFDA"),
+    "P4": PatternFill("solid", fgColor="D9D9D9"),
 }
 RESULT_FILLS = {
     "미확인": PatternFill("solid", fgColor="FFF2CC"),
@@ -89,7 +91,7 @@ def normalize_items(items):
         priority = str(item.get("priority", "")).upper()
         audience = str(item.get("audience", "")).lower()
         if priority not in PRIORITIES:
-            sys.exit(f"priority 는 P0/P1/P2 중 하나여야 합니다: {item!r}")
+            sys.exit(f"priority 는 P0~P4 중 하나여야 합니다: {item!r}")
         if audience not in AUDIENCES:
             sys.exit(f"audience 는 qa/dev 중 하나여야 합니다: {item!r}")
         result = str(item.get("status") or "미확인").strip()
@@ -205,6 +207,13 @@ def write_summary(ws, data, items, generated_at):
     ws.cell(row=note_row, column=1, value="배치 규칙").font = SECTION_FONT
     ws.cell(row=note_row + 1, column=1, value="QA 항목 아래에 개발자 전용 항목을 배치합니다.")
     ws.cell(row=note_row + 2, column=1, value="확인 결과는 미확인/통과/실패/해당 없음 중 하나로 기록합니다.")
+    ws.cell(row=note_row + 4, column=1, value="우선순위 기준").font = SECTION_FONT
+    ws.cell(
+        row=note_row + 5,
+        column=1,
+        value="P0 전면 중단 · P1 핵심 기능 장애 · P2 배포 전 확인 · P3 여유 시 확인 · P4 참고",
+    )
+    ws.merge_cells(start_row=note_row + 5, start_column=1, end_row=note_row + 5, end_column=4)
     ws.column_dimensions["A"].width = 26
     ws.column_dimensions["B"].width = 36
     ws.column_dimensions["C"].width = 14
@@ -392,7 +401,7 @@ def main():
             {
                 "xlsx": str(output),
                 "items": len(items),
-                "priority": dict(Counter(i["priority"] for i in items)),
+                "priority": {priority: sum(1 for i in items if i["priority"] == priority) for priority in PRIORITIES},
                 "audience": dict(Counter(i["audience"] for i in items)),
                 "result": dict(Counter(i["status"] for i in items)),
             },

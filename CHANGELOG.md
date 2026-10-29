@@ -1,6 +1,41 @@
 # 변경 이력
 
-최신 버전은 3.8.0(2026-10-29)입니다. 3.8.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.10.0(2026-10-30)입니다. 3.10.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 3.10.0 · 2026-10-30
+
+`gorani-release-check` 우선순위 P0~P4 조정
+
+**변경**
+
+- Google Issue Tracker P0~P4 기준 적용. P0 전면 중단, P1 핵심 기능 장애, P2 배포 전 확인, P3 여유 시 확인, P4 참고
+- 기존 P0/P1/P2 3단계를 P0~P4 5단계로 확장. P0는 전면 중단 근거가 있을 때만 사용
+- 엑셀 요약에 P0~P4 집계와 기준을 표시하고, 우선순위 드롭다운·색상·ID 규칙 확장
+- 샘플 JSON 우선순위와 `release-check-sample.xlsx` 재생성
+- README·AGENTS·samples/README의 P0/P1/P2 설명 갱신
+
+## 3.9.0 · 2026-10-29
+
+API 계약 변경 점검 스킬 추가
+
+**추가**
+
+- `gorani-api-contract-diff`: OpenAPI 3.x 이전·새 스펙 비교
+- `api_diff.py`: 경로·오퍼레이션·파라미터·스키마·enum·인증 변경 수집
+- breaking/risky/non-breaking/info 분류와 클라이언트 영향·배포 전·테스트 체크리스트
+- 요청·응답 body 스키마 변경과 before/after JSON diff (`body_changes`)
+- 읽기 쉬운 리포트: P0~P4 건수 결론 → 먼저 확인할 것 → API별 변경 → 공통 변경 → 체크리스트
+- Google Issue Tracker P0~P4 기준을 참고해 breaking을 P0/P1/P2, risky를 P3, non-breaking·info를 P4로 구분. breaking이 항상 P0는 아님
+- API별 변경에 `P0`(전면 중단)·`P1`(배포 전 수정)·`P2`(배포 전 확인)·`P3`(호환성 확인)·`P4`(참고) 표시, 같은 변경이 여러 API에 걸치면 영향 API를 함께 표시
+- body 예시를 이전/이후 JSON diff(`-`/`+`)로 표시
+- `GET /shares → 응답 200 본문 → ownerEmail` 위치 표기와 부록 전체 변경 목록
+- `--fail-on-breaking` CI 차단 옵션
+- `samples/api-contract-diff/` old/new 스펙과 리포트
+
+**변경**
+
+- README 스킬 표·설치·예시·샘플 목록에 `gorani-api-contract-diff` 등록
+- AGENTS 3장에 `gorani-api-contract-diff` 계약 추가
 
 ## 3.8.0 · 2026-10-29
 

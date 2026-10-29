@@ -25,7 +25,7 @@ python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-
 | 파일 | 내용 |
 | --- | --- |
 | `release-check-input.json` | 브랜치·리비전 diff 점검 항목 입력 (샘플은 branch-merge-base) |
-| `release-check-sample.xlsx` | 릴리스 점검 엑셀 보고서 (역할·점검 항목, 변경 파일, 커밋, 실행 로그) |
+| `release-check-sample.xlsx` | 릴리스 점검 엑셀 보고서 (P0~P4, 역할·점검 항목, 변경 파일, 커밋, 실행 로그) |
 
 재생성:
 
@@ -34,6 +34,21 @@ python3 skills/gorani-release-check/scripts/release_xlsx.py --input samples/rele
 ```
 
 리비전 비교 컨텍스트는 `compare_revisions.py --mode revision --from <ref> --to <ref> --out .qa/release-check-input.json`로 만듭니다. 샘플 JSON은 브랜치 merge-base 모드입니다.
+
+## gorani-api-contract-diff
+
+| 파일 | 내용 |
+| --- | --- |
+| `old.yaml` | 이전 OpenAPI 3.x 스펙 |
+| `new.yaml` | 새 OpenAPI 3.x 스펙 |
+| `api-diff.md` | 결론(P0~P4)·먼저 확인할 것·API별 변경·공통 변경·before/after 예시 diff 리포트 |
+| `api-diff.json` | 같은 findings·body_changes의 기계 판독용 JSON |
+
+재생성:
+
+```bash
+python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-contract-diff/old.yaml --new samples/api-contract-diff/new.yaml --service "Share API" --release-version "1.1.0" --clients "web, ios, android" --out samples/api-contract-diff/api-diff.md --json-out samples/api-contract-diff/api-diff.json
+```
 
 ## gorani-license-notice
 

@@ -10,7 +10,8 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | --- | --- | --- |
 | `gorani-docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
 | `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
-| `gorani-release-check` | 운영 배포 전 브랜치·리비전 차이를 볼 때 | P0/P1/P2 점검 엑셀 |
+| `gorani-release-check` | 운영 배포 전 브랜치·리비전 차이를 볼 때 | P0~P4 점검 엑셀 |
+| `gorani-api-contract-diff` | API 스펙 변경이 클라이언트를 깨뜨리는지 볼 때 | API별 변경 리포트, 배포 전·테스트 체크리스트 |
 | `gorani-license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀 |
 | `gorani-release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
 | `gorani-dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
@@ -45,13 +46,30 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - 브랜치: `main...develop` merge-base 기본, `--tip`으로 tip 대 tip 비교
 - 리비전: `v1.0.0..v1.2.0` 직접 비교, `--merge-base`로 공통 조상 기준 비교
 - `compare_revisions.py`가 커밋·파일·통계 JSON을 만들고, `release_xlsx.py`가 엑셀을 생성
-- P0 배포 차단 / P1 주요 기능 / P2 경미
+- Google Issue Tracker P0~P4 기준: P0 전면 중단 / P1 핵심 기능 장애 / P2 배포 전 확인 / P3 여유 시 확인 / P4 참고
 - 점검 항목에 역할(`ADMIN` → 관리자) 컬럼을 추가
 - 점검 항목·기대 결과는 비개발자도 이해할 수 있는 사용자 관점 문장으로 작성
 - 엑셀에는 기술적인 `변경 근거` 열을 넣지 않고, 근거는 입력 JSON에만 보관
 - QA가 확인할 항목과 개발자만 확인할 항목을 나누고, 개발자 항목은 시트 하단에 배치
 - 결과: `docs/qa/release-check-YYYY-MM-DD.xlsx`
 - 코드는 건드리지 않음
+
+### gorani-api-contract-diff
+
+OpenAPI 3.x 스펙 두 개를 비교해 계약 변경을 정리합니다.
+
+- 입력: 이전·새 OpenAPI 3.x JSON/YAML
+- breaking / risky / non-breaking / info 분류
+- 결론(P0~P4 건수) → 먼저 확인할 것 → API별 변경 → 공통 변경 → 체크리스트 순서
+- Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 적용. breaking이 항상 P0는 아님
+- API별 변경은 `P0`(전면 중단)·`P1`(배포 전 수정)·`P2`(배포 전 확인)·`P3`(호환성 확인)·`P4`(참고)로 표시
+- 같은 변경이 여러 API에 걸치면 먼저 확인할 것에 영향 API를 함께 표시
+- 요청·응답 body의 필드·필수값·enum 변경과 before/after JSON diff
+- 위치를 `GET /shares → 응답 200 본문 → ownerEmail`처럼 표시
+- 배포 전·테스트 체크리스트와 전체 변경 부록
+- 결과: `docs/api/<service>/api-diff.md`, 선택 시 `api-diff.json`
+- `--fail-on-breaking`으로 CI에서 breaking 변경 차단
+- 스펙 기준 비교이며 런타임 동작·클라이언트 구현은 별도 확인
 
 ### gorani-license-notice
 
@@ -119,7 +137,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -129,10 +147,10 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
-opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 일곱 스킬이 보입니다.
+opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 여덟 스킬이 보입니다.
 
 ## 도구 자동 설치
 
@@ -149,7 +167,7 @@ opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`를 넣습니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-api-contract-diff`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`를 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -216,6 +234,7 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/release-note/release-notes-store.txt` | 스토어 긴 버전 (기본 4,000자) |
 | `samples/release-note/release-notes-internal.md` | commit 매핑·검토 기록 (내부용, 배포 제외) |
 | `samples/spec-analysis/` | 기획서 분석 패키지 (source, index, glossary, domain, processes, flows, validation) |
+| `samples/api-contract-diff/` | OpenAPI 이전·새 스펙과 계약 변경 리포트 |
 
 샘플 데이터는 형식 설명용 가상 데이터입니다. 재생성 명령은 `samples/README.md`에 있습니다.
 
