@@ -16,6 +16,8 @@ import argparse
 import difflib
 import json
 import re
+import shlex
+import subprocess
 import sys
 from collections import Counter
 from datetime import datetime
@@ -49,8 +51,114 @@ def parse_args():
     parser.add_argument("--service", default="", help="서비스명")
     parser.add_argument("--release-version", default="", help="배포 버전")
     parser.add_argument("--clients", default="", help="영향을 받는 클라이언트 목록 (쉼표 구분)")
+    parser.add_argument("--sources", default="", help="산출물 갱신 판단에 쓸 소스 글롭 (쉼표 구분). 기본은 이전·새 스펙 경로")
+    parser.add_argument("--manifest", help="sidecar .artifact.json 출력 경로. 기본은 리포트 옆")
+    parser.add_argument("--no-manifest", action="store_true", help="sidecar .artifact.json manifest를 만들지 않음")
     parser.add_argument("--fail-on-breaking", action="store_true", help="breaking finding 이 있으면 exit 1")
     return parser.parse_args()
+
+
+def repo_path(path):
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = (Path.cwd() / candidate).resolve()
+    else:
+        candidate = candidate.resolve()
+    try:
+        return candidate.relative_to(Path.cwd().resolve()).as_posix()
+    except ValueError:
+        return candidate.as_posix()
+
+
+def git_head_commit():
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def git_dirty():
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return False
+    return bool(result.stdout.strip()) if result.returncode == 0 else False
+
+
+PATH_OPTIONS = {"--old", "--new", "--out", "--json-out", "--manifest"}
+
+
+def portable_value(value):
+    if not value or value == "-" or value.startswith("-"):
+        return value
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        return value
+    try:
+        return candidate.expanduser().resolve().relative_to(Path.cwd().resolve()).as_posix()
+    except (ValueError, OSError):
+        return value
+
+
+def portable_args(argv):
+    result = []
+    index = 0
+    while index < len(argv):
+        item = argv[index]
+        if item in PATH_OPTIONS and index + 1 < len(argv):
+            result.extend([item, portable_value(argv[index + 1])])
+            index += 2
+            continue
+        matched = False
+        for option in PATH_OPTIONS:
+            if item.startswith(option + "="):
+                result.append(option + "=" + portable_value(item[len(option) + 1 :]))
+                matched = True
+                break
+        if not matched:
+            result.append(item)
+        index += 1
+    return result
+
+
+def regenerate_command():
+    script = Path(sys.argv[0])
+    if script.exists():
+        relative = repo_path(script)
+        if not Path(relative).is_absolute() and not relative.startswith("../"):
+            return "python3 " + shlex.join([relative, *portable_args(sys.argv[1:])])
+    if script.parent.name == "scripts" and script.parent.parent.name:
+        portable = f"{script.parent.parent.name}/scripts/{script.name}"
+    else:
+        portable = script.name
+    return "python3 " + shlex.join([portable, *portable_args(sys.argv[1:])])
+
+
+def write_manifest(path, artifact, outputs, sources):
+    payload = {
+        "version": 1,
+        "skill": "gorani-api-contract-diff",
+        "artifact": artifact,
+        "outputs": outputs,
+        "sources": sources,
+        "generated_commit": git_head_commit(),
+        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "working_tree_dirty": git_dirty(),
+        "regenerate": regenerate_command(),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def load_spec(path: str) -> dict:
@@ -1065,12 +1173,14 @@ def main() -> int:
     findings, body_changes, unresolved = compare_specs(old, new)
     report = markdown_report(args.old, args.new, old, new, findings, body_changes, args.clients, args.service, args.release_version)
 
+    output_path = None
     if args.out == "-":
         print(report)
     else:
         out = Path(args.out)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(report, encoding="utf-8")
+        output_path = out
         print(str(out))
 
     if args.json_out:
@@ -1089,6 +1199,26 @@ def main() -> int:
         json_out = Path(args.json_out)
         json_out.parent.mkdir(parents=True, exist_ok=True)
         json_out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    if not args.no_manifest:
+        if args.manifest:
+            manifest_path = Path(args.manifest)
+        elif output_path is not None:
+            manifest_path = output_path.parent / f"{output_path.stem}.artifact.json"
+        else:
+            manifest_path = None
+        if manifest_path is not None:
+            outputs = []
+            if output_path is not None:
+                outputs.append(repo_path(output_path))
+            if args.json_out:
+                outputs.append(repo_path(args.json_out))
+            if args.sources:
+                sources = [item.strip() for item in args.sources.split(",") if item.strip()]
+            else:
+                sources = [repo_path(args.old), repo_path(args.new)]
+            primary = repo_path(output_path) if output_path is not None else (repo_path(args.json_out) if args.json_out else "")
+            write_manifest(manifest_path, primary, outputs, sources)
 
     if args.fail_on_breaking and any(f["severity"] == "breaking" for f in findings):
         return 1

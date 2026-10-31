@@ -35,6 +35,66 @@ python3 skills/gorani-release-check/scripts/release_xlsx.py --input samples/rele
 
 리비전 비교 컨텍스트는 `compare_revisions.py --mode revision --from <ref> --to <ref> --out .qa/release-check-input.json`로 만듭니다. 샘플 JSON은 브랜치 merge-base 모드입니다.
 
+## gorani-report
+
+| 파일 | 내용 |
+| --- | --- |
+| `issue-body-sample.md` | 스킬 개선 요청 이슈 본문 샘플 (환경·도구 버전·재현 절차) |
+| `format-idea-sample.md` | Excel 양식 제안 이슈 본문 샘플 (제안·기대 효과·현재 양식) |
+
+재생성:
+
+```bash
+python3 skills/gorani-report/scripts/report_issue.py \
+  --skill gorani-table-spec \
+  --kind enhancement \
+  --summary "DB 모드에서 테이블 설명이 비어 있습니다" \
+  --expected "COMMENT ON 설명이 명세서에 표시됩니다." \
+  --actual "설명 열이 모두 비어 있습니다." \
+  --steps "1. DB에 COMMENT를 추가합니다. 2. table_spec.py를 실행합니다." \
+  --command "python3 skills/gorani-table-spec/scripts/table_spec.py --db-url \"$DATABASE_URL\" --outdir docs/db" \
+  --error "warning: column comment lookup returned empty" \
+  --tool "sqlglot=30.27.0" \
+  --out samples/report/issue-body-sample.md \
+  --no-duplicate-search
+```
+
+Excel 양식 제안:
+
+```bash
+python3 skills/gorani-report/scripts/report_issue.py \
+  --skill gorani-table-spec \
+  --kind format \
+  --area excel \
+  --summary "테이블 명세서 Excel의 설명 열과 시트 순서를 조정했으면 합니다" \
+  --proposal "설명 열을 넓히고 요약 시트를 첫 번째로 고정합니다." \
+  --benefit "긴 설명을 줄바꿈 없이 읽고 리뷰어가 요약을 먼저 봅니다." \
+  --current "현재 설명 열이 좁고 요약 시트가 마지막에 있습니다." \
+  --tool "openpyxl=3.1.5" \
+  --out samples/report/format-idea-sample.md \
+  --no-duplicate-search
+```
+
+이 명령은 드래프트만 만들고 GitHub 이슈를 생성하지 않습니다. 실제 생성은 사용자 확인 후 `--create`로 실행합니다.
+
+## gorani-change-impact
+
+| 파일 | 내용 |
+| --- | --- |
+| `artifact-manifest.example.json` | 산출물 옆에 두는 sidecar manifest 예시 |
+| `pr-impact.yml` | 특정 경로가 바뀔 때만 stale 검사를 실행하는 GitHub Actions 예시 |
+| `impact-sample.md` | full 모드 리포트 샘플 (변경 분류·갱신 필요·확인 제안) |
+| `impact-sample.json` | 같은 내용의 기계 판독용 JSON |
+
+이 샘플은 임시 git 저장소에서 만든 예시이며 commit hash는 설명용입니다. `pr-impact.yml`은 스킬 폴더를 저장소에 vendoring했거나 gorani 저장소를 체크아웃한 경우를 가정하므로, 실제 프로젝트에서는 `python3` 경로를 설치 위치에 맞춥니다. 실제 저장소에서는 아래처럼 실행합니다.
+
+```bash
+python3 skills/gorani-change-impact/scripts/change_impact.py --mode stale --working
+python3 skills/gorani-change-impact/scripts/change_impact.py --mode full --base origin/main
+```
+
+`stale`은 갱신 대상이 없으면 아무 파일도 만들지 않습니다. `full`은 릴리스 전이나 요청 시에만 실행합니다. 리포트는 `.gorani/impact/`에 생기며 커밋하지 않습니다.
+
 ## gorani-api-contract-diff
 
 | 파일 | 내용 |
@@ -43,6 +103,7 @@ python3 skills/gorani-release-check/scripts/release_xlsx.py --input samples/rele
 | `new.yaml` | 새 OpenAPI 3.x 스펙 |
 | `api-diff.md` | 결론(P0~P4)·먼저 확인할 것·API별 변경·공통 변경·before/after 예시 diff 리포트 |
 | `api-diff.json` | 같은 findings·body_changes의 기계 판독용 JSON |
+| `api-diff.artifact.json` | 갱신 판단용 sidecar manifest |
 
 재생성:
 
@@ -58,6 +119,7 @@ python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-co
 | `site-structure-sample.xlsx` | 요약·사이트 구조·화면 목록·API 매핑·API only·표준 근거·검토 메모 |
 | `site-structure-sample.md` | 같은 내용의 Markdown 구조도 |
 | `site-structure-sample.html` | 검색·메뉴 트리·화면 표를 담은 자기완결 HTML |
+| `site-structure-sample.artifact.json` | 갱신 판단용 sidecar manifest |
 
 재생성:
 
@@ -75,6 +137,7 @@ python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/s
 | `table-spec.xlsx` | 요약·테이블 목록·컬럼 명세·관계·인덱스·파싱 메모 |
 | `table-spec.md` | 같은 내용의 Markdown 명세서 |
 | `table-spec.html` | 검색·목차·인쇄를 지원하는 자기완결 HTML 명세서 |
+| `table-spec.artifact.json` | 갱신 판단용 sidecar manifest |
 
 재생성:
 
@@ -156,6 +219,8 @@ ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식을 사용합니다. 샘플은 `P-RESERV
 - gorani-cve-scan·gorani-release-check 샘플과 gorani-license-notice의 `--xlsx`는 `openpyxl`이 필요합니다: `python3 -m pip install --user openpyxl`
 - gorani-table-spec은 DDL 모드에 `sqlglot`, DB 모드에 `sqlalchemy`와 DB 드라이버, xlsx 생성 시 `openpyxl`이 필요합니다: `python3 -m pip install --user sqlglot sqlalchemy openpyxl`
 - gorani-site-structure는 xlsx 생성 시 `openpyxl`이 필요합니다. Playwright 자동 수집을 선택한 경우에만 Playwright와 브라우저 바이너리가 필요합니다.
+- gorani-change-impact는 Python 3와 git만 필요합니다. 추가 패키지는 설치하지 않습니다.
+- gorani-report는 Python 3와 `gh`가 필요합니다. 실제 이슈 생성에는 `gh auth login` 인증이 필요합니다.
 - PostgreSQL DB 모드는 `psycopg[binary]`, MySQL은 `pymysql`, SQL Server는 `pymssql`, Oracle은 `oracledb`를 추가로 설치합니다.
 - gorani-release-note는 표준 라이브러리만 사용합니다.
 - 스크립트나 시트 구성을 바꾸면 샘플도 다시 생성해 같은 변경에 포함합니다.

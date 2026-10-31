@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "mode": "full",
+  "generated_at": "2026-10-31T15:00:00+09:00",
+  "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
+  "head": "87b272f1c7f839f37971ea139b6ebeb3d92eeb3d",
+  "manifest_glob": "**/*.artifact.json",
+  "working": false,
+  "summary": {
+    "changed_files": 5,
+    "stale": 3,
+    "clean": 0,
+    "unknown": 0,
+    "warnings": 0
+  },
+  "categories": {
+    "frontend": [
+      "src/app/users/page.tsx"
+    ],
+    "api": [
+      "openapi/share.yaml"
+    ],
+    "db": [
+      "db/migrations/002_status.sql"
+    ],
+    "config": [
+      ".env.example"
+    ],
+    "dependencies": [
+      "package.json"
+    ]
+  },
+  "stale": [
+    {
+      "manifest": "docs/api/share-api/api-diff.artifact.json",
+      "skill": "gorani-api-contract-diff",
+      "artifact": "docs/api/share-api/api-diff.md",
+      "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
+      "matched": [
+        "openapi/share.yaml"
+      ],
+      "regenerate": "python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old openapi/share-v1.yaml --new openapi/share.yaml --out docs/api/share-api/api-diff.md"
+    },
+    {
+      "manifest": "docs/db/table-spec.artifact.json",
+      "skill": "gorani-table-spec",
+      "artifact": "docs/db/table-spec.xlsx",
+      "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
+      "matched": [
+        "db/migrations/002_status.sql"
+      ],
+      "regenerate": "python3 skills/gorani-table-spec/scripts/table_spec.py --ddl db/migrations --dialect postgres --outdir docs/db --name table-spec"
+    },
+    {
+      "manifest": "docs/site-structure/site-structure.artifact.json",
+      "skill": "gorani-site-structure",
+      "artifact": "docs/site-structure/site-structure.xlsx",
+      "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
+      "matched": [
+        "src/app/users/page.tsx"
+      ],
+      "regenerate": "python3 skills/gorani-site-structure/scripts/site_structure.py --input docs/site-structure/site-structure-input.json --outdir docs/site-structure --name site-structure"
+    }
+  ],
+  "clean": [],
+  "unknown": [],
+  "suggestions": [
+    {
+      "skill": "gorani-site-structure",
+      "reason": "화면·메뉴·레이아웃 영향 여부를 실제 프론트에서 확인하고 구조도를 갱신합니다.",
+      "category": "frontend"
+    },
+    {
+      "skill": "gorani-api-contract-diff",
+      "reason": "이전·새 OpenAPI 스펙을 비교해 breaking change와 클라이언트 영향을 확인합니다.",
+      "category": "api"
+    },
+    {
+      "skill": "gorani-table-spec",
+      "reason": "테이블 명세를 갱신하고 마이그레이션 잠금·데이터 손실 위험을 확인합니다.",
+      "category": "db"
+    },
+    {
+      "skill": "수동 확인",
+      "reason": ".env.example·compose·Kubernetes manifest의 환경변수가 서로 일치하는지 확인합니다.",
+      "category": "config"
+    },
+    {
+      "skill": "gorani-cve-scan",
+      "reason": "의존성 CVE와 라이선스 고지 갱신 필요 여부를 확인합니다. 이어서 gorani-dependency-update를 검토합니다.",
+      "category": "dependencies"
+    }
+  ],
+  "warnings": []
+}

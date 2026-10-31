@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skill": "gorani-table-spec",
+  "artifact": "samples/table-spec/table-spec.xlsx",
+  "outputs": [
+    "samples/table-spec/table-spec.md",
+    "samples/table-spec/table-spec.html",
+    "samples/table-spec/table-spec.xlsx"
+  ],
+  "sources": [
+    "samples/table-spec/schema.sql"
+  ],
+  "generated_commit": "136443a",
+  "generated_at": "2026-10-31T19:10:52+09:00",
+  "working_tree_dirty": true,
+  "regenerate": "python3 skills/gorani-table-spec/scripts/table_spec.py --ddl samples/table-spec/schema.sql --dialect postgres --project 'Sample DB' --outdir samples/table-spec --name table-spec --formats xlsx,md,html"
+}

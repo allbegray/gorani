@@ -1,6 +1,9 @@
 ---
 name: gorani-docs-governance
 description: GitHub 기본 문서 세트(README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, CHANGELOG, 이슈/PR 템플릿, CODEOWNERS)를 생성·유지한다. 새 프로젝트의 문서 체계를 세팅하거나, 코드 변경 후 문서를 최신화하거나, push 전 문서 점검이 필요할 때 사용.
+metadata:
+  version: "3.17.0"
+  updated: "2026-10-31"
 ---
 
 # GitHub 표준 문서 생성·유지
@@ -81,3 +84,7 @@ description: GitHub 기본 문서 세트(README, LICENSE, CONTRIBUTING, CODE_OF_
 - 기존 문서 삭제나 전체 덮어쓰기
 - 확인되지 않은 연락처·핸들로 CODEOWNERS, SECURITY, CODE_OF_CONDUCT 작성
 - 스캔하거나 확인하지 않은 내용을 문서에 단정적으로 기록
+
+## 문제 보고
+
+스킬이 예상과 다르게 실패하거나 개선점·아이디어·양식 제안이 보이면, 원인이 이 스킬·스크립트에 있는지 확인한 뒤 `gorani-report`로 GitHub 이슈를 만들지 사용자에게 먼저 묻습니다. 공개 이슈에는 고객 정보·시크릿·내부 URL을 넣지 않고, 사용자 확인 후 작성합니다.

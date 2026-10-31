@@ -6,7 +6,7 @@
 - 비교: `samples/api-contract-diff/old.yaml` (v1.0.0) → `samples/api-contract-diff/new.yaml` (v1.1.0)
 - 배포 버전: 1.1.0
 - 영향 클라이언트: web, ios, android
-- 생성 시각: 2026-10-29T23:57:08+09:00
+- 생성 시각: 2026-10-31T19:10:52+09:00
 - 우선순위: P0 전면 중단 · P1 배포 전 수정 · P2 배포 전 확인 · P3 호환성 확인 · P4 참고
 - 집계: P0 0 · P1 4 · P2 7 · P3 8 · P4 3
 

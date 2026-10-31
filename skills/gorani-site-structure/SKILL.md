@@ -1,6 +1,9 @@
 ---
 name: gorani-site-structure
 description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 사이트 구조도 산출물을 만든다. Excel·Markdown·HTML과 화면·API only·표준 근거를 정리한다. IA 문서화, 메뉴 구조 검토, 화면 목록 작성이 필요할 때 사용.
+metadata:
+  version: "3.17.0"
+  updated: "2026-10-31"
 ---
 
 # 사이트 구조도 생성
@@ -63,8 +66,9 @@ description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 �
    `python3 <스킬 폴더>/scripts/site_structure.py --input docs/site-structure/site-structure-input.json --outdir docs/site-structure --name site-structure --formats xlsx,md,html`
 
 8. 사용자가 고른 형식만 생성합니다. 기본은 `xlsx,md,html`입니다.
-9. 출력의 화면 수, depth, API 매핑, API only, 표준 근거, 검토 메모를 확인합니다.
-10. `--strict`를 주면 검증 경고가 있을 때 exit 1로 CI에서 차단할 수 있습니다.
+9. 산출물 옆에 `site-structure.artifact.json`이 생겼는지 확인합니다. sources가 실제 프론트 소스와 맞지 않으면 `--sources` 또는 입력 JSON의 `sources`로 보정하고 다시 생성합니다.
+10. 출력의 화면 수, depth, API 매핑, API only, 표준 근거, 검토 메모를 확인합니다.
+11. `--strict`를 주면 검증 경고가 있을 때 exit 1로 CI에서 차단할 수 있습니다.
 
 ## 입력 JSON
 
@@ -82,6 +86,7 @@ description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 �
 - `api_only`: 화면 없이 API만 있는 경로
 - `standards`: 표준 근거
 - `warnings`: 검토 메모
+- `sources`: 산출물과 연결할 소스 글롭. 생략하면 입력 JSON과 `src/app`·`src/pages`·`src/routes`를 사용합니다.
 
 `pages` 필드:
 
@@ -124,7 +129,9 @@ description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 �
   - `검토 메모`: 확인 필요 사항과 가정
 - `site-structure.md`: 같은 내용의 Markdown 표
 - `site-structure.html`: 검색·메뉴 트리·화면 표·표준 근거·검토 메모를 담은 자기완결 HTML
+- `site-structure.artifact.json`: 산출물 옆에 남기는 sidecar manifest. `sources`, `generated_commit`, `regenerate`를 기록해 `gorani-change-impact`가 갱신 필요 여부를 판단하게 합니다.
 - `--formats md` 또는 `html`만 주면 openpyxl 없이 동작합니다.
+- `--sources`로 소스 글롭을 직접 지정하고, `--no-manifest`로 manifest를 생략할 수 있습니다.
 
 ## 검증
 
@@ -136,6 +143,7 @@ description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 �
 - API only가 구조도에 섞이지 않았는지 확인
 - HTML 검색과 메뉴 트리, 외부 요청 0건, CSP 확인
 - Excel 시트·필터·스크린샷 경로 열 확인
+- sidecar manifest의 `sources`, `generated_commit`, `outputs` 확인
 
 ## 실패 처리
 
@@ -146,6 +154,7 @@ description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 �
 - 메뉴 depth가 3을 넘으면 KRDS 기준 경고를 남깁니다.
 - `xlsx`를 선택했는데 openpyxl이 없으면 설치를 시도합니다. 거부하면 `--formats md` 또는 `html`로 생성합니다.
 - API만 보고 화면을 만들지 않습니다. 실제 화면을 확인할 수 없으면 해당 화면은 `planned` 또는 `미확인`으로 두고 검토 메모에 남깁니다.
+- manifest를 쓰지 못하면 산출물은 그대로 두고 실패 원인(권한·경로)을 보고합니다.
 - Playwright 자동 수집이 실패하면 세션·권한·동적 렌더링을 확인하고, 에이전트가 브라우저로 직접 보정합니다.
 
 ## 도구 설치
@@ -169,3 +178,7 @@ description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 �
 - 고객 정보, 내부 URL, 시크릿을 문서에 넣지 않습니다.
 - 사용자 지시 없이 커밋·푸시·PR을 만들지 않습니다.
 - 경고를 숨기기 위해 결과를 임의로 편집하지 않습니다.
+
+## 문제 보고
+
+스킬이 예상과 다르게 실패하거나 개선점·아이디어·양식 제안이 보이면, 원인이 이 스킬·스크립트에 있는지 확인한 뒤 `gorani-report`로 GitHub 이슈를 만들지 사용자에게 먼저 묻습니다. 공개 이슈에는 고객 정보·시크릿·내부 URL을 넣지 않고, 사용자 확인 후 작성합니다.

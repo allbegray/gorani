@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skill": "gorani-api-contract-diff",
+  "artifact": "samples/api-contract-diff/api-diff.md",
+  "outputs": [
+    "samples/api-contract-diff/api-diff.md",
+    "samples/api-contract-diff/api-diff.json"
+  ],
+  "sources": [
+    "samples/api-contract-diff/old.yaml",
+    "samples/api-contract-diff/new.yaml"
+  ],
+  "generated_commit": "136443a",
+  "generated_at": "2026-10-31T19:10:52+09:00",
+  "working_tree_dirty": true,
+  "regenerate": "python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-contract-diff/old.yaml --new samples/api-contract-diff/new.yaml --service 'Share API' --release-version 1.1.0 --clients 'web, ios, android' --out samples/api-contract-diff/api-diff.md --json-out samples/api-contract-diff/api-diff.json"
+}

@@ -1,6 +1,9 @@
 ---
 name: gorani-table-spec
 description: SQL DDL 또는 실제 DB에서 테이블·컬럼·PK/FK·인덱스·설명을 추출해 테이블 명세서를 Excel, Markdown, HTML로 만든다. DB 스키마 문서화, 테이블 정의서 작성, 릴리스 전 스키마 검토가 필요할 때 사용.
+metadata:
+  version: "3.17.0"
+  updated: "2026-10-31"
 ---
 
 # 테이블 명세서 생성
@@ -40,7 +43,8 @@ SQL DDL 파일 또는 실제 데이터베이스에서 테이블 정의를 읽어
 5. 출력의 `tables`, `columns`, `foreign_keys`, `indexes`, `warnings`를 확인합니다.
 6. `warnings`가 있으면 원본 DDL 또는 DB 스키마·권한을 확인합니다. `--strict`를 주면 경고가 있을 때 exit 1로 CI에서 차단할 수 있습니다.
 7. 테이블·컬럼 설명은 입력에 있는 COMMENT만 사용합니다. 없으면 비워 두고 추측하지 않습니다.
-8. DDL이 바뀌거나 DB 스키마가 바뀔 때 다시 생성합니다. `docs/db/table-spec.xlsx`를 배포 문서나 저장소 위키에 연결합니다.
+8. `table-spec.artifact.json`의 `sources`가 실제 마이그레이션 경로와 맞는지 확인합니다. 다르면 `--sources`로 보정하고 다시 생성합니다.
+9. DDL이 바뀌거나 DB 스키마가 바뀔 때 다시 생성합니다. `docs/db/table-spec.xlsx`를 배포 문서나 저장소 위키에 연결합니다.
 
 ## 입력
 
@@ -68,6 +72,8 @@ SQL DDL 파일 또는 실제 데이터베이스에서 테이블 정의를 읽어
 
 - `--formats`는 `md,xlsx,html` 조합입니다. 기본은 `xlsx,md,html`입니다. 사용자가 고른 형식만 넣습니다.
 - `--project`를 생략하면 현재 디렉터리 이름을 씁니다.
+- `--sources`는 산출물 갱신 판단에 쓸 소스 글롭입니다. 생략하면 `--ddl` 경로를 사용합니다. DB 모드에서는 비어 있으므로 마이그레이션 글롭을 직접 지정하는 것을 권장합니다.
+- `--no-manifest`는 sidecar `.artifact.json`을 만들지 않습니다.
 - `--strict`는 경고를 실패로 처리합니다.
 
 ## 출력 형식
@@ -81,6 +87,7 @@ SQL DDL 파일 또는 실제 데이터베이스에서 테이블 정의를 읽어
   - `파싱 메모`: 경고와 원본
 - `table-spec.md`: 같은 내용을 Markdown 표로 정리합니다. 테이블별 상세와 관계·인덱스를 포함합니다.
 - `table-spec.html`: 자기완결 HTML입니다. 테이블 검색, 목차, 컬럼·관계·인덱스 표를 포함하고 외부 CSS·JS·폰트·이미지를 쓰지 않습니다.
+- `table-spec.artifact.json`: 산출물 옆에 남기는 sidecar manifest. `sources`, `generated_commit`, `regenerate`를 기록해 `gorani-change-impact`가 갱신 필요 여부를 판단하게 합니다. DB 모드의 `regenerate`에는 `--db-url` 실제 값을 넣지 않고 `$DATABASE_URL`로 기록합니다.
 - `--formats md` 또는 `--formats html`만 주면 openpyxl 없이 동작합니다.
 
 ### HTML
@@ -164,3 +171,7 @@ SQL DDL 파일 또는 실제 데이터베이스에서 테이블 정의를 읽어
 - 사용자 지시 없이 커밋·푸시·PR을 만들지 않습니다.
 - 고객 정보, 내부 URL, 시크릿을 문서에 넣지 않습니다.
 - 경고를 숨기기 위해 결과를 임의로 편집하지 않습니다.
+
+## 문제 보고
+
+스킬이 예상과 다르게 실패하거나 개선점·아이디어·양식 제안이 보이면, 원인이 이 스킬·스크립트에 있는지 확인한 뒤 `gorani-report`로 GitHub 이슈를 만들지 사용자에게 먼저 묻습니다. 공개 이슈에는 고객 정보·시크릿·내부 URL을 넣지 않고, 사용자 확인 후 작성합니다.

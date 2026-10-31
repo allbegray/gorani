@@ -14,6 +14,8 @@ import argparse
 import html
 import json
 import re
+import shlex
+import subprocess
 import sys
 from collections import Counter
 from datetime import datetime
@@ -71,6 +73,16 @@ def parse_args():
         help=f"생성할 산출물: {','.join(OUTPUT_FORMATS)} (기본: {DEFAULT_FORMATS})",
     )
     parser.add_argument(
+        "--sources",
+        default="",
+        help="산출물 갱신 판단에 쓸 소스 글롭 (쉼표 구분). 기본은 --ddl 경로",
+    )
+    parser.add_argument(
+        "--no-manifest",
+        action="store_true",
+        help="sidecar .artifact.json manifest를 만들지 않음",
+    )
+    parser.add_argument(
         "--strict",
         action="store_true",
         help="파싱 경고가 있으면 종료 코드 1",
@@ -88,6 +100,124 @@ def parse_args():
         parser.error("--formats 에 하나 이상의 형식을 지정하세요.")
     args.formats = set(formats)
     return args
+
+
+def repo_path(path):
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = (Path.cwd() / candidate).resolve()
+    else:
+        candidate = candidate.resolve()
+    try:
+        return candidate.relative_to(Path.cwd().resolve()).as_posix()
+    except ValueError:
+        return candidate.as_posix()
+
+
+def git_head_commit():
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def git_dirty():
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return False
+    return bool(result.stdout.strip()) if result.returncode == 0 else False
+
+
+PATH_OPTIONS = {"--ddl", "--outdir"}
+
+
+def portable_value(value):
+    if not value or value == "-" or value.startswith("-"):
+        return value
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        return value
+    try:
+        return candidate.expanduser().resolve().relative_to(Path.cwd().resolve()).as_posix()
+    except (ValueError, OSError):
+        return value
+
+
+def portable_args(argv):
+    result = []
+    index = 0
+    while index < len(argv):
+        item = argv[index]
+        if item in PATH_OPTIONS and index + 1 < len(argv):
+            result.extend([item, portable_value(argv[index + 1])])
+            index += 2
+            continue
+        matched = False
+        for option in PATH_OPTIONS:
+            if item.startswith(option + "="):
+                result.append(option + "=" + portable_value(item[len(option) + 1 :]))
+                matched = True
+                break
+        if not matched:
+            result.append(item)
+        index += 1
+    return result
+
+
+def regenerate_command():
+    script = Path(sys.argv[0])
+    if script.exists():
+        relative = repo_path(script)
+        if not Path(relative).is_absolute() and not relative.startswith("../"):
+            script_arg = relative
+        else:
+            script_arg = f"{script.parent.parent.name}/scripts/{script.name}" if script.parent.name == "scripts" else script.name
+    else:
+        script_arg = script.name
+    args = []
+    skip_next = False
+    for item in portable_args(sys.argv[1:]):
+        if skip_next:
+            skip_next = False
+            continue
+        if item == "--db-url":
+            args.extend([item, "$DATABASE_URL"])
+            skip_next = True
+        elif item.startswith("--db-url="):
+            args.append("--db-url=$DATABASE_URL")
+        else:
+            args.append(item)
+    command = "python3 " + shlex.join([script_arg, *args])
+    return command.replace("'$DATABASE_URL'", '"$DATABASE_URL"')
+
+
+def write_manifest(path, artifact, outputs, sources, note):
+    payload = {
+        "version": 1,
+        "skill": "gorani-table-spec",
+        "artifact": artifact,
+        "outputs": outputs,
+        "sources": sources,
+        "generated_commit": git_head_commit(),
+        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "working_tree_dirty": git_dirty(),
+        "regenerate": regenerate_command(),
+    }
+    if note:
+        payload["note"] = note
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def collect_files(paths):
@@ -1411,6 +1541,28 @@ def main():
         html_path.write_text(build_html(data, tables), encoding="utf-8")
     if "xlsx" in args.formats:
         write_xlsx(xlsx_path, data, tables)
+    outputs = []
+    for key, path in (("md", md_path), ("html", html_path), ("xlsx", xlsx_path)):
+        if key in args.formats:
+            outputs.append(repo_path(path))
+    if args.sources:
+        sources = [item.strip() for item in args.sources.split(",") if item.strip()]
+    elif args.ddl:
+        sources = []
+        for raw in args.ddl:
+            candidate = Path(raw)
+            source = repo_path(candidate) + ("/**" if candidate.is_dir() else "")
+            if source not in sources:
+                sources.append(source)
+    else:
+        sources = []
+    note = ""
+    if source == "database" and not sources:
+        note = "DB 접속 시점 스키마 기준입니다. 변경 감지에 쓰려면 --sources로 마이그레이션 글롭을 지정하세요."
+    manifest_path = outdir / f"{args.name}.artifact.json"
+    if not args.no_manifest:
+        primary = repo_path(xlsx_path if "xlsx" in args.formats else outputs[0] if outputs else outdir)
+        write_manifest(manifest_path, primary, outputs, sources, note)
     summary = {
         "md": str(md_path) if "md" in args.formats else "",
         "html": str(html_path) if "html" in args.formats else "",
@@ -1421,6 +1573,8 @@ def main():
         "indexes": data["index_count"],
         "warnings": len(warnings),
         "dialects": data["dialects"],
+        "manifest": "" if args.no_manifest else str(manifest_path),
+        "sources": sources,
     }
     print(json.dumps(summary, ensure_ascii=False))
     if args.strict and warnings:

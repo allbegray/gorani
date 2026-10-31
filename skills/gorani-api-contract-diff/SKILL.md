@@ -1,6 +1,9 @@
 ---
 name: gorani-api-contract-diff
 description: OpenAPI 3.x 스펙 두 개를 비교해 breaking change, 클라이언트 영향, 배포 전·테스트 체크리스트를 만든다. API 변경 리뷰, 버전 업, 외부 연동 영향 확인이 필요할 때 사용.
+metadata:
+  version: "3.17.0"
+  updated: "2026-10-31"
 ---
 
 # API 계약 변경 점검
@@ -59,6 +62,7 @@ Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 조정합니
 7. `## 배포 전 체크리스트`와 `## 테스트 체크리스트`를 실제 배포 순서에 맞게 보정합니다.
 8. `--fail-on-breaking`을 쓰면 breaking이 있을 때 exit 1로 CI에서 차단할 수 있습니다.
 9. 결과를 요약합니다. P0~P4 건수, 영향 경로, 클라이언트 배포 순서, 확인 필요 항목을 보고합니다.
+10. 리포트 옆의 `api-diff.artifact.json`에서 `sources`가 실제 스펙 경로와 맞는지 확인합니다. 스펙이 `openapi/` 아래 여러 파일로 나뉘면 `--sources openapi/**`처럼 넓혀 다시 생성합니다.
 
 ## 출력 형식
 
@@ -78,6 +82,8 @@ Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 조정합니
 
 심각도를 P0~P4에 그대로 대응시키지 않습니다. breaking은 P0(전면 중단)·P1(배포 전 수정)·P2(배포 전 확인)로 나누고, risky는 P3, non-breaking·info는 P4로 둡니다. 상단에 우선순위 범례와 P0~P4 집계를 표시합니다. 위치는 `GET /shares → 응답 200 본문 → ownerEmail`처럼 메서드·경로·요청/응답 본문·필드 순서로 씁니다.
 
+`api-diff.artifact.json`은 산출물 옆에 남기는 sidecar manifest입니다. `sources`(기본: 이전·새 스펙 경로), `generated_commit`, `regenerate`를 기록해 `gorani-change-impact`가 갱신 필요 여부를 판단하게 합니다.
+
 `api-diff.json`은 같은 findings를 기계적으로 읽을 수 있게 저장합니다.
 
 | 필드 | 내용 |
@@ -91,6 +97,7 @@ Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 조정합니
 - finding ID는 `B-01`, `R-01`, `N-01`, `I-01`처럼 심각도별로 부여합니다.
 - `old`·`new`에는 이전·이후 타입, 필수 여부, enum 값, 제약 조건을 기록합니다.
 - 실제 코드나 스펙을 수정하지 않습니다.
+- `--out -`으로 stdout에만 쓸 때는 `--manifest`를 주지 않으면 sidecar manifest를 만들지 않습니다.
 
 ## 입력과 옵션
 
@@ -102,6 +109,9 @@ Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 조정합니
 | `--service` | 서비스명 |
 | `--release-version` | 배포 버전 |
 | `--clients` | 영향 클라이언트 목록 (쉼표 구분) |
+| `--sources` | 산출물 갱신 판단에 쓸 소스 글롭 (쉼표 구분). 기본은 이전·새 스펙 경로 |
+| `--manifest` | sidecar `.artifact.json` 경로. 기본은 리포트 옆 |
+| `--no-manifest` | sidecar manifest를 만들지 않음 |
 | `--fail-on-breaking` | breaking이 있으면 exit 1 |
 
 ## 도구 설치
@@ -136,3 +146,7 @@ Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 조정합니
 - enum 추가를 무조건 안전하다고 단정하지 않습니다. 응답 enum은 risky로 둡니다.
 - 내부 URL, 토큰, 고객 정보를 리포트에 그대로 노출하지 않습니다. 필요하면 마스킹합니다.
 - 스펙 파일을 외부 API·LLM 서비스에 무단 업로드하지 않습니다.
+
+## 문제 보고
+
+스킬이 예상과 다르게 실패하거나 개선점·아이디어·양식 제안이 보이면, 원인이 이 스킬·스크립트에 있는지 확인한 뒤 `gorani-report`로 GitHub 이슈를 만들지 사용자에게 먼저 묻습니다. 공개 이슈에는 고객 정보·시크릿·내부 URL을 넣지 않고, 사용자 확인 후 작성합니다.

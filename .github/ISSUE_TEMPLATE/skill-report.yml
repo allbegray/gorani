@@ -1,0 +1,144 @@
+name: Skill report
+description: gorani 스킬의 오류·개선·아이디어·양식 제안·문서 문제를 알려주세요.
+title: "[skill]"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        gorani 스킬을 쓰다 만난 문제뿐 아니라 새로운 아이디어, Excel·Markdown·HTML 양식 제안도 환영합니다.
+        고객 정보, 시크릿, 내부 URL, 실제 운영 데이터는 넣지 마세요.
+        가능하면 `gorani-report` 스킬로 드래프트를 만든 뒤 이 양식 대신 사용해도 됩니다.
+
+  - type: input
+    id: skill
+    attributes:
+      label: 스킬
+      description: 대상 스킬 이름
+      placeholder: "예: gorani-table-spec"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 종류
+      options:
+        - 오류 (bug)
+        - 개선 (enhancement)
+        - 아이디어 (idea)
+        - 양식 (format)
+        - 문서 (documentation)
+        - 질문 (question)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 영역
+      description: 아이디어·양식 제안이면 해당 산출물을 골라 주세요.
+      options:
+        - Excel
+        - Markdown
+        - HTML
+        - CLI
+        - 문서
+        - 기타
+
+  - type: input
+    id: skill-version
+    attributes:
+      label: 스킬 버전
+      description: SKILL.md의 metadata.version. 모르면 비워 두세요.
+      placeholder: "예: 3.17.0"
+
+  - type: input
+    id: summary
+    attributes:
+      label: 한 줄 요약
+      placeholder: "예: Excel 설명 열을 조금 넓혔으면 합니다"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 제안 내용
+      description: 아이디어·양식·문서 개선이면 어떻게 바뀌면 좋을지 적어 주세요.
+      placeholder: |
+        예: 컬럼 명세 시트의 설명 열을 넓히고, 요약 시트를 첫 번째로 고정합니다.
+
+  - type: textarea
+    id: benefit
+    attributes:
+      label: 기대 효과
+      description: 이 제안이 왜 유용한가요?
+
+  - type: textarea
+    id: current
+    attributes:
+      label: 현재 동작·양식
+      description: 지금 어떻게 보이거나 동작하는지 적어 주세요.
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 절차
+      description: 오류라면 실행한 명령과 순서를 적어 주세요.
+      placeholder: |
+        1. ...
+        2. ...
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 결과
+      description: 오류일 때 어떻게 동작해야 한다고 생각했나요?
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 결과
+      description: 오류일 때 실제로 무엇이 일어났나요?
+
+  - type: input
+    id: command
+    attributes:
+      label: 실행 명령
+      description: 민감 정보가 있으면 마스킹해 주세요.
+      placeholder: "python3 skills/gorani-.../scripts/... --..."
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 환경
+      description: OS, Python, 관련 도구 버전
+      placeholder: |
+        - OS: macOS 15
+        - Python: 3.14
+        - openpyxl: 3.1.5
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 오류 로그
+      description: 스택 트레이스나 오류 메시지. 토큰·비밀번호·이메일은 지워 주세요.
+      render: text
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 추가 맥락
+      description: 관련 이슈, 시도한 해결 방법, 참고 자료
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 공개 안전 확인
+      options:
+        - label: 고객 정보·시크릿·내부 URL을 포함하지 않았습니다.
+          required: true
+        - label: 재현 가능한 최소 입력 또는 제안에 필요한 최소 정보만 포함했습니다.
+          required: true
+        - label: 이 이슈가 공개 저장소에 게시된다는 점을 확인했습니다.
+          required: true

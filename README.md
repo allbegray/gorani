@@ -9,6 +9,8 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | 스킬 | 이럴 때 | 결과 |
 | --- | --- | --- |
 | `gorani-ask` | 어떤 스킬을 써야 할지 모를 때, 작업 순서를 정할 때 | 상황별 스킬·작업 순서 추천 |
+| `gorani-change-impact` | 기존 산출물이 소스 변경으로 낡았는지 확인할 때, 릴리스 전 갱신 대상을 볼 때 | 갱신 필요 산출물·매칭된 변경·재생성 명령 |
+| `gorani-report` | 스킬 오류·개선점을 GitHub 이슈로 남기고 싶을 때 | 마스킹된 이슈 드래프트·생성 URL |
 | `gorani-docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
 | `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
 | `gorani-release-check` | 운영 배포 전 브랜치·리비전 차이를 볼 때 | P0~P4 점검 엑셀 |
@@ -31,6 +33,33 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - 추천한 스킬의 준비물과 다음 단계를 함께 안내
 - 스킬을 대신 실행하지 않고, 사용자가 진행을 원할 때 해당 스킬로 넘김
 - 새 스킬이 추가되면 `gorani-ask`의 스킬 지도도 함께 갱신
+
+### gorani-change-impact
+
+기존 스킬이 만든 산출물 옆의 `*.artifact.json` sidecar manifest와 git diff를 비교해, 갱신이 필요한 산출물만 알려 줍니다.
+
+- 기본은 값싼 `stale` 모드. 코드 파싱 없이 `git diff`와 글롭만 사용
+- 갱신 대상이 없으면 리포트 파일도 PR 코멘트도 만들지 않음
+- `full` 모드는 릴리스 전이나 요청 시에만 실행하고 화면·API·DB·설정·의존성·테스트 영향을 분류
+- 산출물을 자동 수정하지 않고 manifest의 `regenerate` 명령만 제안
+- `gorani-site-structure`, `gorani-table-spec`, `gorani-api-contract-diff`가 manifest를 자동 생성
+- PR CI는 특정 경로가 바뀔 때만 path-filter로 실행
+- 결과: `.gorani/impact/impact-<head>-stale.md`, `.json` 또는 `-full.md`, `.json`
+- `.gorani/`는 로컬 임시 산출물이므로 커밋하지 않음
+
+### gorani-report
+
+스킬 사용 중 만난 오류·개선·아이디어·양식 제안을 공개 GitHub 이슈로 정리합니다.
+
+- 실행 명령·오류 로그·제안 내용·환경과 대상 스킬의 `metadata.version`·`metadata.updated`를 모아 드래프트 생성
+- 홈 경로·토큰·비밀번호·DB URL 자격증명·이메일·내부 URL 마스킹
+- Excel·Markdown·HTML 양식 제안과 새 아이디어도 오류와 같은 흐름으로 작성
+- `--kind idea`·`--kind format`·`--area excel`로 제안 종류와 영역을 구분
+- 중복 이슈를 먼저 검색하고, 기존 이슈 코멘트 또는 새 이슈를 선택
+- 기본은 드래프트이며, 사용자 확인 후에만 `--create`로 실제 생성
+- `gh`가 없거나 인증되지 않았으면 드래프트만 남기고 `gh auth login` 안내
+- `.github/ISSUE_TEMPLATE/skill-report.yml` 양식으로 직접 보고도 가능
+- 결과: `.gorani/report/<skill>-<timestamp>.md`, `--json` 메타데이터, 생성된 이슈 URL
 
 ### gorani-docs-governance
 
@@ -181,7 +210,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-ask gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-ask gorani-change-impact gorani-report gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -191,10 +220,10 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-ask gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-ask gorani-change-impact gorani-report gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
-opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 열한 스킬이 보입니다.
+opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 열세 스킬이 보입니다.
 
 ## 도구 자동 설치
 
@@ -211,7 +240,7 @@ opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-ask`, `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-api-contract-diff`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`, `gorani-table-spec`, `gorani-site-structure`을 넣습니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-ask`, `gorani-change-impact`, `gorani-report`, `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-api-contract-diff`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`, `gorani-table-spec`, `gorani-site-structure`을 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -281,6 +310,8 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/api-contract-diff/` | OpenAPI 이전·새 스펙과 계약 변경 리포트 |
 | `samples/table-spec/` | DDL과 테이블 명세서 Excel·Markdown 샘플 |
 | `samples/site-structure/` | 실제 레이아웃 인벤토리와 사이트 구조도 Excel·Markdown·HTML 샘플 |
+| `samples/change-impact/` | sidecar manifest 예시, PR path-filter 워크플로, stale·full 리포트 샘플 |
+| `samples/report/` | `gorani-report`가 만드는 오류·Excel 양식 제안 이슈 본문 샘플 |
 
 샘플 데이터는 형식 설명용 가상 데이터입니다. 재생성 명령은 `samples/README.md`에 있습니다.
 

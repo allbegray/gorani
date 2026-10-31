@@ -1,6 +1,9 @@
 ---
 name: gorani-ask
 description: 여러 gorani 스킬 중 지금 상황에 맞는 스킬과 작업 순서를 안내한다. 어떤 스킬을 써야 할지 모르거나 릴리스·API·DB·기획서·문서 작업을 어디서 시작할지 물을 때 사용.
+metadata:
+  version: "3.17.0"
+  updated: "2026-10-31"
 ---
 
 # Gorani Ask
@@ -29,13 +32,15 @@ description: 여러 gorani 스킬 중 지금 상황에 맞는 스킬과 작업 �
 | `gorani-dependency-update` | 의존성을 최신 안정·CVE 최소 수정으로 올릴 때 | 업데이트 계획·적용·검증 |
 | `gorani-license-notice` | 앱·백엔드에 오픈소스 고지 페이지를 넣을 때 | 고지 HTML·md·검토 목록 |
 | `gorani-release-note` | 고객용 릴리스 노트·스토어 업데이트 문구를 쓸 때 | HTML·md·스토어 요약 |
+| `gorani-change-impact` | 기존 산출물이 소스 변경으로 낡았는지 확인할 때 | 갱신 필요 산출물·재생성 명령 |
+| `gorani-report` | 스킬 오류·개선·아이디어·양식 제안을 GitHub 이슈로 남기고 싶을 때 | 마스킹된 이슈 드래프트·생성 URL |
 | `gorani-ask` | 어떤 스킬을 써야 할지 모를 때 | 추천 스킬과 작업 순서 |
 
 ## 먼저 확인할 것
 
 사용자 말에서 아래 세 가지를 찾습니다. 이미 있으면 다시 묻지 않습니다.
 
-1. **결과물**: 문서, 엑셀, HTML, 리포트, 코드 변경, 배포 판단 중 무엇인가?
+1. **결과물**: 문서, 엑셀, HTML, 리포트, 코드 변경, 배포 판단, GitHub 이슈 중 무엇인가?
 2. **가진 자료**: 기획서, OpenAPI, DDL/DB, git 브랜치·태그, 프론트 URL, SBOM, 없음
 3. **단계**: 기획, 변경, 배포 전, 배포 후, 문서 정리
 
@@ -57,11 +62,28 @@ description: 여러 gorani 스킬 중 지금 상황에 맞는 스킬과 작업 �
 
 ### 릴리스 전체
 
-`gorani-release-check` → `gorani-cve-scan` → `gorani-license-notice` → `gorani-release-note`
+`gorani-change-impact` → `gorani-release-check` → `gorani-cve-scan` → `gorani-license-notice` → `gorani-release-note`
 
-- 먼저 배포 diff와 점검 항목을 봅니다.
+- 먼저 갱신이 필요한 기존 산출물이 있는지 확인합니다.
+- 이어서 배포 diff와 점검 항목을 봅니다.
 - 의존성 CVE와 고지 의무를 확인합니다.
 - 마지막에 고객에게 나갈 문구를 만듭니다.
+
+### 문제 보고
+
+`gorani-report`
+
+- 스킬이 실패했거나 개선·아이디어·양식 제안이 보이면 명령·오류 로그·제안 내용·환경을 모아 드래프트를 만듭니다.
+- 공개 이슈 작성 전 사용자 확인을 받고, 중복 이슈가 있으면 코멘트를 먼저 제안합니다.
+- `gh`가 없거나 인증되지 않았으면 드래프트만 남기고 `gh auth login`을 안내합니다.
+
+### 산출물 갱신
+
+`gorani-change-impact` → `gorani-site-structure`·`gorani-table-spec`·`gorani-api-contract-diff` 중 해당 스킬
+
+- `stale` 모드로 갱신 대상과 매칭된 변경 파일을 확인합니다.
+- 리포트의 `regenerate` 명령으로 산출물을 다시 만들고 manifest를 갱신합니다.
+- `full` 모드는 릴리스 전이나 사용자가 요청할 때만 사용합니다.
 
 ### API 변경
 
@@ -129,3 +151,7 @@ description: 여러 gorani 스킬 중 지금 상황에 맞는 스킬과 작업 �
 ## 유지보수
 
 스킬이 추가·이름 변경·삭제되거나 작업 경로가 바뀌면 이 파일의 **스킬 지도**와 **주요 작업 경로**를 같은 변경에 갱신합니다. `gorani-ask`가 오래된 스킬을 추천하면 라우터가 없는 것보다 더 위험합니다.
+
+## 문제 보고
+
+스킬이 예상과 다르게 실패하거나 개선점·아이디어·양식 제안이 보이면, 원인이 이 스킬·스크립트에 있는지 확인한 뒤 `gorani-report`로 GitHub 이슈를 만들지 사용자에게 먼저 묻습니다. 공개 이슈에는 고객 정보·시크릿·내부 URL을 넣지 않고, 사용자 확인 후 작성합니다.

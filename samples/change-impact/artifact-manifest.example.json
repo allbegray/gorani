@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "skill": "gorani-site-structure",
+  "artifact": "docs/site-structure/site-structure.xlsx",
+  "outputs": [
+    "docs/site-structure/site-structure.xlsx",
+    "docs/site-structure/site-structure.md",
+    "docs/site-structure/site-structure.html"
+  ],
+  "sources": [
+    "docs/site-structure/site-structure-input.json",
+    "src/app/**",
+    "src/pages/**",
+    "src/routes/**",
+    "!src/app/**/*.test.*"
+  ],
+  "generated_commit": "abc1234",
+  "generated_at": "2026-10-31T14:00:00+09:00",
+  "working_tree_dirty": false,
+  "regenerate": "python3 skills/gorani-site-structure/scripts/site_structure.py --input docs/site-structure/site-structure-input.json --outdir docs/site-structure --name site-structure --formats xlsx,md,html"
+}

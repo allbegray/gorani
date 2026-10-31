@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skill": "gorani-site-structure",
+  "artifact": "samples/site-structure/site-structure-sample.xlsx",
+  "outputs": [
+    "samples/site-structure/site-structure-sample.md",
+    "samples/site-structure/site-structure-sample.html",
+    "samples/site-structure/site-structure-sample.xlsx"
+  ],
+  "sources": [
+    "samples/site-structure/site-structure-input.json"
+  ],
+  "generated_commit": "136443a",
+  "generated_at": "2026-10-31T19:06:59+09:00",
+  "working_tree_dirty": true,
+  "regenerate": "python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/site-structure/site-structure-input.json --outdir samples/site-structure --name site-structure-sample --formats xlsx,md,html"
+}

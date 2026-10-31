@@ -21,6 +21,9 @@
 | scripts의 시트·정렬 | samples 재생성, SKILL.md의 입력·시트 설명, evidence |
 | 새 스킬 | README 스킬 표, `gorani-ask` 스킬 지도·작업 경로, 3장 스킬 계약, samples(선택) |
 | 스킬 이름·경로 | README의 설치·프롬프트 명령 경로, `gorani-ask` 스킬 지도, 3장 스킬 계약 |
+| sidecar manifest 필드·글롭 규칙 | `gorani-change-impact` 판독 로직, `samples/change-impact`, evidence |
+| 오류 보고 경로·마스킹 규칙 | `gorani-report`, `.github/ISSUE_TEMPLATE/skill-report.yml`, `samples/report`, evidence |
+| 스킬 내용·스크립트 변경 | 해당 `SKILL.md`의 `metadata.version`을 CHANGELOG 릴리스 버전으로, `metadata.updated`를 변경 날짜로 갱신 |
 
 ## 3. 스킬 계약
 
@@ -34,6 +37,34 @@
 | 출력 | 추천 스킬, 이유, 준비물, 다음 단계, 이어질 스킬 |
 | 갱신 | 스킬 추가·이름 변경·삭제·작업 경로 변경 시 같은 변경에 스킬 지도와 주요 작업 경로를 갱신 |
 | 금지 | 없는 스킬 추천, 이름만 보고 설명, 한 번에 여러 스킬 실행, 추천만 요청했는데 산출물 생성 |
+
+### gorani-change-impact
+
+| 항목 | 내용 |
+| --- | --- |
+| 역할 | 기존 산출물의 stale 여부를 알려주는 라우터. 산출물을 직접 수정하지 않고 갱신 명령만 제안 |
+| 기본 모드 | `--mode stale`. `*.artifact.json` 탐색, manifest 마지막 커밋과 `generated_commit` 중 최신 기준의 git diff, `sources` 글롭 매칭만 사용. 코드 파싱 없음. 1~2초 목표 |
+| full 모드 | 릴리스 전·사용자 요청 시에만. 변경을 frontend·api·db·config·dependencies·tests로 분류하고 확인 제안. 기본 base는 마지막 태그, 없으면 `origin/main`·`main` merge-base, 그다음 `HEAD~1` |
+| 출력 | stale이 있을 때만 `.gorani/impact/impact-<head>-stale.md`·`.json`. full은 항상 `-full.md`·`.json`. 갱신 대상이 없으면 파일·PR 코멘트를 만들지 않음 |
+| manifest | 산출물 옆 `<이름>.artifact.json`. `skill`·`artifact`·`outputs`·`sources`·`generated_commit`·`generated_at`·`regenerate` 기록. 중앙 registry를 두지 않음 |
+| CI | path-filter가 걸린 경로에서만 실행. stale이 있을 때만 PR 코멘트. 처음에는 경고, 안정화 후 `--fail-on-stale` |
+| 금지 | 산출물 자동 수정, 매 PR full 실행, manifest 없는 산출물 추측, 확인 불가를 최신으로 간주, `.gorani/` 커밋 |
+| 검증 | 샘플 manifest로 stale·clean·unknown, `--working`, `--fail-on-stale`, `--mode full` 분류 확인 |
+
+### gorani-report
+
+| 항목 | 내용 |
+| --- | --- |
+| 역할 | 스킬 오류·개선·아이디어·양식 제안을 공개 GitHub 이슈로 정리. 기본은 드래프트, 사용자 확인 후에만 생성. 사용자 프로젝트 버그는 대상 아님 |
+| 입력 | 스킬 이름, 스킬 버전, 종류(`bug`·`enhancement`·`idea`·`format`·`documentation`·`question`), 영역, 요약, 제안·기대 효과·현재 동작, 기대·실제 결과, 재현 절차, 실행 명령, 오류 로그, 도구 버전 |
+| 마스킹 | 홈·작업 경로, 토큰, 비밀번호, DB URL 자격증명, 이메일, 내부 URL, private key. 잔여 위험 패턴이 있으면 생성 차단 |
+| 중복 | `gh issue list --search <skill>`로 확인. 중복 후보가 있으면 새 이슈 대신 코멘트를 먼저 제안 |
+| 버전 | 대상 `SKILL.md`의 `metadata.version`·`metadata.updated`를 읽어 본문·JSON에 포함. 없으면 `unknown`, `--skill-version`으로 override |
+| 제안 | `idea`·`format`·`enhancement`는 재현 절차·오류 로그 없이 제안·기대 효과·현재 동작으로 본문 구성. `format`은 `--area`로 Excel·Markdown·HTML 등을 구분 |
+| 출력 | `.gorani/report/*.md` 드래프트, `--json` 메타데이터, 생성·코멘트 URL. `.gorani/`는 커밋 금지 |
+| 확인 | 공개 이슈 작성 전 사용자 확인 필수. `gh` 미인증이면 드래프트만 남기고 `gh auth login` 안내 |
+| 금지 | 자동 생성, 확인 없는 외부 업로드, 고객 정보·시크릿 포함, 경고를 숨긴 `--force`, `.gorani/report` 커밋 |
+| 검증 | 가짜 `gh`로 드래프트·중복·생성·코멘트·마스킹·미인증 경로 확인 |
 
 ### gorani-docs-governance
 
@@ -74,8 +105,8 @@
 | 입력 | OpenAPI 3.x JSON/YAML 두 개. Swagger 2.0·GraphQL SDL·실제 응답 비교는 1차 범위 아님 |
 | 비교 | 경로·오퍼레이션·파라미터·요청/응답 body 스키마·before/after 예시·enum·인증·서버. breaking/risky/non-breaking/info |
 | 우선순위 | Google Issue Tracker P0~P4 기준. P0는 전면 중단이 명백할 때만, P1·P2는 breaking, P3는 risky, P4는 non-breaking·info |
-| 출력 | `docs/api/<service>/api-diff.md`, 선택 시 `api-diff.json`. 결론·P0~P4 우선순위·먼저 확인할 것·API별 변경·공통 변경·전체 변경 부록과 읽기 쉬운 위치 표기 포함 |
-| 스크립트 | `scripts/api_diff.py`. JSON은 표준 라이브러리, YAML은 PyYAML. 스펙 기준 비교이며 런타임 비교 아님 |
+| 출력 | `docs/api/<service>/api-diff.md`, 선택 시 `api-diff.json`, sidecar `api-diff.artifact.json`. 결론·P0~P4 우선순위·먼저 확인할 것·API별 변경·공통 변경·전체 변경 부록과 읽기 쉬운 위치 표기 포함 |
+| 스크립트 | `scripts/api_diff.py`. JSON은 표준 라이브러리, YAML은 PyYAML. 스펙 기준 비교이며 런타임 비교 아님. `--sources`·`--manifest`·`--no-manifest` 지원 |
 | 검증 | 샘플 old/new로 리포트·JSON 생성, P0~P4 분류, `--fail-on-breaking` exit 1 확인 |
 | 금지 | 스펙에 없는 런타임 단정, 코드·스펙 수정, 근거 없는 non-breaking, 외부 업로드 |
 
@@ -134,8 +165,8 @@
 | --- | --- |
 | 입력 | `.sql`·`.ddl` 파일 또는 디렉터리, SQLAlchemy `--db-url`. DDL은 `CREATE TABLE`·`ALTER TABLE`·`COMMENT ON`·`CREATE INDEX`·`DROP TABLE`을 반영 |
 | 파싱 | DDL은 `sqlglot`과 `--dialect`, DB는 SQLAlchemy Inspector와 `--schema` 사용. postgres·mysql·sqlite·mssql·oracle 지원. 시스템 테이블 기본 제외, `--include-system`으로 포함 |
-| 출력 | `table-spec.xlsx`(요약·테이블 목록·컬럼 명세·관계·인덱스·파싱 메모), `table-spec.md`, 자기완결 `table-spec.html` |
-| 선택 | `--formats xlsx,md,html` 기본. 사용자가 고른 형식만 생성. `md`·`html`만 선택하면 openpyxl 없이 동작. `--strict`는 경고 시 exit 1 |
+| 출력 | `table-spec.xlsx`(요약·테이블 목록·컬럼 명세·관계·인덱스·파싱 메모), `table-spec.md`, 자기완결 `table-spec.html`, sidecar `table-spec.artifact.json` |
+| 선택 | `--formats xlsx,md,html` 기본. 사용자가 고른 형식만 생성. `md`·`html`만 선택하면 openpyxl 없이 동작. `--sources`로 manifest 소스 글롭 지정, `--no-manifest`로 생략. `--strict`는 경고 시 exit 1 |
 | 제한 | DB 모드는 접속 시점 스키마만 반영. 뷰·동적 SQL·트리거·저장 프로시저는 테이블 명세 대상이 아님. DB 비밀번호는 결과에서 마스킹 |
 | 검증 | 샘플 DDL xlsx·md·html, PostgreSQL·MySQL·SQL Server·Oracle Docker 실DB, SQLite, URL 마스킹, HTML 외부 요청 0건, `--strict` exit 1 확인 |
 
@@ -145,14 +176,15 @@
 | --- | --- |
 | 입력 | 실제 프론트 레이아웃을 확인해 작성한 `site-structure-input.json`. API 스펙·URL만으로 구조를 만들지 않음 |
 | 기준 | KRDS 디지털 정부서비스 UI/UX 가이드라인과 전자정부 웹사이트 품질관리 지침. 메뉴 depth 최소 2·최대 3 |
-| 출력 | `site-structure.xlsx`(요약·사이트 구조·화면 목록·API 매핑·API only·표준 근거·검토 메모), `.md`, 자기완결 `.html` |
-| 선택 | `--formats xlsx,md,html` 기본. `md`·`html`만 선택하면 openpyxl 없이 동작. `--strict`는 경고 시 exit 1 |
+| 출력 | `site-structure.xlsx`(요약·사이트 구조·화면 목록·API 매핑·API only·표준 근거·검토 메모), `.md`, 자기완결 `.html`, sidecar `.artifact.json` |
+| 선택 | `--formats xlsx,md,html` 기본. `md`·`html`만 선택하면 openpyxl 없이 동작. `--sources` 또는 입력 JSON `sources`로 manifest 소스 지정, `--no-manifest`로 생략. `--strict`는 경고 시 exit 1 |
 | 제한 | API only는 구조도와 분리. 상세·탭·액션은 부모 화면과 노출 방식으로 표현. 스크린샷은 파일 경로만 기록 |
 | 검증 | 샘플 15화면·2Depth, 동적 Depth 컬럼, HTML 외부 요청 0건, `--strict` exit 1 확인 |
 
 ## 4. 스킬 형식
 
 - frontmatter: `name`(`gorani-` prefix를 붙인 폴더명과 동일, 소문자·숫자·하이픈), `description`(1-1024자, 언제 쓰는지 중심)
+- `metadata.version`은 해당 스킬이 마지막으로 바뀐 gorani 릴리스 버전(예: `"3.17.0"`), `metadata.updated`는 그 날짜(`YYYY-MM-DD`)입니다. 값을 바꾸면 `gorani-report`가 이슈 본문에 자동으로 넣습니다.
 - 새 스킬 ID는 `gorani-` prefix를 붙여 다른 설치본과의 충돌을 피함
 - 본문: H1 + 역할 한 줄 → `## 전제`, `## 절차`, `## 출력 형식`, `## 실패 처리`, `## 금지` 같은 섹션
 - 한국어, 코드 펜스 없는 인라인 표기
@@ -183,7 +215,7 @@
 ## 7. 하지 말 것
 
 - 지시 없는 커밋·푸시
-- `.omo/`, `.codegraph/`, `.idea/`, `.security/`, `.qa/`, `__pycache__/`, `*.pyc` 커밋
+- `.omo/`, `.gorani/`, `.codegraph/`, `.idea/`, `.security/`, `.qa/`, `__pycache__/`, `*.pyc` 커밋
 - README 명령 구조 변경: `opencode run` positional, `claude -p`, `codex exec`, `curl.exe` + UTF-8 프리픽스
 - 확인하지 않은 내용을 문서에 단정적으로 쓰기
 - `curl | sh`, 출처 불명 바이너리, 임의 URL로 도구 설치
@@ -214,3 +246,5 @@
 | 2026-10-31 | `table-spec` HTML 산출물 추가 (v3.13.0) | `.omo/evidence/2026-10-31-table-spec-html.md` |
 | 2026-10-31 | `site-structure` 추가 (v3.14.0) | `.omo/evidence/2026-10-31-site-structure.md` |
 | 2026-10-31 | `ask` 라우터 추가 (v3.15.0) | `.omo/evidence/2026-10-31-ask.md` |
+| 2026-10-31 | `change-impact` 추가, 세 스킬에 sidecar manifest 생성 (v3.16.0) | `.omo/evidence/2026-10-31-change-impact.md` |
+| 2026-10-31 | `report` 추가, 전 스킬에 문제 보고 경로 연결 (v3.17.0) | `.omo/evidence/2026-10-31-report.md` |

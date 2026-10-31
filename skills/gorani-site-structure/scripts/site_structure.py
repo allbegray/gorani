@@ -14,8 +14,11 @@ import argparse
 import html
 import json
 import re
+import shlex
+import subprocess
 import sys
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 
 OUTPUT_FORMATS = ("md", "xlsx", "html")
@@ -41,6 +44,16 @@ def parse_args():
         help=f"생성할 산출물: {','.join(OUTPUT_FORMATS)} (기본: {DEFAULT_FORMATS})",
     )
     parser.add_argument(
+        "--sources",
+        default="",
+        help="산출물 갱신 판단에 쓸 소스 글롭 (쉼표 구분). 기본은 입력 JSON과 src/app·src/pages·src/routes",
+    )
+    parser.add_argument(
+        "--no-manifest",
+        action="store_true",
+        help="sidecar .artifact.json manifest를 만들지 않음",
+    )
+    parser.add_argument(
         "--strict",
         action="store_true",
         help="검증 경고가 있으면 종료 코드 1",
@@ -54,6 +67,108 @@ def parse_args():
         parser.error("--formats 에 하나 이상의 형식을 지정하세요.")
     args.formats = set(formats)
     return args
+
+
+def repo_path(path):
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = (Path.cwd() / candidate).resolve()
+    else:
+        candidate = candidate.resolve()
+    try:
+        return candidate.relative_to(Path.cwd().resolve()).as_posix()
+    except ValueError:
+        return candidate.as_posix()
+
+
+def git_head_commit():
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def git_dirty():
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return False
+    return bool(result.stdout.strip()) if result.returncode == 0 else False
+
+
+PATH_OPTIONS = {"--input", "--outdir"}
+
+
+def portable_value(value):
+    if not value or value == "-" or value.startswith("-"):
+        return value
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        return value
+    try:
+        return candidate.expanduser().resolve().relative_to(Path.cwd().resolve()).as_posix()
+    except (ValueError, OSError):
+        return value
+
+
+def portable_args(argv):
+    result = []
+    index = 0
+    while index < len(argv):
+        item = argv[index]
+        if item in PATH_OPTIONS and index + 1 < len(argv):
+            result.extend([item, portable_value(argv[index + 1])])
+            index += 2
+            continue
+        matched = False
+        for option in PATH_OPTIONS:
+            if item.startswith(option + "="):
+                result.append(option + "=" + portable_value(item[len(option) + 1 :]))
+                matched = True
+                break
+        if not matched:
+            result.append(item)
+        index += 1
+    return result
+
+
+def regenerate_command():
+    script = Path(sys.argv[0])
+    if script.exists():
+        relative = repo_path(script)
+        if not Path(relative).is_absolute() and not relative.startswith("../"):
+            return "python3 " + shlex.join([relative, *portable_args(sys.argv[1:])])
+    if script.parent.name == "scripts" and script.parent.parent.name:
+        portable = f"{script.parent.parent.name}/scripts/{script.name}"
+    else:
+        portable = script.name
+    return "python3 " + shlex.join([portable, *portable_args(sys.argv[1:])])
+
+
+def write_manifest(path, artifact, outputs, sources):
+    payload = {
+        "version": 1,
+        "skill": "gorani-site-structure",
+        "artifact": artifact,
+        "outputs": outputs,
+        "sources": sources,
+        "generated_commit": git_head_commit(),
+        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "working_tree_dirty": git_dirty(),
+        "regenerate": regenerate_command(),
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def as_list(value):
@@ -237,6 +352,7 @@ def load_input(path):
         "roles": as_list(data.get("roles")),
         "viewports": as_list(data.get("viewports")),
         "review_status": str(data.get("review_status", "")).strip(),
+        "sources": as_list(data.get("sources")),
     }
     return meta, pages, depth_count, warnings, standards, api_only
 
@@ -827,6 +943,27 @@ def main():
         html_path.write_text(build_html(meta, pages, depth_count, warnings, standards, api_only), encoding="utf-8")
     if "xlsx" in args.formats:
         write_xlsx(xlsx_path, meta, pages, depth_count, warnings, standards, api_only)
+    outputs = []
+    for key, path in (("md", md_path), ("html", html_path), ("xlsx", xlsx_path)):
+        if key in args.formats:
+            outputs.append(repo_path(path))
+    if args.sources:
+        sources = [item.strip() for item in args.sources.split(",") if item.strip()]
+    elif meta["sources"]:
+        sources = meta["sources"]
+    else:
+        sources = [repo_path(args.input)]
+        for candidate in ("src/app", "src/pages", "src/routes"):
+            if (Path.cwd() / candidate).is_dir():
+                sources.append(candidate + "/**")
+    unique_sources = []
+    for item in sources:
+        if item not in unique_sources:
+            unique_sources.append(item)
+    sources = unique_sources
+    manifest_path = outdir / f"{args.name}.artifact.json"
+    if not args.no_manifest:
+        write_manifest(manifest_path, repo_path(xlsx_path if "xlsx" in args.formats else outputs[0] if outputs else outdir), outputs, sources)
     summary = {
         "md": str(md_path) if "md" in args.formats else "",
         "html": str(html_path) if "html" in args.formats else "",
@@ -837,6 +974,7 @@ def main():
         "api_only": len(api_only),
         "standards": len(standards),
         "warnings": len(warnings),
+        "manifest": "" if args.no_manifest else str(manifest_path),
     }
     print(json.dumps(summary, ensure_ascii=False))
     if args.strict and warnings:

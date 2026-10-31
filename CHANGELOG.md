@@ -1,6 +1,54 @@
 # 변경 이력
 
-최신 버전은 3.15.0(2026-10-31)입니다. 3.15.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.17.0(2026-10-31)입니다. 3.17.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 3.17.0 · 2026-10-31
+
+`gorani-report` 추가, 전 스킬에 문제 보고 경로 연결
+
+**추가**
+
+- `gorani-report`: 스킬 오류·개선·아이디어·양식 제안을 공개 GitHub 이슈로 정리하는 드래프트 생성기
+- 실행 명령·오류 로그·환경·도구 버전을 모아 이슈 본문 생성
+- 홈·작업 경로, 토큰, 비밀번호, DB URL 자격증명, 이메일, 내부 URL, private key 자동 마스킹
+- 잔여 위험 패턴이 있으면 `--force` 없이는 생성 차단
+- `gh issue list`로 중복 이슈를 확인하고 기존 이슈 코멘트를 먼저 제안
+- 기본은 드래프트, 사용자 확인 후 `--create`·`--comment-on`으로 실제 생성
+- `gh` 미설치·미인증이면 드래프트만 남기고 안내
+- `--kind idea`·`--kind format`, `--area excel|markdown|html|cli|docs|other`로 아이디어·양식 제안 구분
+- `--proposal`·`--benefit`·`--current`로 오류가 아닌 제안 본문 구성
+- `.github/ISSUE_TEMPLATE/skill-report.yml` 수동 보고 양식에 아이디어·양식·영역 필드 추가
+- 모든 스킬의 `## 문제 보고` 섹션에서 `gorani-report` 연결
+- 모든 스킬 frontmatter에 `metadata.version`·`metadata.updated` 추가
+- `gorani-report`가 대상 스킬의 버전·갱신일을 이슈 본문과 JSON에 포함
+
+**변경**
+
+- README 스킬 표·설치·프롬프트·샘플 목록에 `gorani-report` 등록
+- AGENTS 2장 변경 계약과 3장 스킬 계약에 보고 경로·마스킹 규칙 추가
+- `gorani-ask` 스킬 지도와 문제 보고 경로 추가
+
+## 3.16.0 · 2026-10-31
+
+`gorani-change-impact` 추가, 기존 산출물에 sidecar manifest 생성
+
+**추가**
+
+- `gorani-change-impact`: `*.artifact.json`과 git diff만 비교하는 값싼 `stale` 모드
+- 릴리스 전·요청 시에만 쓰는 `full` 모드: 화면·API·DB·설정·의존성·테스트 변경 분류와 확인 제안
+- stale이 있을 때만 `.gorani/impact/impact-<head>-stale.md`·`.json` 생성, 없으면 파일·코멘트 없음
+- manifest 마지막 커밋과 `generated_commit` 중 최신을 기준으로 비교해, 같은 PR에서 재생성한 산출물을 stale로 오판하지 않음
+- `--working`, `--fail-on-stale`, `--fail-on-unknown`, `--base`, `--head` 지원
+- `gorani-site-structure`·`gorani-table-spec`·`gorani-api-contract-diff`가 산출물 옆에 `.artifact.json` 자동 생성
+- `--sources`로 manifest 소스 글롭 지정, `--no-manifest`로 생략
+- GitHub Actions path-filter 예시와 sidecar manifest 예시 샘플
+
+**변경**
+
+- README·samples에 `gorani-change-impact` 등록
+- `gorani-ask` 스킬 지도와 릴리스 경로에 `change-impact` 추가
+- AGENTS 2장 변경 계약, 3장 스킬 계약, 7장 금지 목록에 sidecar manifest·`.gorani/` 규칙 추가
+- `.gitignore`에 `.gorani/` 추가
 
 ## 3.15.0 · 2026-10-31
 
