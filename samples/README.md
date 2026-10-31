@@ -50,6 +50,44 @@ python3 skills/gorani-release-check/scripts/release_xlsx.py --input samples/rele
 python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-contract-diff/old.yaml --new samples/api-contract-diff/new.yaml --service "Share API" --release-version "1.1.0" --clients "web, ios, android" --out samples/api-contract-diff/api-diff.md --json-out samples/api-contract-diff/api-diff.json
 ```
 
+## gorani-site-structure
+
+| 파일 | 내용 |
+| --- | --- |
+| `site-structure-input.json` | 실제 프론트 레이아웃을 확인해 정리한 구조 인벤토리 |
+| `site-structure-sample.xlsx` | 요약·사이트 구조·화면 목록·API 매핑·API only·표준 근거·검토 메모 |
+| `site-structure-sample.md` | 같은 내용의 Markdown 구조도 |
+| `site-structure-sample.html` | 검색·메뉴 트리·화면 표를 담은 자기완결 HTML |
+
+재생성:
+
+```bash
+python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/site-structure/site-structure-input.json --outdir samples/site-structure --name site-structure-sample --formats xlsx,md,html
+```
+
+샘플은 가상의 Admin Console 레이아웃이며, 스크린샷 경로도 예시입니다. 실제 구조는 브라우저에서 메뉴·탭·역할별 노출을 확인해 입력 JSON을 채웁니다. Playwright 자동 수집은 선택 사항입니다.
+
+## gorani-table-spec
+
+| 파일 | 내용 |
+| --- | --- |
+| `schema.sql` | 테이블·컬럼·주석·관계·인덱스가 있는 샘플 PostgreSQL DDL |
+| `table-spec.xlsx` | 요약·테이블 목록·컬럼 명세·관계·인덱스·파싱 메모 |
+| `table-spec.md` | 같은 내용의 Markdown 명세서 |
+| `table-spec.html` | 검색·목차·인쇄를 지원하는 자기완결 HTML 명세서 |
+
+재생성:
+
+```bash
+python3 skills/gorani-table-spec/scripts/table_spec.py --ddl samples/table-spec/schema.sql --dialect postgres --project "Sample DB" --outdir samples/table-spec --name table-spec --formats xlsx,md,html
+```
+
+DB 모드:
+
+```bash
+python3 skills/gorani-table-spec/scripts/table_spec.py --db-url "$DATABASE_URL" --schema public --project "My Service" --outdir docs/db --name table-spec --formats xlsx,md,html
+```
+
 ## gorani-license-notice
 
 | 파일 | 내용 |
@@ -116,5 +154,8 @@ ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식을 사용합니다. 샘플은 `P-RESERV
 
 - 샘플 데이터는 형식을 보여주기 위한 가상 데이터입니다. 실제 프로젝트 결과가 아닙니다.
 - gorani-cve-scan·gorani-release-check 샘플과 gorani-license-notice의 `--xlsx`는 `openpyxl`이 필요합니다: `python3 -m pip install --user openpyxl`
+- gorani-table-spec은 DDL 모드에 `sqlglot`, DB 모드에 `sqlalchemy`와 DB 드라이버, xlsx 생성 시 `openpyxl`이 필요합니다: `python3 -m pip install --user sqlglot sqlalchemy openpyxl`
+- gorani-site-structure는 xlsx 생성 시 `openpyxl`이 필요합니다. Playwright 자동 수집을 선택한 경우에만 Playwright와 브라우저 바이너리가 필요합니다.
+- PostgreSQL DB 모드는 `psycopg[binary]`, MySQL은 `pymysql`, SQL Server는 `pymssql`, Oracle은 `oracledb`를 추가로 설치합니다.
 - gorani-release-note는 표준 라이브러리만 사용합니다.
 - 스크립트나 시트 구성을 바꾸면 샘플도 다시 생성해 같은 변경에 포함합니다.

@@ -1,6 +1,82 @@
 # 변경 이력
 
-최신 버전은 3.11.0(2026-10-30)입니다. 3.11.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.15.0(2026-10-31)입니다. 3.15.0 이전 이력은 git log와 태그로 확인합니다.
+
+## 3.15.0 · 2026-10-31
+
+`gorani-ask` 스킬 라우터 추가
+
+**추가**
+
+- 사용자의 결과물·가진 자료·작업 단계를 보고 첫 스킬과 이어질 순서를 추천
+- 릴리스, API 변경, DB 변경, 기획서 분석, 의존성·보안, 문서 정리 작업 경로 제공
+- 추천 스킬의 이유·준비물·다음 단계 출력
+- 스킬을 대신 실행하지 않고 사용자가 진행을 원할 때 해당 스킬로 넘김
+- 스킬 추가·이름 변경·삭제 시 `gorani-ask` 지도 갱신 규칙 추가
+
+**변경**
+
+- README 스킬 표·설치·프롬프트 목록에 `gorani-ask` 등록
+- AGENTS 2장 변경 계약과 3장 스킬 계약에 `gorani-ask` 추가
+
+## 3.14.0 · 2026-10-31
+
+`gorani-site-structure` 추가
+
+**추가**
+
+- 실제 프론트 레이아웃에서 확인한 메뉴·탭·화면 구조를 `site-structure-input.json`으로 정리
+- `site-structure.xlsx`: 요약, 사이트 구조, 화면 목록, API 매핑, API only, 표준 근거, 검토 메모
+- `site-structure.md`, 자기완결 `site-structure.html` 생성
+- KRDS 디지털 정부서비스 UI/UX 가이드라인과 전자정부 웹사이트 품질관리 지침을 표준 근거로 기록
+- 메뉴 depth 최소 2·최대 3, 3Depth 초과는 상세·탭·액션으로 분리
+- API only를 구조도와 분리하고 스크린샷은 `screens/` 파일 경로로 기록
+- Playwright 자동 수집은 선택 사항으로 두고 에이전트의 실제 화면 확인을 기본으로 함
+- `samples/site-structure/` 입력 JSON과 Excel·Markdown·HTML 샘플
+
+**변경**
+
+- README 스킬 표·설치·예시·샘플 목록에 `gorani-site-structure` 등록
+- AGENTS 3장에 `gorani-site-structure` 계약 추가
+
+## 3.13.0 · 2026-10-31
+
+`gorani-table-spec` HTML 산출물 추가
+
+**추가**
+
+- `--formats html`: 검색·목차·인쇄를 지원하는 자기완결 `table-spec.html` 생성
+- Excel·Markdown·HTML 중 사용자가 고른 형식만 생성
+- HTML은 외부 CSS·JS·폰트·이미지 없이 CSP로 외부 요청 차단
+- 샘플 `samples/table-spec/table-spec.html` 추가
+
+**변경**
+
+- `--formats` 기본값을 `xlsx,md,html`로 조정
+- `md`·`html`만 선택하면 openpyxl 없이 동작
+- README·AGENTS·samples/README에 형식 선택과 HTML 설명 추가
+
+## 3.12.0 · 2026-10-31
+
+`gorani-table-spec` 추가
+
+**추가**
+
+- SQL DDL 또는 실제 DB에서 테이블·컬럼·PK/FK·UNIQUE·NOT NULL·DEFAULT·설명·인덱스를 추출
+- `table-spec.xlsx`: 요약, 테이블 목록, 컬럼 명세, 관계, 인덱스, 파싱 메모
+- `table-spec.md`: 같은 내용의 Markdown 명세서
+- DDL: `CREATE TABLE`, `ALTER TABLE`, `COMMENT ON`, `CREATE INDEX`, `DROP TABLE` 지원
+- DB: SQLAlchemy Inspector로 테이블·컬럼·PK·FK·UNIQUE·인덱스·COMMENT 조회, `--schema` 지원
+- SQL Server 시스템 테이블 기본 제외, `--include-system` 옵션, MySQL UTF-8 연결 예시
+- `--dialect auto`와 PostgreSQL·MySQL·SQLite·MSSQL·Oracle 지정
+- `--formats md`만 선택하면 openpyxl 없이 동작, `--strict`는 경고 시 exit 1
+- DB URL 비밀번호 마스킹, 읽기 전용 계정 권장
+- `samples/table-spec/` DDL과 샘플 명세서
+
+**변경**
+
+- README 스킬 표·설치·예시·샘플 목록에 `gorani-table-spec` 등록
+- AGENTS 3장에 `gorani-table-spec` 계약 추가
 
 ## 3.11.0 · 2026-10-30
 

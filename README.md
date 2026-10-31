@@ -8,6 +8,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 
 | 스킬 | 이럴 때 | 결과 |
 | --- | --- | --- |
+| `gorani-ask` | 어떤 스킬을 써야 할지 모를 때, 작업 순서를 정할 때 | 상황별 스킬·작업 순서 추천 |
 | `gorani-docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
 | `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
 | `gorani-release-check` | 운영 배포 전 브랜치·리비전 차이를 볼 때 | P0~P4 점검 엑셀 |
@@ -16,8 +17,20 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | `gorani-release-note` | 고객에게 나갈 릴리스 노트를 써야 할 때, 앱 업데이트 안내를 준비할 때 | 선택한 HTML·md·스토어 요약·내부 기록 |
 | `gorani-dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
 | `gorani-spec-analysis` | 기획서를 정리·검토할 때, 용어·도메인·프로세스·흐름을 뽑을 때 | markdown 원문, 용어 사전, 도메인 모델, 프로세스·플로우, 검증 리포트 |
+| `gorani-table-spec` | DB 테이블 정의서를 만들 때, DDL이나 실제 DB로 스키마를 문서화할 때 | 테이블·컬럼·PK/FK·인덱스 명세 Excel·Markdown·HTML |
+| `gorani-site-structure` | 실제 프론트 메뉴·레이아웃을 사이트 구조도로 정리할 때 | 메뉴 구조·화면 목록·API only·표준 근거 Excel·Markdown·HTML |
 
 ## 각 스킬이 하는 일
+
+### gorani-ask
+
+스킬 이름을 외우지 않아도 되도록, 지금 상황에 맞는 첫 스킬과 이어질 순서를 골라 줍니다.
+
+- 결과물·가진 자료·작업 단계를 보고 가장 가까운 스킬을 추천
+- 릴리스, API 변경, DB 변경, 기획서 분석, 문서 정리 같은 작업 경로 제시
+- 추천한 스킬의 준비물과 다음 단계를 함께 안내
+- 스킬을 대신 실행하지 않고, 사용자가 진행을 원할 때 해당 스킬로 넘김
+- 새 스킬이 추가되면 `gorani-ask`의 스킬 지도도 함께 갱신
 
 ### gorani-docs-governance
 
@@ -108,6 +121,19 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - major 변경·프레임워크 범위 밖 재정의·모드 3은 계획을 보여 주고 확인 후 적용
 - npm/pnpm/yarn, pip/Poetry/uv, Flutter, Maven/Gradle, .NET, Go, Cargo, Bundler, Composer 절차를 안내
 
+### gorani-site-structure
+
+실제 프론트 화면에서 확인한 메뉴·탭·레이아웃을 기준으로 사이트 구조도를 만듭니다.
+
+- 입력: 실제 화면을 확인해 작성한 `site-structure-input.json`
+- API 스펙만으로 구조를 만들지 않고, 화면별 API 연결과 API only를 분리
+- KRDS 디지털 정부서비스 UI/UX 가이드라인과 전자정부 웹사이트 품질관리 지침을 기준으로 기록
+- 메뉴 depth는 최소 2Depth, 최대 3Depth. 상세·탭·액션은 부모 화면과 노출 방식으로 표현
+- 스크린샷은 엑셀에 넣지 않고 `screens/` 파일 경로만 기록
+- Playwright 자동 수집은 선택 사항. 기본은 에이전트가 실제 화면을 확인
+- 결과: `docs/site-structure/site-structure.xlsx`, `.md`, `.html`
+- `--formats`로 필요한 형식만 선택. `md`·`html`은 openpyxl 없이 동작
+
 ### gorani-spec-analysis
 
 기획서 원본을 markdown으로 변환하고, 용어·도메인·프로세스·플로우차트·검증 결과를 한 패키지로 정리합니다.
@@ -124,6 +150,22 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - 원문에 없는 규칙은 사실로 쓰지 않고 `추론`·`질문`으로 분리
 - 변환 도구가 없으면 설치를 임의로 하지 않고 대체 도구나 markdown 입력을 안내
 
+### gorani-table-spec
+
+SQL DDL 또는 실제 DB에서 테이블 정의를 읽어 테이블 명세서를 만듭니다.
+
+- 입력: `.sql`·`.ddl` 파일 또는 디렉터리, SQLAlchemy DB URL
+- DDL: PostgreSQL·MySQL·SQLite·MSSQL·Oracle 방언과 `ALTER TABLE`·`COMMENT`·`INDEX` 반영
+- DB: PostgreSQL·MySQL·SQLite·MSSQL·Oracle을 SQLAlchemy로 조회. 읽기 전용 계정 권장, 시스템 테이블 기본 제외
+- 테이블·컬럼·데이터 타입·길이·PK·FK·UNIQUE·NOT NULL·DEFAULT·설명·인덱스 정리
+- 결과: `docs/db/table-spec.xlsx`, `table-spec.md`, `table-spec.html`
+- `--formats`로 Excel·Markdown·HTML 중 필요한 형식만 선택
+- HTML은 검색·목차·인쇄를 지원하는 자기완결 페이지
+- `--db-url`과 `--schema`로 실제 DB 스키마를 조회하고, 비밀번호는 결과에서 마스킹
+- `--formats md` 또는 `html`만 주면 openpyxl 없이 동작
+- `--strict`로 파싱 경고가 있을 때 CI에서 차단
+- DDL 모드는 파일 기준, DB 모드는 접속 시점 스키마 기준
+
 ## 설치
 
 스킬 폴더를 에이전트가 읽는 위치에 연결합니다. 심볼릭 링크를 쓸 수 없는 환경(Windows 등)에서는 같은 경로에 폴더를 복사하세요.
@@ -139,7 +181,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-ask gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -149,10 +191,10 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-ask gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
-opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 여덟 스킬이 보입니다.
+opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 열한 스킬이 보입니다.
 
 ## 도구 자동 설치
 
@@ -169,7 +211,7 @@ opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-api-contract-diff`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`를 넣습니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-ask`, `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-api-contract-diff`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`, `gorani-table-spec`, `gorani-site-structure`을 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -237,6 +279,8 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/release-note/release-notes-internal.md` | commit 매핑·검토 기록 (내부용, 배포 제외) |
 | `samples/spec-analysis/` | 기획서 분석 패키지 (source, index, glossary, domain, processes, flows, validation) |
 | `samples/api-contract-diff/` | OpenAPI 이전·새 스펙과 계약 변경 리포트 |
+| `samples/table-spec/` | DDL과 테이블 명세서 Excel·Markdown 샘플 |
+| `samples/site-structure/` | 실제 레이아웃 인벤토리와 사이트 구조도 Excel·Markdown·HTML 샘플 |
 
 샘플 데이터는 형식 설명용 가상 데이터입니다. 재생성 명령은 `samples/README.md`에 있습니다.
 

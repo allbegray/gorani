@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'">
+<title>사이트 구조도 — Admin Console</title>
+<style>:root { color-scheme: light dark; --bg:#fff; --fg:#17181c; --muted:#5c6270; --line:#e2e5ea; --panel:#f6f7f9; --accent:#1f5fbf; }
+@media (prefers-color-scheme: dark) { :root { --bg:#111216; --fg:#e8eaee; --muted:#9aa1ae; --line:#2a2d35; --panel:#181a20; --accent:#9db8e8; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif; }
+main, header, footer { max-width:86rem; margin:0 auto; padding:0 1.25rem; }
+header { padding-top:2.5rem; }
+h1 { font-size:1.8rem; margin:0 0 .35rem; letter-spacing:-.02em; }
+h2 { font-size:1.15rem; margin:0 0 .75rem; }
+h3 { font-size:.95rem; margin:1rem 0 .5rem; }
+p { margin:.35rem 0; }
+.eyebrow { color:var(--accent); font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+.meta { color:var(--muted); font-size:.875rem; }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); gap:.65rem; margin:1.5rem 0 1rem; }
+.stat { padding:.75rem .9rem; background:var(--panel); border:1px solid var(--line); border-radius:.6rem; }
+.stat strong { display:block; font-size:1.25rem; }
+.stat span { color:var(--muted); font-size:.78rem; }
+.controls { display:flex; flex-wrap:wrap; align-items:center; gap:.75rem; margin:1.2rem 0 .8rem; padding:.85rem 1rem; background:var(--panel); border:1px solid var(--line); border-radius:.7rem; }
+.controls label { font-weight:600; font-size:.875rem; }
+.controls input { flex:1 1 16rem; min-width:0; padding:.55rem .75rem; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:.45rem; font:inherit; }
+.controls input:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.count { color:var(--muted); font-size:.8125rem; }
+.tree { margin:0; padding:1rem 1rem 1rem 1.4rem; background:var(--panel); border:1px solid var(--line); border-radius:.6rem; }
+.tree ul { margin:.25rem 0 .25rem 1rem; padding-left:1rem; border-left:1px solid var(--line); }
+.tree li { margin:.3rem 0; }
+.menu-label { font-weight:700; }
+.menu-node > .menu-label { color:var(--fg); }
+.screen-item a { color:var(--accent); text-decoration:none; }
+.screen-item a:hover { text-decoration:underline; }
+.badge { display:inline-block; margin-left:.45rem; padding:.02rem .4rem; color:var(--muted); border:1px solid var(--line); border-radius:999px; font-size:.7rem; }
+.path { margin-left:.45rem; color:var(--muted); font: .75rem/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+.section { margin:1.5rem 0; }
+.table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:.5rem; }
+table { width:100%; border-collapse:collapse; font-size:.84rem; }
+th, td { padding:.5rem .6rem; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+tr:last-child td { border-bottom:0; }
+th { background:var(--panel); color:var(--muted); font-size:.76rem; font-weight:600; white-space:nowrap; }
+.status { display:inline-block; padding:.02rem .4rem; border-radius:999px; font-size:.72rem; }
+.status.active { background:#C6E0B4; color:#1e3b12; }
+.status.planned { background:#FFE699; color:#4d3b00; }
+.status.deprecated { background:#D9D9D9; color:#333; }
+.warnings { padding:1rem; border:1px dashed var(--line); border-radius:.6rem; }
+.warnings ul { margin:.25rem 0 0; padding-left:1.2rem; color:var(--muted); font-size:.875rem; }
+.links a { color:var(--accent); }
+footer { padding:2rem 0 3rem; color:var(--muted); font-size:.8125rem; border-top:1px solid var(--line); }
+[hidden] { display:none !important; }
+@media print { .controls, footer { display:none; } .section { break-inside:avoid-page; } body { font-size:10.5pt; } }</style>
+</head>
+<body>
+<header>
+<p class="eyebrow">Information architecture</p>
+<h1>사이트 구조도 — Admin Console</h1>
+<p class="meta">Admin Console · 2026-10-31 14:00 KST · 렌더링된 프론트 레이아웃 (샘플)</p>
+<p class="meta">역할: admin, owner, member · 화면 폭: desktop, mobile</p>
+<div class="stats">
+<div class="stat"><strong>15</strong><span>화면</span></div>
+<div class="stat"><strong>6</strong><span>메뉴 그룹</span></div>
+<div class="stat"><strong>22</strong><span>API 매핑</span></div>
+<div class="stat"><strong>2</strong><span>API only</span></div>
+</div>
+</header>
+<main>
+<div class="controls"><label for="search">화면 검색</label><input id="search" type="search" placeholder="메뉴·화면·URL" autocomplete="off"><p class="count" id="result-count">15 screens</p></div>
+<section class="section"><h2>메뉴 구조</h2><ul class="tree">
+<li class="menu-node"><span class="menu-label">대시보드</span><ul><li class="screen-item" data-tree-search="대시보드 대시보드 / 전역 메뉴"><a href="#screen-dashboard">대시보드</a><span class="badge">전역 메뉴</span><span class="path">/</span></li></ul></li><li class="menu-node"><span class="menu-label">사용자</span><ul><li class="menu-node"><span class="menu-label">사용자 목록</span><ul><li class="screen-item" data-tree-search="사용자 목록 사용자 사용자 목록 /users 전역 메뉴"><a href="#screen-users-list">사용자 목록</a><span class="badge">전역 메뉴</span><span class="path">/users</span></li><li class="screen-item" data-tree-search="사용자 상세 사용자 사용자 목록 /users/[id] 상세 진입"><a href="#screen-users-detail">사용자 상세</a><span class="badge">상세 진입</span><span class="path">/users/[id]</span></li><li class="screen-item" data-tree-search="사용자 초대 사용자 사용자 목록 /users/invite 액션"><a href="#screen-users-invite">사용자 초대</a><span class="badge">액션</span><span class="path">/users/invite</span></li></ul></li></ul></li><li class="menu-node"><span class="menu-label">프로젝트</span><ul><li class="menu-node"><span class="menu-label">프로젝트 목록</span><ul><li class="screen-item" data-tree-search="프로젝트 목록 프로젝트 프로젝트 목록 /projects 전역 메뉴"><a href="#screen-projects-list">프로젝트 목록</a><span class="badge">전역 메뉴</span><span class="path">/projects</span></li><li class="screen-item" data-tree-search="프로젝트 상세 프로젝트 프로젝트 목록 /projects/[id] 상세 진입"><a href="#screen-projects-detail">프로젝트 상세</a><span class="badge">상세 진입</span><span class="path">/projects/[id]</span></li><li class="screen-item" data-tree-search="프로젝트 멤버 프로젝트 프로젝트 목록 /projects/[id]/members 탭"><a href="#screen-projects-members">프로젝트 멤버</a><span class="badge">탭</span><span class="path">/projects/[id]/members</span></li><li class="screen-item" data-tree-search="프로젝트 설정 프로젝트 프로젝트 목록 /projects/[id]/settings 탭"><a href="#screen-projects-settings">프로젝트 설정</a><span class="badge">탭</span><span class="path">/projects/[id]/settings</span></li></ul></li></ul></li><li class="menu-node"><span class="menu-label">결제</span><ul><li class="menu-node"><span class="menu-label">요금제</span><ul><li class="screen-item" data-tree-search="요금제 결제 요금제 /billing/plans 전역 메뉴"><a href="#screen-billing-plans">요금제</a><span class="badge">전역 메뉴</span><span class="path">/billing/plans</span></li></ul></li><li class="menu-node"><span class="menu-label">결제 수단</span><ul><li class="screen-item" data-tree-search="결제 수단 결제 결제 수단 /billing/payment-methods 전역 메뉴"><a href="#screen-billing-payment">결제 수단</a><span class="badge">전역 메뉴</span><span class="path">/billing/payment-methods</span></li></ul></li><li class="menu-node"><span class="menu-label">결제 내역</span><ul><li class="screen-item" data-tree-search="결제 내역 결제 결제 내역 /billing/invoices 전역 메뉴"><a href="#screen-billing-invoices">결제 내역</a><span class="badge">전역 메뉴</span><span class="path">/billing/invoices</span></li></ul></li></ul></li><li class="menu-node"><span class="menu-label">설정</span><ul><li class="menu-node"><span class="menu-label">프로필</span><ul><li class="screen-item" data-tree-search="프로필 설정 프로필 /settings/profile 전역 메뉴"><a href="#screen-settings-profile">프로필</a><span class="badge">전역 메뉴</span><span class="path">/settings/profile</span></li></ul></li><li class="menu-node"><span class="menu-label">알림</span><ul><li class="screen-item" data-tree-search="알림 설정 알림 /settings/notifications 전역 메뉴"><a href="#screen-settings-notifications">알림</a><span class="badge">전역 메뉴</span><span class="path">/settings/notifications</span></li></ul></li><li class="menu-node"><span class="menu-label">보안</span><ul><li class="screen-item" data-tree-search="보안 설정 보안 /settings/security 전역 메뉴"><a href="#screen-settings-security">보안</a><span class="badge">전역 메뉴</span><span class="path">/settings/security</span></li></ul></li></ul></li><li class="menu-node"><span class="menu-label">리포트</span><ul><li class="menu-node"><span class="menu-label">리포트 목록</span><ul><li class="screen-item" data-tree-search="리포트 목록 리포트 리포트 목록 /reports 전역 메뉴"><a href="#screen-reports">리포트 목록</a><span class="badge">전역 메뉴</span><span class="path">/reports</span></li></ul></li></ul></li>
+</ul></section>
+<section class="section"><h2>화면 목록</h2><div class="table-wrap"><table>
+<thead><tr><th>화면</th><th>메뉴 경로</th><th>URL</th><th>부모 화면</th><th>레이아웃</th><th>노출</th><th>역할</th><th>데스크톱</th><th>모바일</th><th>상태</th><th>스크린샷 경로</th></tr></thead><tbody>
+<tr id="screen-dashboard" data-screen-search="대시보드 대시보드 / 전역 메뉴"><td><strong>대시보드</strong><br><span class=path>dashboard</span></td><td>대시보드</td><td>/</td><td>-</td><td>dashboard</td><td>전역 메뉴</td><td>전체</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/dashboard.png</td></tr>
+<tr id="screen-users-list" data-screen-search="사용자 목록 사용자 사용자 목록 /users 전역 메뉴"><td><strong>사용자 목록</strong><br><span class=path>users-list</span></td><td>사용자 &gt; 사용자 목록</td><td>/users</td><td>-</td><td>list</td><td>전역 메뉴</td><td>admin, owner</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/users-list.png</td></tr>
+<tr id="screen-users-detail" data-screen-search="사용자 상세 사용자 사용자 목록 /users/[id] 상세 진입"><td><strong>사용자 상세</strong><br><span class=path>users-detail</span></td><td>사용자 &gt; 사용자 목록</td><td>/users/[id]</td><td>사용자 목록</td><td>detail</td><td>상세 진입</td><td>admin</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/users-detail.png</td></tr>
+<tr id="screen-users-invite" data-screen-search="사용자 초대 사용자 사용자 목록 /users/invite 액션"><td><strong>사용자 초대</strong><br><span class=path>users-invite</span></td><td>사용자 &gt; 사용자 목록</td><td>/users/invite</td><td>사용자 목록</td><td>form</td><td>액션</td><td>admin</td><td>Y</td><td>N</td><td><span class="status active">active</span></td><td>screens/users-invite.png</td></tr>
+<tr id="screen-projects-list" data-screen-search="프로젝트 목록 프로젝트 프로젝트 목록 /projects 전역 메뉴"><td><strong>프로젝트 목록</strong><br><span class=path>projects-list</span></td><td>프로젝트 &gt; 프로젝트 목록</td><td>/projects</td><td>-</td><td>list</td><td>전역 메뉴</td><td>전체</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/projects-list.png</td></tr>
+<tr id="screen-projects-detail" data-screen-search="프로젝트 상세 프로젝트 프로젝트 목록 /projects/[id] 상세 진입"><td><strong>프로젝트 상세</strong><br><span class=path>projects-detail</span></td><td>프로젝트 &gt; 프로젝트 목록</td><td>/projects/[id]</td><td>프로젝트 목록</td><td>detail</td><td>상세 진입</td><td>전체</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/projects-detail.png</td></tr>
+<tr id="screen-projects-members" data-screen-search="프로젝트 멤버 프로젝트 프로젝트 목록 /projects/[id]/members 탭"><td><strong>프로젝트 멤버</strong><br><span class=path>projects-members</span></td><td>프로젝트 &gt; 프로젝트 목록</td><td>/projects/[id]/members</td><td>프로젝트 상세</td><td>list</td><td>탭</td><td>owner, admin</td><td>Y</td><td>N</td><td><span class="status active">active</span></td><td>screens/projects-members.png</td></tr>
+<tr id="screen-projects-settings" data-screen-search="프로젝트 설정 프로젝트 프로젝트 목록 /projects/[id]/settings 탭"><td><strong>프로젝트 설정</strong><br><span class=path>projects-settings</span></td><td>프로젝트 &gt; 프로젝트 목록</td><td>/projects/[id]/settings</td><td>프로젝트 상세</td><td>settings</td><td>탭</td><td>owner</td><td>Y</td><td>N</td><td><span class="status active">active</span></td><td>screens/projects-settings.png</td></tr>
+<tr id="screen-billing-plans" data-screen-search="요금제 결제 요금제 /billing/plans 전역 메뉴"><td><strong>요금제</strong><br><span class=path>billing-plans</span></td><td>결제 &gt; 요금제</td><td>/billing/plans</td><td>-</td><td>list</td><td>전역 메뉴</td><td>owner, admin</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/billing-plans.png</td></tr>
+<tr id="screen-billing-payment" data-screen-search="결제 수단 결제 결제 수단 /billing/payment-methods 전역 메뉴"><td><strong>결제 수단</strong><br><span class=path>billing-payment</span></td><td>결제 &gt; 결제 수단</td><td>/billing/payment-methods</td><td>-</td><td>settings</td><td>전역 메뉴</td><td>owner</td><td>Y</td><td>N</td><td><span class="status active">active</span></td><td>screens/billing-payment.png</td></tr>
+<tr id="screen-billing-invoices" data-screen-search="결제 내역 결제 결제 내역 /billing/invoices 전역 메뉴"><td><strong>결제 내역</strong><br><span class=path>billing-invoices</span></td><td>결제 &gt; 결제 내역</td><td>/billing/invoices</td><td>-</td><td>list</td><td>전역 메뉴</td><td>owner, admin</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/billing-invoices.png</td></tr>
+<tr id="screen-settings-profile" data-screen-search="프로필 설정 프로필 /settings/profile 전역 메뉴"><td><strong>프로필</strong><br><span class=path>settings-profile</span></td><td>설정 &gt; 프로필</td><td>/settings/profile</td><td>-</td><td>form</td><td>전역 메뉴</td><td>전체</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/settings-profile.png</td></tr>
+<tr id="screen-settings-notifications" data-screen-search="알림 설정 알림 /settings/notifications 전역 메뉴"><td><strong>알림</strong><br><span class=path>settings-notifications</span></td><td>설정 &gt; 알림</td><td>/settings/notifications</td><td>-</td><td>settings</td><td>전역 메뉴</td><td>전체</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/settings-notifications.png</td></tr>
+<tr id="screen-settings-security" data-screen-search="보안 설정 보안 /settings/security 전역 메뉴"><td><strong>보안</strong><br><span class=path>settings-security</span></td><td>설정 &gt; 보안</td><td>/settings/security</td><td>-</td><td>settings</td><td>전역 메뉴</td><td>전체</td><td>Y</td><td>Y</td><td><span class="status active">active</span></td><td>screens/settings-security.png</td></tr>
+<tr id="screen-reports" data-screen-search="리포트 목록 리포트 리포트 목록 /reports 전역 메뉴"><td><strong>리포트 목록</strong><br><span class=path>reports</span></td><td>리포트 &gt; 리포트 목록</td><td>/reports</td><td>-</td><td>dashboard</td><td>전역 메뉴</td><td>admin</td><td>Y</td><td>N</td><td><span class="status planned">planned</span></td><td>screens/reports.png</td></tr>
+</tbody></table></div></section>
+<section class="section"><h2>API only</h2>
+<div class=table-wrap><table><thead><tr><th>Method</th><th>API 경로</th><th>용도</th><th>호출 주체</th><th>화면 없음 사유</th></tr></thead><tbody>
+<tr><td>GET</td><td>/api/health</td><td>서비스 상태 확인</td><td>인프라 모니터링</td><td>화면 없이 모니터링 도구가 호출</td></tr>
+<tr><td>POST</td><td>/api/webhooks/stripe</td><td>Stripe 결제 이벤트 수신</td><td>Stripe webhook</td><td>외부 시스템에서 호출</td></tr>
+</tbody></table></div>
+</section><section class="section links"><h2>표준 근거</h2>
+<div class=table-wrap><table><thead><tr><th>구분</th><th>문서</th><th>적용 항목</th><th>내용</th><th>링크</th></tr></thead><tbody>
+<tr><td>KRDS</td><td><a href="https://www.krds.go.kr/html/site/component/component_03_02.html" rel="noopener noreferrer">디지털 정부서비스 UI/UX 가이드라인 (2025.8)</a></td><td>메인 메뉴</td><td>서비스 정보 구조를 반영하고 메인 메뉴는 최대 3수준까지 사용</td><td>https://www.krds.go.kr/html/site/component/component_03_02.html</td></tr>
+<tr><td>KRDS</td><td><a href="https://www.krds.go.kr/html/site/component/component_03_02.html" rel="noopener noreferrer">디지털 정부서비스 UI/UX 가이드라인 (2025.8)</a></td><td>현재 위치</td><td>현재 페이지가 사이트 구조상 어디인지 활성 메뉴로 명확히 표시</td><td>https://www.krds.go.kr/html/site/component/component_03_02.html</td></tr>
+<tr><td>KRDS</td><td><a href="https://www.krds.go.kr/html/site/utility/utility_07.html" rel="noopener noreferrer">디지털 정부서비스 UI/UX 가이드라인 (2025.8)</a></td><td>레이아웃</td><td>IA가 많고 depth가 깊은 화면은 LNB·SNB 사용</td><td>https://www.krds.go.kr/html/site/utility/utility_07.html</td></tr>
+<tr><td>KRDS</td><td><a href="https://www.krds.go.kr/html/site/component/component_03_02.html" rel="noopener noreferrer">디지털 정부서비스 UI/UX 가이드라인 (2025.8)</a></td><td>모바일</td><td>햄버거 메뉴·사이드 탭·집중 탐색 레이어 등 별도 패턴 사용</td><td>https://www.krds.go.kr/html/site/component/component_03_02.html</td></tr>
+<tr><td>KRDS</td><td><a href="https://www.krds.go.kr/html/site/component/component_03_02.html" rel="noopener noreferrer">디지털 정부서비스 UI/UX 가이드라인 (2025.8)</a></td><td>접근성</td><td>KWCAG 2.2 기준 키보드 탐색, 메뉴 계층 구조, aria-current 제공</td><td>https://www.krds.go.kr/html/site/component/component_03_02.html</td></tr>
+<tr><td>전자정부</td><td><a href="https://www.law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000260906&amp;chrClsCd=010201" rel="noopener noreferrer">전자정부 웹사이트 품질관리 지침 (2025.6.25.)</a></td><td>품질관리</td><td>공공 웹사이트 품질 기준과 준수 항목 확인</td><td>https://www.law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000260906&amp;chrClsCd=010201</td></tr>
+</tbody></table></div>
+</section>
+<section class="section warnings"><h2>검토 메모</h2>
+<ul>
+<li><strong>레이아웃</strong>: 사용자 상세·초대는 전역 메뉴가 아니라 사용자 목록에서 진입한다. — 목록 화면의 행 클릭·초대 버튼 확인</li>
+<li><strong>레이아웃</strong>: 모바일에서는 결제 메뉴가 숨겨지고 결제 수단 화면도 노출되지 않는다. — 모바일 내비게이션 확인</li>
+<li><strong>권한</strong>: 프로젝트 설정은 owner에게만 노출된다. — owner/admin/member 역할별 확인</li>
+<li><strong>API</strong>: API only 2건은 화면 구조도에 넣지 않고 별도 시트에 분리했다. — API only 시트 확인</li>
+<li><strong>상태</strong>: 리포트 화면은 planned 상태이며 실제 캡처가 없다. — 기획 확정 후 재수집</li>
+<li><strong>증적</strong>: 스크린샷은 엑셀에 삽입하지 않고 screens/ 아래 파일 경로만 기록한다. — 실제 수집 시 PNG 파일 저장</li>
+<li><strong>수집 방식</strong>: Playwright는 선택 사항으로 두고, 권한·소요 시간 때문에 에이전트가 실제 화면을 먼저 확인한다. — 자동 수집이 필요한 경우 별도 옵션</li>
+<li><strong>구조</strong>: Depth 컬럼은 실제 메뉴 계층만 표시하고, 상세·탭·액션 화면은 부모 화면으로 연결한다. — 사이트 구조 시트 확인</li>
+<li><strong>Depth</strong>: 1~2Depth는 항상 유지하고, 실제 메뉴가 더 깊으면 프론트 소스·레이아웃 분석으로 컬럼을 추가한다. — 실제 수집 후 Depth 컬럼 수 확인</li>
+<li><strong>KRDS</strong>: 메인 메뉴는 서비스 정보 구조를 반영하고 최대 3수준까지 사용한다. 현재 샘플은 2수준이다. — 3Depth 메뉴가 필요하면 컬럼 추가</li>
+<li><strong>KRDS</strong>: 현재 페이지는 활성 메뉴로 명확히 표시하고, 모바일은 별도 메뉴 패턴을 확인한다. — 활성 메뉴·모바일 메뉴 확인</li>
+<li><strong>접근성</strong>: KWCAG 2.2 기준 키보드 탐색·계층 구조·aria-current를 확인한다. — 메뉴 접근성 확인</li>
+<li><strong>품질관리</strong>: 전자정부 웹사이트 품질관리 지침의 품질 기준을 확인한다. — KRDS·품질관리 지침</li>
+</ul>
+</section>
+<section class="section"><h2>검토 요청</h2><ol>
+<li>메뉴 depth가 실제 프론트 메뉴 구조와 일치하는가?</li><li>상세·탭·액션 화면이 부모 화면으로 연결됐는가?</li><li>API only가 화면 구조도와 분리됐는가?</li><li>스크린샷 경로가 실제 화면과 일치하는가?</li><li>KRDS 메인 메뉴 최대 3Depth 기준을 지켰는가?</li>
+</ol></section>
+</main>
+<footer>생성 기준: 렌더링된 프론트 레이아웃 (샘플) · 적용 기준: KRDS 디지털 정부서비스 UI/UX 가이드라인 (2025.8) + 전자정부 웹사이트 품질관리 지침 · Depth 2 (최소 2, KRDS 최대 3 권장)</footer>
+<script>(function () {
+  var input = document.getElementById("search");
+  if (!input) return;
+  var count = document.getElementById("result-count");
+  var rows = Array.prototype.slice.call(document.querySelectorAll("[data-screen-search]"));
+  var treeItems = Array.prototype.slice.call(document.querySelectorAll("[data-tree-search]"));
+  var menus = Array.prototype.slice.call(document.querySelectorAll(".menu-node")).reverse();
+  function apply() {
+    var q = (input.value || "").trim().toLowerCase();
+    var shown = 0;
+    rows.forEach(function (item) {
+      var match = !q || (item.getAttribute("data-screen-search") || "").indexOf(q) !== -1;
+      item.hidden = !match;
+      if (match) shown += 1;
+    });
+    treeItems.forEach(function (item) {
+      var match = !q || (item.getAttribute("data-tree-search") || "").indexOf(q) !== -1;
+      item.hidden = !match;
+    });
+    menus.forEach(function (menu) {
+      var has = menu.querySelector("[data-tree-search]:not([hidden])");
+      menu.hidden = !has;
+    });
+    if (count) count.textContent = q ? shown + " matches" : shown + " screens";
+  }
+  input.addEventListener("input", apply);
+  apply();
+})();</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'">
+<title>테이블 명세서 — Sample DB</title>
+<style>:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #17181c;
+  --muted: #5c6270;
+  --line: #e2e5ea;
+  --panel: #f6f7f9;
+  --accent: #1f5fbf;
+  --code: #f3f4f6;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111216;
+    --fg: #e8eaee;
+    --muted: #9aa1ae;
+    --line: #2a2d35;
+    --panel: #181a20;
+    --accent: #9db8e8;
+    --code: #1a1c22;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif; }
+main, header, footer { max-width: 78rem; margin: 0 auto; padding: 0 1.25rem; }
+header { padding-top: 2.5rem; padding-bottom: .5rem; }
+h1 { font-size: 1.8rem; line-height: 1.2; margin: 0 0 .4rem; letter-spacing: -.02em; }
+h2 { font-size: 1.15rem; margin: 0; }
+h3 { font-size: .95rem; margin: 0 0 .5rem; }
+p { margin: .35rem 0; }
+.eyebrow { color: var(--accent); font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.meta { color: var(--muted); font-size: .875rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .65rem; margin: 1.5rem 0 1rem; }
+.stat { padding: .75rem .9rem; background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; }
+.stat strong { display: block; font-size: 1.25rem; line-height: 1.2; }
+.stat span { color: var(--muted); font-size: .78rem; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin: 1.2rem 0 .8rem; padding: .85rem 1rem; background: var(--panel); border: 1px solid var(--line); border-radius: .7rem; }
+.controls label { font-weight: 600; font-size: .875rem; }
+.controls input { flex: 1 1 16rem; min-width: 0; padding: .55rem .75rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: .45rem; font: inherit; }
+.controls input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.count { margin: 0; color: var(--muted); font-size: .8125rem; }
+.toc { margin: .8rem 0 1.5rem; }
+.toc ul { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.toc a { display: inline-flex; padding: .28rem .6rem; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; font-size: .8rem; text-decoration: none; }
+.toc a:hover { border-color: var(--accent); }
+.overview { margin: 1.5rem 0 2rem; }
+.table-card { padding: 1.5rem 0; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+.table-card h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; }
+.table-card h2 .desc { color: var(--muted); font-size: .9rem; font-weight: 400; }
+.table-card .meta { margin-bottom: .75rem; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: .5rem; }
+table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+th, td { padding: .5rem .6rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { background: var(--panel); color: var(--muted); font-size: .76rem; font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--panel) 55%, transparent); }
+.flag { color: var(--muted); }
+.flag.yes { color: var(--accent); font-weight: 700; }
+.subsection { margin-top: 1rem; }
+.warnings { margin: 1.5rem 0; padding: 1rem; border: 1px dashed var(--line); border-radius: .6rem; }
+.warnings h2 { font-size: 1rem; margin-bottom: .4rem; }
+.warnings ul { margin: .25rem 0 0; padding-left: 1.2rem; color: var(--muted); font-size: .875rem; }
+footer { padding-top: 2rem; padding-bottom: 2.5rem; color: var(--muted); font-size: .8125rem; border-top: 1px solid var(--line); }
+[hidden] { display: none !important; }
+@media print {
+  .controls, .toc, footer { display: none; }
+  .table-card { break-inside: avoid-page; }
+  body { font-size: 10.5pt; }
+}</style>
+</head>
+<body>
+<header>
+<p class="eyebrow">Database specification</p>
+<h1>테이블 명세서 — Sample DB</h1>
+<p class="meta">Sample DB · 2026-10-31T11:00:27+09:00</p>
+<p class="meta">원본: DDL 파일 1개 · SQL 방언: postgres</p>
+<div class="stats">
+<div class="stat"><strong>3</strong><span>테이블</span></div>
+<div class="stat"><strong>14</strong><span>컬럼</span></div>
+<div class="stat"><strong>2</strong><span>관계</span></div>
+<div class="stat"><strong>3</strong><span>인덱스</span></div>
+</div>
+</header>
+<main>
+<div class="controls">
+<label for="search">테이블 검색</label>
+<input id="search" type="search" placeholder="테이블·컬럼·설명" autocomplete="off" spellcheck="false">
+<p class="count" id="result-count" aria-live="polite">3 tables</p>
+</div>
+<nav class="toc" aria-label="테이블 목차"><ul>
+<li><a href="#table-1">projects</a></li>
+<li><a href="#table-2">teams</a></li>
+<li><a href="#table-3">users</a></li>
+</ul></nav>
+<section class="overview"><h2>테이블 목록</h2><div class="table-wrap"><table>
+<thead><tr><th>No</th><th>스키마</th><th>테이블</th><th>설명</th><th>컬럼</th><th>PK</th><th>FK</th><th>인덱스</th></tr></thead><tbody>
+<tr><td>1</td><td>-</td><td><a href="#table-1">projects</a></td><td>프로젝트</td><td>4</td><td>id</td><td>1</td><td>1</td></tr>
+<tr><td>2</td><td>-</td><td><a href="#table-2">teams</a></td><td>팀</td><td>3</td><td>id</td><td>0</td><td>0</td></tr>
+<tr><td>3</td><td>-</td><td><a href="#table-3">users</a></td><td>사용자</td><td>7</td><td>id</td><td>1</td><td>2</td></tr>
+</tbody></table></div></section>
+<section class="table-card" id="table-1" data-search="projects 프로젝트 id owner_id slug title  소유자 url slug ">
+<h2>projects <span class="desc">프로젝트</span></h2>
+<p class="meta">스키마: - · 원본: samples/table-spec/schema.sql</p>
+<div class="table-wrap"><table>
+<thead><tr><th>No</th><th>컬럼</th><th>타입</th><th>길이</th><th>PK</th><th>FK</th><th>UNIQUE</th><th>NOT NULL</th><th>DEFAULT</th><th>설명</th><th>비고</th></tr></thead><tbody>
+<tr><td>1</td><td>id</td><td>BIGSERIAL</td><td>-</td><td><span class="flag yes">Y</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>2</td><td>owner_id</td><td>BIGINT</td><td>-</td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>소유자</td><td>-</td></tr>
+<tr><td>3</td><td>slug</td><td>VARCHAR</td><td>80</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>URL slug</td><td>-</td></tr>
+<tr><td>4</td><td>title</td><td>VARCHAR</td><td>200</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>-</td><td>-</td></tr>
+</tbody></table></div>
+<div class="subsection"><h3>관계</h3><div class="table-wrap"><table>
+<thead><tr><th>FK</th><th>컬럼</th><th>참조 테이블</th><th>참조 컬럼</th><th>ON DELETE</th><th>ON UPDATE</th></tr></thead><tbody>
+<tr><td>fk_projects_owner</td><td>owner_id</td><td>users</td><td>id</td><td>-</td><td>-</td></tr>
+</tbody></table></div></div>
+<div class="subsection"><h3>인덱스</h3><div class="table-wrap"><table>
+<thead><tr><th>인덱스</th><th>UNIQUE</th><th>컬럼</th></tr></thead><tbody>
+<tr><td>uq_projects_slug</td><td><span class="flag yes">Y</span></td><td>slug</td></tr>
+</tbody></table></div></div>
+</section>
+<section class="table-card" id="table-2" data-search="teams 팀 id name created_at  팀 이름 ">
+<h2>teams <span class="desc">팀</span></h2>
+<p class="meta">스키마: - · 원본: samples/table-spec/schema.sql</p>
+<div class="table-wrap"><table>
+<thead><tr><th>No</th><th>컬럼</th><th>타입</th><th>길이</th><th>PK</th><th>FK</th><th>UNIQUE</th><th>NOT NULL</th><th>DEFAULT</th><th>설명</th><th>비고</th></tr></thead><tbody>
+<tr><td>1</td><td>id</td><td>BIGSERIAL</td><td>-</td><td><span class="flag yes">Y</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>2</td><td>name</td><td>VARCHAR</td><td>100</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>팀 이름</td><td>-</td></tr>
+<tr><td>3</td><td>created_at</td><td>TIMESTAMPTZ</td><td>-</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>CURRENT_TIMESTAMP</td><td>-</td><td>-</td></tr>
+</tbody></table></div>
+</section>
+<section class="table-card" id="table-3" data-search="users 사용자 id email name team_id status created_at last_login_at  로그인 이메일  소속 팀   마지막 로그인">
+<h2>users <span class="desc">사용자</span></h2>
+<p class="meta">스키마: - · 원본: samples/table-spec/schema.sql</p>
+<div class="table-wrap"><table>
+<thead><tr><th>No</th><th>컬럼</th><th>타입</th><th>길이</th><th>PK</th><th>FK</th><th>UNIQUE</th><th>NOT NULL</th><th>DEFAULT</th><th>설명</th><th>비고</th></tr></thead><tbody>
+<tr><td>1</td><td>id</td><td>BIGSERIAL</td><td>-</td><td><span class="flag yes">Y</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>2</td><td>email</td><td>VARCHAR</td><td>255</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>로그인 이메일</td><td>-</td></tr>
+<tr><td>3</td><td>name</td><td>VARCHAR</td><td>100</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>4</td><td>team_id</td><td>BIGINT</td><td>-</td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>-</td><td>소속 팀</td><td>-</td></tr>
+<tr><td>5</td><td>status</td><td>VARCHAR</td><td>20</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>&#x27;active&#x27;</td><td>-</td><td>CHECK status IN (&#x27;active&#x27;, &#x27;blocked&#x27;)</td></tr>
+<tr><td>6</td><td>created_at</td><td>TIMESTAMPTZ</td><td>-</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag yes">Y</span></td><td>CURRENT_TIMESTAMP</td><td>-</td><td>-</td></tr>
+<tr><td>7</td><td>last_login_at</td><td>TIMESTAMPTZ</td><td>-</td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td><span class="flag">-</span></td><td>-</td><td>마지막 로그인</td><td>-</td></tr>
+</tbody></table></div>
+<div class="subsection"><h3>관계</h3><div class="table-wrap"><table>
+<thead><tr><th>FK</th><th>컬럼</th><th>참조 테이블</th><th>참조 컬럼</th><th>ON DELETE</th><th>ON UPDATE</th></tr></thead><tbody>
+<tr><td>fk_users_team_id</td><td>team_id</td><td>teams</td><td>id</td><td>CASCADE</td><td>-</td></tr>
+</tbody></table></div></div>
+<div class="subsection"><h3>인덱스</h3><div class="table-wrap"><table>
+<thead><tr><th>인덱스</th><th>UNIQUE</th><th>컬럼</th></tr></thead><tbody>
+<tr><td>idx_users_team</td><td><span class="flag">-</span></td><td>team_id</td></tr>
+<tr><td>uq_users_email</td><td><span class="flag yes">Y</span></td><td>email</td></tr>
+</tbody></table></div></div>
+</section>
+</main>
+<footer>원본: DDL 파일 1개 · 생성: 2026-10-31T11:00:27+09:00</footer>
+<script>(function () {
+  var input = document.getElementById("search");
+  if (!input) return;
+  var count = document.getElementById("result-count");
+  var cards = Array.prototype.slice.call(document.querySelectorAll(".table-card"));
+  var links = Array.prototype.slice.call(document.querySelectorAll(".toc a"));
+  var initial = count ? count.textContent : "";
+  function apply() {
+    var query = (input.value || "").trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (card) {
+      var match = !query || (card.getAttribute("data-search") || "").indexOf(query) !== -1;
+      card.hidden = !match;
+      if (match) shown += 1;
+    });
+    links.forEach(function (link) {
+      var target = document.querySelector(link.getAttribute("href"));
+      link.parentNode.hidden = !!(target && target.hidden);
+    });
+    if (count) {
+      count.textContent = query ? shown + " / " + cards.length + " tables" : initial;
+    }
+  }
+  input.addEventListener("input", apply);
+})();</script>
+</body>
+</html>

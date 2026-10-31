@@ -19,10 +19,21 @@
 | --- | --- |
 | SKILL.md의 절차·출력 | README의 해당 스킬 설명, 출력 형식이 바뀌면 samples 재생성, evidence |
 | scripts의 시트·정렬 | samples 재생성, SKILL.md의 입력·시트 설명, evidence |
-| 새 스킬 | README 스킬 표, 3장 스킬 계약, samples(선택) |
-| 스킬 이름·경로 | README의 설치·프롬프트 명령 경로, 3장 스킬 계약 |
+| 새 스킬 | README 스킬 표, `gorani-ask` 스킬 지도·작업 경로, 3장 스킬 계약, samples(선택) |
+| 스킬 이름·경로 | README의 설치·프롬프트 명령 경로, `gorani-ask` 스킬 지도, 3장 스킬 계약 |
 
 ## 3. 스킬 계약
+
+### gorani-ask
+
+| 항목 | 내용 |
+| --- | --- |
+| 역할 | 스킬 라우터. 산출물을 만들지 않고 첫 스킬과 작업 순서만 추천 |
+| 입력 | 만들 결과물, 가진 자료, 작업 단계. 모호하면 한 번에 하나씩 질문 |
+| 지도 | README와 3장 계약의 스킬과 동기화. 추천 전 해당 `SKILL.md`를 읽고 확인 |
+| 출력 | 추천 스킬, 이유, 준비물, 다음 단계, 이어질 스킬 |
+| 갱신 | 스킬 추가·이름 변경·삭제·작업 경로 변경 시 같은 변경에 스킬 지도와 주요 작업 경로를 갱신 |
+| 금지 | 없는 스킬 추천, 이름만 보고 설명, 한 번에 여러 스킬 실행, 추천만 요청했는데 산출물 생성 |
 
 ### gorani-docs-governance
 
@@ -117,6 +128,28 @@
 | 검증 | blocker/major/minor/question 심각도, 추적성, 준비 상태 `ready`/`conditional`/`blocked` |
 | 금지 | 원문에 없는 규칙 생성, 외부 OCR·LLM 무단 업로드, AS-IS/TO-BE 혼합, 확인 없는 커밋·푸시 |
 
+### gorani-table-spec
+
+| 항목 | 내용 |
+| --- | --- |
+| 입력 | `.sql`·`.ddl` 파일 또는 디렉터리, SQLAlchemy `--db-url`. DDL은 `CREATE TABLE`·`ALTER TABLE`·`COMMENT ON`·`CREATE INDEX`·`DROP TABLE`을 반영 |
+| 파싱 | DDL은 `sqlglot`과 `--dialect`, DB는 SQLAlchemy Inspector와 `--schema` 사용. postgres·mysql·sqlite·mssql·oracle 지원. 시스템 테이블 기본 제외, `--include-system`으로 포함 |
+| 출력 | `table-spec.xlsx`(요약·테이블 목록·컬럼 명세·관계·인덱스·파싱 메모), `table-spec.md`, 자기완결 `table-spec.html` |
+| 선택 | `--formats xlsx,md,html` 기본. 사용자가 고른 형식만 생성. `md`·`html`만 선택하면 openpyxl 없이 동작. `--strict`는 경고 시 exit 1 |
+| 제한 | DB 모드는 접속 시점 스키마만 반영. 뷰·동적 SQL·트리거·저장 프로시저는 테이블 명세 대상이 아님. DB 비밀번호는 결과에서 마스킹 |
+| 검증 | 샘플 DDL xlsx·md·html, PostgreSQL·MySQL·SQL Server·Oracle Docker 실DB, SQLite, URL 마스킹, HTML 외부 요청 0건, `--strict` exit 1 확인 |
+
+### gorani-site-structure
+
+| 항목 | 내용 |
+| --- | --- |
+| 입력 | 실제 프론트 레이아웃을 확인해 작성한 `site-structure-input.json`. API 스펙·URL만으로 구조를 만들지 않음 |
+| 기준 | KRDS 디지털 정부서비스 UI/UX 가이드라인과 전자정부 웹사이트 품질관리 지침. 메뉴 depth 최소 2·최대 3 |
+| 출력 | `site-structure.xlsx`(요약·사이트 구조·화면 목록·API 매핑·API only·표준 근거·검토 메모), `.md`, 자기완결 `.html` |
+| 선택 | `--formats xlsx,md,html` 기본. `md`·`html`만 선택하면 openpyxl 없이 동작. `--strict`는 경고 시 exit 1 |
+| 제한 | API only는 구조도와 분리. 상세·탭·액션은 부모 화면과 노출 방식으로 표현. 스크린샷은 파일 경로만 기록 |
+| 검증 | 샘플 15화면·2Depth, 동적 Depth 컬럼, HTML 외부 요청 0건, `--strict` exit 1 확인 |
+
 ## 4. 스킬 형식
 
 - frontmatter: `name`(`gorani-` prefix를 붙인 폴더명과 동일, 소문자·숫자·하이픈), `description`(1-1024자, 언제 쓰는지 중심)
@@ -177,3 +210,7 @@
 | 2026-10-29 | `api-contract-diff` 추가 (v3.9.0) | `.omo/evidence/2026-10-29-api-contract-diff.md` |
 | 2026-10-30 | `release-check` 우선순위 P0~P4 조정 (v3.10.0) | `.omo/evidence/2026-10-30-release-check-priority.md` |
 | 2026-10-30 | `license-notice` 간소화 페이지 옵션 추가 (v3.11.0) | `.omo/evidence/2026-10-30-license-notice-simple.md` |
+| 2026-10-31 | `table-spec` 추가 (v3.12.0) | `.omo/evidence/2026-10-31-table-spec.md` |
+| 2026-10-31 | `table-spec` HTML 산출물 추가 (v3.13.0) | `.omo/evidence/2026-10-31-table-spec-html.md` |
+| 2026-10-31 | `site-structure` 추가 (v3.14.0) | `.omo/evidence/2026-10-31-site-structure.md` |
+| 2026-10-31 | `ask` 라우터 추가 (v3.15.0) | `.omo/evidence/2026-10-31-ask.md` |

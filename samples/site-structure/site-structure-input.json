@@ -1,0 +1,366 @@
+{
+  "site": "Admin Console",
+  "base_url": "https://admin.example.com",
+  "inspected_at": "2026-10-31 14:00 KST",
+  "source": "렌더링된 프론트 레이아웃 (샘플)",
+  "standard": "KRDS 디지털 정부서비스 UI/UX 가이드라인 (2025.8) + 전자정부 웹사이트 품질관리 지침",
+  "roles": ["admin", "owner", "member"],
+  "viewports": ["desktop", "mobile"],
+  "review_status": "초안 — KRDS 기준 검토 필요",
+  "pages": [
+    {
+      "id": "dashboard",
+      "title": "대시보드",
+      "menu_path": ["대시보드"],
+      "parent_id": "",
+      "url": "/",
+      "layout": "dashboard",
+      "roles": ["전체"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/dashboard.png",
+      "apis": [
+        {"method": "GET", "path": "/api/dashboard/summary", "purpose": "대시보드 요약 조회"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "users-list",
+      "title": "사용자 목록",
+      "menu_path": ["사용자", "사용자 목록"],
+      "parent_id": "",
+      "url": "/users",
+      "layout": "list",
+      "roles": ["admin", "owner"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/users-list.png",
+      "apis": [
+        {"method": "GET", "path": "/api/users", "purpose": "사용자 목록 조회"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "users-detail",
+      "title": "사용자 상세",
+      "menu_path": ["사용자", "사용자 목록"],
+      "parent_id": "users-list",
+      "url": "/users/[id]",
+      "layout": "detail",
+      "roles": ["admin"],
+      "exposure": "상세 진입",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/users-detail.png",
+      "apis": [
+        {"method": "GET", "path": "/api/users/{id}", "purpose": "사용자 상세 조회"},
+        {"method": "PATCH", "path": "/api/users/{id}", "purpose": "사용자 정보 수정"}
+      ],
+      "note": "목록 행 클릭으로 진입"
+    },
+    {
+      "id": "users-invite",
+      "title": "사용자 초대",
+      "menu_path": ["사용자", "사용자 목록"],
+      "parent_id": "users-list",
+      "url": "/users/invite",
+      "layout": "form",
+      "roles": ["admin"],
+      "exposure": "액션",
+      "desktop": true,
+      "mobile": false,
+      "status": "active",
+      "screenshot": "screens/users-invite.png",
+      "apis": [
+        {"method": "POST", "path": "/api/users/invite", "purpose": "사용자 초대"}
+      ],
+      "note": "목록 우측 상단 버튼"
+    },
+    {
+      "id": "projects-list",
+      "title": "프로젝트 목록",
+      "menu_path": ["프로젝트", "프로젝트 목록"],
+      "parent_id": "",
+      "url": "/projects",
+      "layout": "list",
+      "roles": ["전체"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/projects-list.png",
+      "apis": [
+        {"method": "GET", "path": "/api/projects", "purpose": "프로젝트 목록 조회"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "projects-detail",
+      "title": "프로젝트 상세",
+      "menu_path": ["프로젝트", "프로젝트 목록"],
+      "parent_id": "projects-list",
+      "url": "/projects/[id]",
+      "layout": "detail",
+      "roles": ["전체"],
+      "exposure": "상세 진입",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/projects-detail.png",
+      "apis": [
+        {"method": "GET", "path": "/api/projects/{id}", "purpose": "프로젝트 상세 조회"}
+      ],
+      "note": "카드 클릭으로 진입"
+    },
+    {
+      "id": "projects-members",
+      "title": "프로젝트 멤버",
+      "menu_path": ["프로젝트", "프로젝트 목록"],
+      "parent_id": "projects-detail",
+      "url": "/projects/[id]/members",
+      "layout": "list",
+      "roles": ["owner", "admin"],
+      "exposure": "탭",
+      "desktop": true,
+      "mobile": false,
+      "status": "active",
+      "screenshot": "screens/projects-members.png",
+      "apis": [
+        {"method": "GET", "path": "/api/projects/{id}/members", "purpose": "멤버 목록 조회"},
+        {"method": "POST", "path": "/api/projects/{id}/members", "purpose": "멤버 추가"},
+        {"method": "DELETE", "path": "/api/projects/{id}/members/{userId}", "purpose": "멤버 제거"}
+      ],
+      "note": "상세 화면 탭"
+    },
+    {
+      "id": "projects-settings",
+      "title": "프로젝트 설정",
+      "menu_path": ["프로젝트", "프로젝트 목록"],
+      "parent_id": "projects-detail",
+      "url": "/projects/[id]/settings",
+      "layout": "settings",
+      "roles": ["owner"],
+      "exposure": "탭",
+      "desktop": true,
+      "mobile": false,
+      "status": "active",
+      "screenshot": "screens/projects-settings.png",
+      "apis": [
+        {"method": "PATCH", "path": "/api/projects/{id}", "purpose": "프로젝트 설정 수정"}
+      ],
+      "note": "owner만 노출"
+    },
+    {
+      "id": "billing-plans",
+      "title": "요금제",
+      "menu_path": ["결제", "요금제"],
+      "parent_id": "",
+      "url": "/billing/plans",
+      "layout": "list",
+      "roles": ["owner", "admin"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/billing-plans.png",
+      "apis": [
+        {"method": "GET", "path": "/api/billing/plans", "purpose": "요금제 조회"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "billing-payment",
+      "title": "결제 수단",
+      "menu_path": ["결제", "결제 수단"],
+      "parent_id": "",
+      "url": "/billing/payment-methods",
+      "layout": "settings",
+      "roles": ["owner"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": false,
+      "status": "active",
+      "screenshot": "screens/billing-payment.png",
+      "apis": [
+        {"method": "GET", "path": "/api/billing/payment-methods", "purpose": "결제 수단 조회"},
+        {"method": "POST", "path": "/api/billing/payment-methods", "purpose": "결제 수단 추가"}
+      ],
+      "note": "모바일에서는 결제 메뉴 자체가 숨겨짐"
+    },
+    {
+      "id": "billing-invoices",
+      "title": "결제 내역",
+      "menu_path": ["결제", "결제 내역"],
+      "parent_id": "",
+      "url": "/billing/invoices",
+      "layout": "list",
+      "roles": ["owner", "admin"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/billing-invoices.png",
+      "apis": [
+        {"method": "GET", "path": "/api/billing/invoices", "purpose": "결제 내역 조회"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "settings-profile",
+      "title": "프로필",
+      "menu_path": ["설정", "프로필"],
+      "parent_id": "",
+      "url": "/settings/profile",
+      "layout": "form",
+      "roles": ["전체"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/settings-profile.png",
+      "apis": [
+        {"method": "GET", "path": "/api/me", "purpose": "내 정보 조회"},
+        {"method": "PATCH", "path": "/api/me", "purpose": "내 정보 수정"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "settings-notifications",
+      "title": "알림",
+      "menu_path": ["설정", "알림"],
+      "parent_id": "",
+      "url": "/settings/notifications",
+      "layout": "settings",
+      "roles": ["전체"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/settings-notifications.png",
+      "apis": [
+        {"method": "GET", "path": "/api/me/notifications", "purpose": "알림 설정 조회"},
+        {"method": "PATCH", "path": "/api/me/notifications", "purpose": "알림 설정 수정"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "settings-security",
+      "title": "보안",
+      "menu_path": ["설정", "보안"],
+      "parent_id": "",
+      "url": "/settings/security",
+      "layout": "settings",
+      "roles": ["전체"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": true,
+      "status": "active",
+      "screenshot": "screens/settings-security.png",
+      "apis": [
+        {"method": "GET", "path": "/api/me/sessions", "purpose": "세션 목록 조회"},
+        {"method": "POST", "path": "/api/me/password", "purpose": "비밀번호 변경"}
+      ],
+      "note": ""
+    },
+    {
+      "id": "reports",
+      "title": "리포트 목록",
+      "menu_path": ["리포트", "리포트 목록"],
+      "parent_id": "",
+      "url": "/reports",
+      "layout": "dashboard",
+      "roles": ["admin"],
+      "exposure": "전역 메뉴",
+      "desktop": true,
+      "mobile": false,
+      "status": "planned",
+      "screenshot": "screens/reports.png",
+      "apis": [
+        {"method": "GET", "path": "/api/reports", "purpose": "리포트 조회 (계획)"}
+      ],
+      "note": "계획 상태, 실제 화면 미확인"
+    }
+  ],
+  "api_only": [
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "purpose": "서비스 상태 확인",
+      "caller": "인프라 모니터링",
+      "reason": "화면 없이 모니터링 도구가 호출",
+      "note": "구조도 제외"
+    },
+    {
+      "method": "POST",
+      "path": "/api/webhooks/stripe",
+      "purpose": "Stripe 결제 이벤트 수신",
+      "caller": "Stripe webhook",
+      "reason": "외부 시스템에서 호출",
+      "note": "구조도 제외"
+    }
+  ],
+  "standards": [
+    {
+      "source": "KRDS",
+      "name": "디지털 정부서비스 UI/UX 가이드라인 (2025.8)",
+      "scope": "메인 메뉴",
+      "rule": "서비스 정보 구조를 반영하고 메인 메뉴는 최대 3수준까지 사용",
+      "url": "https://www.krds.go.kr/html/site/component/component_03_02.html"
+    },
+    {
+      "source": "KRDS",
+      "name": "디지털 정부서비스 UI/UX 가이드라인 (2025.8)",
+      "scope": "현재 위치",
+      "rule": "현재 페이지가 사이트 구조상 어디인지 활성 메뉴로 명확히 표시",
+      "url": "https://www.krds.go.kr/html/site/component/component_03_02.html"
+    },
+    {
+      "source": "KRDS",
+      "name": "디지털 정부서비스 UI/UX 가이드라인 (2025.8)",
+      "scope": "레이아웃",
+      "rule": "IA가 많고 depth가 깊은 화면은 LNB·SNB 사용",
+      "url": "https://www.krds.go.kr/html/site/utility/utility_07.html"
+    },
+    {
+      "source": "KRDS",
+      "name": "디지털 정부서비스 UI/UX 가이드라인 (2025.8)",
+      "scope": "모바일",
+      "rule": "햄버거 메뉴·사이드 탭·집중 탐색 레이어 등 별도 패턴 사용",
+      "url": "https://www.krds.go.kr/html/site/component/component_03_02.html"
+    },
+    {
+      "source": "KRDS",
+      "name": "디지털 정부서비스 UI/UX 가이드라인 (2025.8)",
+      "scope": "접근성",
+      "rule": "KWCAG 2.2 기준 키보드 탐색, 메뉴 계층 구조, aria-current 제공",
+      "url": "https://www.krds.go.kr/html/site/component/component_03_02.html"
+    },
+    {
+      "source": "전자정부",
+      "name": "전자정부 웹사이트 품질관리 지침 (2025.6.25.)",
+      "scope": "품질관리",
+      "rule": "공공 웹사이트 품질 기준과 준수 항목 확인",
+      "url": "https://www.law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000260906&chrClsCd=010201"
+    }
+  ],
+  "warnings": [
+    {"category": "레이아웃", "message": "사용자 상세·초대는 전역 메뉴가 아니라 사용자 목록에서 진입한다.", "action": "목록 화면의 행 클릭·초대 버튼 확인"},
+    {"category": "레이아웃", "message": "모바일에서는 결제 메뉴가 숨겨지고 결제 수단 화면도 노출되지 않는다.", "action": "모바일 내비게이션 확인"},
+    {"category": "권한", "message": "프로젝트 설정은 owner에게만 노출된다.", "action": "owner/admin/member 역할별 확인"},
+    {"category": "API", "message": "API only 2건은 화면 구조도에 넣지 않고 별도 시트에 분리했다.", "action": "API only 시트 확인"},
+    {"category": "상태", "message": "리포트 화면은 planned 상태이며 실제 캡처가 없다.", "action": "기획 확정 후 재수집"},
+    {"category": "증적", "message": "스크린샷은 엑셀에 삽입하지 않고 screens/ 아래 파일 경로만 기록한다.", "action": "실제 수집 시 PNG 파일 저장"},
+    {"category": "수집 방식", "message": "Playwright는 선택 사항으로 두고, 권한·소요 시간 때문에 에이전트가 실제 화면을 먼저 확인한다.", "action": "자동 수집이 필요한 경우 별도 옵션"},
+    {"category": "구조", "message": "Depth 컬럼은 실제 메뉴 계층만 표시하고, 상세·탭·액션 화면은 부모 화면으로 연결한다.", "action": "사이트 구조 시트 확인"},
+    {"category": "Depth", "message": "1~2Depth는 항상 유지하고, 실제 메뉴가 더 깊으면 프론트 소스·레이아웃 분석으로 컬럼을 추가한다.", "action": "실제 수집 후 Depth 컬럼 수 확인"},
+    {"category": "KRDS", "message": "메인 메뉴는 서비스 정보 구조를 반영하고 최대 3수준까지 사용한다. 현재 샘플은 2수준이다.", "action": "3Depth 메뉴가 필요하면 컬럼 추가"},
+    {"category": "KRDS", "message": "현재 페이지는 활성 메뉴로 명확히 표시하고, 모바일은 별도 메뉴 패턴을 확인한다.", "action": "활성 메뉴·모바일 메뉴 확인"},
+    {"category": "접근성", "message": "KWCAG 2.2 기준 키보드 탐색·계층 구조·aria-current를 확인한다.", "action": "메뉴 접근성 확인"},
+    {"category": "품질관리", "message": "전자정부 웹사이트 품질관리 지침의 품질 기준을 확인한다.", "action": "KRDS·품질관리 지침"}
+  ]
+}
