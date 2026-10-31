@@ -248,3 +248,12 @@
 | 2026-10-31 | `ask` 라우터 추가 (v3.15.0) | `.omo/evidence/2026-10-31-ask.md` |
 | 2026-10-31 | `change-impact` 추가, 세 스킬에 sidecar manifest 생성 (v3.16.0) | `.omo/evidence/2026-10-31-change-impact.md` |
 | 2026-10-31 | `report` 추가, 전 스킬에 문제 보고 경로 연결 (v3.17.0) | `.omo/evidence/2026-10-31-report.md` |
+| 2026-10-31 | 릴리스 정책 변경: GitHub Release 없이 annotated tag만 사용, v3.17.0 태그 | - |
+
+## 9. 릴리스와 태그
+
+- GitHub Release 기능(릴리스 페이지)은 만들지 않습니다.
+- 버전은 CHANGELOG 최신 항목과 각 `SKILL.md`의 `metadata.version`을 맞춥니다.
+- 배포 지점에 annotated tag `v<버전>`을 만들고 push합니다. 예: `git tag -a v3.17.0 -m "v3.17.0"`, `git push origin v3.17.0`.
+- 이미 push한 태그를 옮기거나 덮어쓰지 않습니다. 잘못 만들었으면 사용자와 상의합니다.
+- 태그를 만든 뒤 GitHub Release, 릴리스 페이지, 자동 배포를 추가로 만들지 않습니다.

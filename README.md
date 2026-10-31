@@ -331,6 +331,17 @@ skills/gorani-<이름>/scripts/      스킬 전용 스크립트
 samples/<스킬>/                    예시 입력과 결과물
 ```
 
+## 릴리스
+
+GitHub Release는 만들지 않고, CHANGELOG 버전에 맞춘 annotated tag만 만듭니다.
+
+```bash
+git tag -a v3.17.0 -m "v3.17.0"
+git push origin v3.17.0
+```
+
+이미 push한 태그는 옮기거나 덮어쓰지 않습니다.
+
 ## 문제 해결
 
 | 증상 | 확인 |
