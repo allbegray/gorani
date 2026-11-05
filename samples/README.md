@@ -15,14 +15,15 @@
 | `cve-report-sample.vex.json` | OpenVEX JSON |
 | `cve-report-sbom-sample.xlsx` | 전체 SBOM VEX 엑셀 보고서 (SBOM 구성요소·용도 포함) |
 | `cve-report-sbom-sample.vex.json` | 전체 SBOM 실행의 OpenVEX JSON (취약점 statement만) |
+| `cve-report-model-sample.json` | 렌더링 전 리포트 모델 JSON (`--model-out`) |
 
-VEX 엑셀과 OpenVEX는 사용자가 요청했을 때만 생성되는 선택 산출물의 예시입니다. 요청하지 않으면 스캔 요약과 조치 목록만 만듭니다. `--scope all`은 SBOM 전체 구성요소를 포함하고, `VEX 판정`과 OpenVEX에는 취약점만 남깁니다. 의존성 용도는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 표시합니다. `dependency-metadata.json`의 각 항목은 `package`(또는 `name`), 선택 `version`, 선택 `purl`, `usage`(50자 이하)를 가집니다.
+VEX 엑셀과 OpenVEX는 사용자가 요청했을 때만 생성되는 선택 산출물의 예시입니다. 요청하지 않으면 스캔 요약과 조치 목록만 만듭니다. `--scope all`은 SBOM 전체 구성요소를 포함하고, `VEX 판정`과 OpenVEX에는 취약점만 남깁니다. 의존성 용도는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 표시합니다. `dependency-metadata.json`의 각 항목은 `package`(또는 `name`), 선택 `version`, 선택 `purl`, `usage`(50자 이하)를 가집니다. `--model-out`은 렌더링 전 데이터를 JSON으로 저장하며, 커스텀 출력은 이 모델을 소비하거나 `scripts/cve_report/render_xlsx.py`를 교체하면 됩니다.
 
 재생성:
 
 ```bash
 python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-input.json --metadata samples/cve-scan/dependency-metadata.json --outdir samples/cve-scan --name cve-report-sample
-python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-input.json --scope all --sbom samples/cve-scan/sbom.cdx.json --metadata samples/cve-scan/dependency-metadata.json --outdir samples/cve-scan --name cve-report-sbom-sample
+python3 skills/gorani-cve-scan/scripts/vex_xlsx.py --input samples/cve-scan/vex-input.json --scope all --sbom samples/cve-scan/sbom.cdx.json --metadata samples/cve-scan/dependency-metadata.json --outdir samples/cve-scan --name cve-report-sbom-sample --model-out samples/cve-scan/cve-report-model-sample.json
 ```
 
 ## gorani-release-check
@@ -80,7 +81,7 @@ python3 skills/gorani-report/scripts/report_issue.py \
   --no-duplicate-search
 ```
 
-이 명령은 드래프트만 만들고 GitHub 이슈를 생성하지 않습니다. 실제 생성은 사용자 확인 후 `--create`로 실행합니다.
+이 명령은 드래프트만 만들고 GitHub 이슈를 생성하지 않습니다. 실제 생성은 사용자 확인 후 `--create`로 실행합니다. `--model-out`은 기존 `--json`과 별도로 `schema_version`이 있는 중첩 리포트 모델을 저장합니다.
 
 ## gorani-change-impact
 
@@ -91,7 +92,7 @@ python3 skills/gorani-report/scripts/report_issue.py \
 | `impact-sample.md` | full 모드 리포트 샘플 (변경 분류·갱신 필요·확인 제안) |
 | `impact-sample.json` | 같은 내용의 기계 판독용 JSON |
 
-이 샘플은 임시 git 저장소에서 만든 예시이며 commit hash는 설명용입니다. `pr-impact.yml`은 스킬 폴더를 저장소에 vendoring했거나 gorani 저장소를 체크아웃한 경우를 가정하므로, 실제 프로젝트에서는 `python3` 경로를 설치 위치에 맞춥니다. 실제 저장소에서는 아래처럼 실행합니다.
+이 샘플은 임시 git 저장소에서 만든 예시이며 commit hash는 설명용입니다. `--generated-at`은 기존 `--now`의 별칭으로 샘플 생성 시각을 고정합니다. `pr-impact.yml`은 스킬 폴더를 저장소에 vendoring했거나 gorani 저장소를 체크아웃한 경우를 가정하므로, 실제 프로젝트에서는 `python3` 경로를 설치 위치에 맞춥니다. 실제 저장소에서는 아래처럼 실행합니다.
 
 ```bash
 python3 skills/gorani-change-impact/scripts/change_impact.py --mode stale --working
@@ -113,7 +114,7 @@ python3 skills/gorani-change-impact/scripts/change_impact.py --mode full --base 
 재생성:
 
 ```bash
-python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-contract-diff/old.yaml --new samples/api-contract-diff/new.yaml --service "Share API" --release-version "1.1.0" --clients "web, ios, android" --out samples/api-contract-diff/api-diff.md --json-out samples/api-contract-diff/api-diff.json
+python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-contract-diff/old.yaml --new samples/api-contract-diff/new.yaml --service "Share API" --release-version "1.1.0" --clients "web, ios, android" --out samples/api-contract-diff/api-diff.md --json-out samples/api-contract-diff/api-diff.json --generated-at 2026-10-31T19:10:52+09:00
 ```
 
 ## gorani-site-structure
@@ -129,7 +130,7 @@ python3 skills/gorani-api-contract-diff/scripts/api_diff.py --old samples/api-co
 재생성:
 
 ```bash
-python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/site-structure/site-structure-input.json --outdir samples/site-structure --name site-structure-sample --formats xlsx,md,html
+python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/site-structure/site-structure-input.json --outdir samples/site-structure --name site-structure-sample --formats xlsx,md,html --generated-at 2026-10-31T19:06:59+09:00
 ```
 
 샘플은 가상의 Admin Console 레이아웃이며, 스크린샷 경로도 예시입니다. 실제 구조는 브라우저에서 메뉴·탭·역할별 노출을 확인해 입력 JSON을 채웁니다. Playwright 자동 수집은 선택 사항입니다.
@@ -147,7 +148,7 @@ python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/s
 재생성:
 
 ```bash
-python3 skills/gorani-table-spec/scripts/table_spec.py --ddl samples/table-spec/schema.sql --dialect postgres --project "Sample DB" --outdir samples/table-spec --name table-spec --formats xlsx,md,html
+python3 skills/gorani-table-spec/scripts/table_spec.py --ddl samples/table-spec/schema.sql --dialect postgres --project "Sample DB" --outdir samples/table-spec --name table-spec --formats xlsx,md,html --generated-at 2026-10-31T19:10:52+09:00
 ```
 
 DB 모드:
@@ -176,7 +177,7 @@ python3 skills/gorani-license-notice/scripts/notice_build.py --input samples/lic
 
 샘플 프로젝트와 `legacy-widget` 패키지는 가상입니다. 라이선스 원문은 실제 npm 패키지에서 가져왔고, unknown·전문 없음·copyleft 검토 항목을 함께 보여 줍니다. 간소화 샘플에서는 `legacy-widget`만 GitHub 저장소가 없어 링크가 `-`로 표시됩니다.
 
-샘플은 `html,md,review` 기본 형식으로 생성합니다. 엑셀은 `--formats xlsx`를 추가했을 때만 만듭니다.
+샘플은 `html,md,review` 기본 형식으로 생성합니다. 엑셀은 `--formats xlsx`를 추가했을 때만 만듭니다. `--model-out`은 렌더링 전 패키지·그룹·검토 모델을 JSON으로 저장하고, `--generated-at`은 생성 시각을 고정합니다.
 
 ## gorani-release-note
 
@@ -197,7 +198,7 @@ python3 skills/gorani-release-note/scripts/notes_build.py --input samples/releas
 
 샘플 제품·버전·링크는 가상입니다. 깨지는 변경, 알려진 문제, 고객 문의 경로, 내부 commit 매핑을 함께 보여 줍니다.
 
-샘플은 전체 형식으로 생성합니다. 실제 프로젝트에서는 필요한 형식만 `--formats`로 지정합니다.
+샘플은 전체 형식으로 생성합니다. 실제 프로젝트에서는 필요한 형식만 `--formats`로 지정합니다. `--model-out`은 섹션·제한·내부 매핑을 담은 리포트 모델을 JSON으로 저장하고, `--generated-at`은 생성 시각을 고정합니다.
 
 ## gorani-spec-analysis
 

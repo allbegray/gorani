@@ -48,6 +48,9 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - PR CI는 특정 경로가 바뀔 때만 path-filter로 실행
 - 결과: `.gorani/impact/impact-<head>-stale.md`, `.json` 또는 `-full.md`, `.json`
 - `.gorani/`는 로컬 임시 산출물이므로 커밋하지 않음
+- `impact-*.json`이 리포트 모델이며 `schema_version`을 포함
+- `--generated-at`은 기존 `--now`의 별칭으로, 샘플 재생성 시각을 고정
+- 스크립트는 `scripts/change_impact/` 패키지로 분리. 모듈 지도는 `skills/gorani-change-impact/scripts/README.md` 참고
 
 ### gorani-report
 
@@ -62,6 +65,8 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - `gh`가 없거나 인증되지 않았으면 드래프트만 남기고 `gh auth login` 안내
 - `.github/ISSUE_TEMPLATE/skill-report.yml` 양식으로 직접 보고도 가능
 - 결과: `.gorani/report/<skill>-<timestamp>.md`, `--json` 메타데이터, 생성된 이슈 URL
+- `--model-out`으로 `schema_version`·`meta`·`summary`·`values`·`environment`·`body`·`duplicates`를 담은 리포트 모델 JSON 저장. 기존 `--json` 출력은 그대로 유지
+- 스크립트는 `scripts/report_issue/` 패키지로 분리. 모듈 지도는 `skills/gorani-report/scripts/README.md` 참고
 
 ### gorani-docs-governance
 
@@ -83,6 +88,8 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - VEX 엑셀 범위: `--scope vuln`(기본, 취약점만) 또는 `--scope all`(SBOM 전체 구성요소)
 - `--scope all`은 syft CycloneDX의 모든 구성요소를 `SBOM 구성요소` 시트에 넣고, 취약점 없는 패키지도 표시. `--sbom .security/sbom.cdx.json` 필요
 - 의존성 사용 용도는 `dependency_metadata` 또는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 50자 이하로 표시. 예: `{"package": "logback-classic", "usage": "시스템 로깅"}`
+- `--model-out`으로 렌더링 전 리포트 모델 JSON을 저장. 커스텀 출력은 이 JSON을 소비하거나 `scripts/cve_report/render_*.py`를 교체
+- 스크립트는 입력 → 리포트 모델 → 렌더러 구조. 모듈 지도는 `skills/gorani-cve-scan/scripts/README.md`
 - 요청 시 결과: 기본은 `docs/security/cve-report-YYYY-MM-DD.xlsx`와 같은 이름의 `.vex.json`, 전체 SBOM은 `cve-report-YYYY-MM-DD-sbom.xlsx`·`.vex.json`
 - OpenVEX JSON은 범위와 무관하게 취약점 statement만 포함. 취약점 없는 패키지를 `not_affected`로 표현하지 않음
 - 고객 제출용 기계 판독 SBOM이 필요하면 `.security/sbom.cdx.json`을 함께 전달. `.security/`는 커밋하지 않음
@@ -117,7 +124,9 @@ OpenAPI 3.x 스펙 두 개를 비교해 계약 변경을 정리합니다.
 - 위치를 `GET /shares → 응답 200 본문 → ownerEmail`처럼 표시
 - 배포 전·테스트 체크리스트와 전체 변경 부록
 - 결과: `docs/api/<service>/api-diff.md`, 선택 시 `api-diff.json`
-- `--fail-on-breaking`으로 CI에서 breaking 변경 차단
+- `api-diff.json`은 Markdown과 같은 리포트 모델. `schema_version`·스펙 버전·클라이언트·findings·body_changes 포함
+- `--fail-on-breaking`으로 CI에서 breaking 변경 차단, `--generated-at`으로 샘플 재생성 시각 고정
+- 스크립트는 스펙 비교 → 리포트 모델 → Markdown/JSON 렌더러 구조. 모듈 지도는 `skills/gorani-api-contract-diff/scripts/README.md`
 - 스펙 기준 비교이며 런타임 동작·클라이언트 구현은 별도 확인
 
 ### gorani-license-notice
@@ -132,6 +141,9 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - `--xlsx` 또는 `--formats xlsx`를 주면 검토용 엑셀도 생성. 기본 경로는 openpyxl 없이 동작
 - `--simple`은 의존성 이름·버전·GitHub 라이선스 링크만 담은 `third-party-notices-simple.html`·`.md`를 생성
 - 간소화 페이지는 전체 고지 의무를 대체하지 않으므로 배포에는 전체 HTML을 사용
+- `--model-out`으로 `schema_version`·`meta`·`summary`·`packages`·`groups`·`review`·`warnings`·`logs` 리포트 모델 JSON 저장
+- `--generated-at`으로 생성 시각을 고정해 샘플을 재현
+- 스크립트는 `scripts/notice_build/` 패키지로 분리. 렌더러 교체·모델 소비는 `skills/gorani-license-notice/scripts/README.md` 참고
 
 ### gorani-release-note
 
@@ -143,6 +155,9 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - 산출물은 `--formats`로 선택: `html`, `md`, `short`, `store`, `internal`. 기본은 전체
 - `--strict`로 commit 매핑·지원 경로·링크를 검증
 - 앱스토어 글자 수 제한은 입력의 `limits`로 조정
+- `--model-out`으로 `schema_version`·`meta`·`summary`·`content`·`summaries`·`limits`·`warnings`·`internal.mappings` 모델 JSON 저장
+- `--generated-at`으로 생성 시각을 고정해 샘플을 재현
+- 스크립트는 `scripts/notes_build/` 패키지로 분리. 출력 형식별 렌더러는 `skills/gorani-release-note/scripts/README.md` 참고
 
 ### gorani-dependency-update
 
@@ -169,6 +184,9 @@ SBOM과 패키지의 LICENSE·NOTICE를 모아 앱에 게시할 고지 페이지
 - Playwright 자동 수집은 선택 사항. 기본은 에이전트가 실제 화면을 확인
 - 결과: `docs/site-structure/site-structure.xlsx`, `.md`, `.html`
 - `--formats`로 필요한 형식만 선택. `md`·`html`은 openpyxl 없이 동작
+- `--model-out`으로 `schema_version`·`meta`·`summary`·`pages`·`api_only`·`standards`·`warnings`·`sources` 모델 JSON 저장
+- `--generated-at`으로 생성 시각을 고정해 샘플을 재현
+- 스크립트는 `scripts/site_structure/` 패키지로 분리. 렌더러 교체는 `skills/gorani-site-structure/scripts/README.md` 참고
 
 ### gorani-spec-analysis
 
@@ -201,6 +219,10 @@ SQL DDL 또는 실제 DB에서 테이블 정의를 읽어 테이블 명세서를
 - `--formats md` 또는 `html`만 주면 openpyxl 없이 동작
 - `--strict`로 파싱 경고가 있을 때 CI에서 차단
 - DDL 모드는 파일 기준, DB 모드는 접속 시점 스키마 기준
+- `--model-out`으로 `schema_version`·`meta`·`summary`·`tables`·`warnings`·`sources` 모델 JSON 저장
+- `--generated-at`으로 생성 시각을 고정해 샘플을 재현
+- 스크립트는 `scripts/table_spec/` 패키지로 분리. 렌더러 교체는 `skills/gorani-table-spec/scripts/README.md` 참고
+- 파싱 경고가 있어도 XLSX를 `--outdir`에 저장하도록 기존 경로 버그를 수정
 
 ## 설치
 
@@ -308,6 +330,7 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/cve-scan/dependency-metadata.json` | 의존성 용도 메타데이터 샘플 (50자 이하) |
 | `samples/cve-scan/cve-report-sbom-sample.xlsx` | 전체 SBOM VEX 엑셀 (SBOM 구성요소·용도 포함) |
 | `samples/cve-scan/cve-report-sbom-sample.vex.json` | 전체 SBOM 실행의 OpenVEX JSON (취약점 statement만) |
+| `samples/cve-scan/cve-report-model-sample.json` | 렌더링 전 리포트 모델 JSON (`--model-out`) |
 | `samples/release-check/release-check-sample.xlsx` | 릴리스 점검 엑셀 (요약, 점검 항목, 변경 파일, 커밋, 실행 로그) |
 | `samples/license-notice/third-party-notices.html` | 앱에 넣는 자기완결 고지 페이지 (검색, 라이선스 전문 접기) |
 | `samples/license-notice/third-party-notices.md` | 같은 내용의 평문 |
@@ -347,8 +370,8 @@ samples/<스킬>/                    예시 입력과 결과물
 GitHub Release는 만들지 않고, CHANGELOG 버전에 맞춘 annotated tag만 만듭니다.
 
 ```bash
-git tag -a v3.20.0 -m "v3.20.0"
-git push origin v3.20.0
+git tag -a v3.21.0 -m "v3.21.0"
+git push origin v3.21.0
 ```
 
 이미 push한 태그는 옮기거나 덮어쓰지 않습니다.

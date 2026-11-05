@@ -2,8 +2,8 @@
 name: gorani-api-contract-diff
 description: OpenAPI 3.x 스펙 두 개를 비교해 breaking change, 클라이언트 영향, 배포 전·테스트 체크리스트를 만든다. API 변경 리뷰, 버전 업, 외부 연동 영향 확인이 필요할 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.21.0"
+  updated: "2026-11-05"
 ---
 
 # API 계약 변경 점검
@@ -84,10 +84,13 @@ Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 조정합니
 
 `api-diff.artifact.json`은 산출물 옆에 남기는 sidecar manifest입니다. `sources`(기본: 이전·새 스펙 경로), `generated_commit`, `regenerate`를 기록해 `gorani-change-impact`가 갱신 필요 여부를 판단하게 합니다.
 
-`api-diff.json`은 같은 findings를 기계적으로 읽을 수 있게 저장합니다.
+`api-diff.json`은 Markdown과 같은 리포트 모델을 기계적으로 읽을 수 있게 저장합니다.
 
 | 필드 | 내용 |
 | --- | --- |
+| `schema_version` | 리포트 모델 스키마 버전 |
+| `old`, `new`, `old_version`, `new_version` | 비교한 스펙 경로와 스펙 버전 |
+| `service`, `release_version`, `clients`, `generated_at` | 서비스·배포 버전·영향 클라이언트·생성 시각 |
 | `summary` | 심각도별 건수 |
 | `priority_summary` | P0~P4 우선순위별 건수 |
 | `findings` | `id`, `severity`, `priority`, `area`, `location`, `message`, `old`, `new`, `action` |
@@ -113,6 +116,14 @@ Google Issue Tracker의 P0~P4 기준을 API 계약 변경에 맞게 조정합니
 | `--manifest` | sidecar `.artifact.json` 경로. 기본은 리포트 옆 |
 | `--no-manifest` | sidecar manifest를 만들지 않음 |
 | `--fail-on-breaking` | breaking이 있으면 exit 1 |
+| `--generated-at` | 생성 시각 강제 지정 (ISO 8601, 샘플 재생성·재현용) |
+
+## 스크립트 구조
+
+- `scripts/api_diff.py`: 기존 CLI 진입점 (얇은 래퍼)
+- `scripts/api_diff/`: `cli`, `compare`, `priority`, `model`, `render_md`, `render_json`, `manifest`, `constants`
+- Markdown과 JSON은 같은 리포트 모델을 소비합니다. 새 출력 형식은 `render_<format>.py`를 추가하고 `cli.py`에서 호출합니다.
+- 모듈 지도와 커스터마이징 지점은 `scripts/README.md`를 참고합니다.
 
 ## 도구 설치
 

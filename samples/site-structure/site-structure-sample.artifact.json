@@ -10,8 +10,8 @@
   "sources": [
     "samples/site-structure/site-structure-input.json"
   ],
-  "generated_commit": "136443a",
+  "generated_commit": "6f6f9a6",
   "generated_at": "2026-10-31T19:06:59+09:00",
   "working_tree_dirty": true,
-  "regenerate": "python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/site-structure/site-structure-input.json --outdir samples/site-structure --name site-structure-sample --formats xlsx,md,html"
+  "regenerate": "python3 skills/gorani-site-structure/scripts/site_structure.py --input samples/site-structure/site-structure-input.json --outdir samples/site-structure --name site-structure-sample --formats xlsx,md,html --generated-at 2026-10-31T19:06:59+09:00"
 }

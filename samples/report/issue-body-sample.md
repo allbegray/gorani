@@ -8,26 +8,20 @@ DB 모드에서 테이블 설명이 비어 있습니다
 
 ## 제안
 
-COMMENT ON으로 작성한 테이블·컬럼 설명이 명세서에 표시됩니다.
-
-## 기대 효과
-
-PostgreSQL 16, SQLAlchemy 2.1.6. DDL 모드에서는 설명이 정상입니다.
+COMMENT ON 설명이 명세서에 표시됩니다.
 
 ## 현재 동작·양식
 
-설명 열이 모두 비어 있고, 원본 DB에는 COMMENT가 있습니다.
+설명 열이 모두 비어 있습니다.
 
 ## 참고한 화면·명령
 
-1. PostgreSQL에서 COMMENT ON TABLE users IS ... 로 설명을 추가합니다.
-2. table_spec.py --db-url "$DATABASE_URL" --outdir docs/db --formats xlsx,md 로 실행합니다.
-3. table-spec.md의 설명 열을 확인합니다.
+1. DB에 COMMENT를 추가합니다. 2. table_spec.py를 실행합니다.
 
 ## 실행 명령
 
 ```bash
-python3 skills/gorani-table-spec/scripts/table_spec.py --db-url "$DATABASE_URL" --outdir docs/db --formats xlsx,md
+python3 skills/gorani-table-spec/scripts/table_spec.py --db-url "$DATABASE_URL" --outdir docs/db
 ```
 
 ## 환경
@@ -35,18 +29,18 @@ python3 skills/gorani-table-spec/scripts/table_spec.py --db-url "$DATABASE_URL" 
 | 항목 | 값 |
 | --- | --- |
 | 스킬 | gorani-table-spec |
-| 스킬 버전 | 3.17.0 |
-| 스킬 갱신일 | 2026-10-31 |
-| skill source commit | 136443a+dirty |
-| OS | macOS-27.0.1-arm64-arm-64bit-Mach-O |
-| Python | 3.15.2 |
+| 스킬 버전 | 3.21.0 |
+| 스킬 갱신일 | 2026-11-05 |
+| skill source commit | 6f6f9a6+dirty |
+| OS | macOS-27.2-arm64-arm-64bit-Mach-O |
+| Python | 3.14.7 |
 | Shell | zsh |
-| 도구 | sqlglot=30.27.0 SQLAlchemy=2.1.6 |
+| 도구 | sqlglot=30.27.0 |
 
 ## 참고 로그
 
 ```text
-warning: column comment lookup returned empty for schema public
+warning: column comment lookup returned empty
 ```
 
 ## 공개 안전 확인

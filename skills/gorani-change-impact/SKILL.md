@@ -2,8 +2,8 @@
 name: gorani-change-impact
 description: 기존 산출물이 소스 변경으로 낡았는지 sidecar .artifact.json과 git diff로 값싸게 확인하고, 릴리스 때만 전체 영향도를 정리한다. 산출물을 자동 수정하지 않고 갱신 명령만 제안한다. PR·릴리스 전 산출물 갱신 대상 확인이 필요할 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.21.0"
+  updated: "2026-11-05"
 ---
 
 # 변경 영향 확인
@@ -93,7 +93,8 @@ metadata:
 | `--force` | stale이 없어도 리포트 파일 생성 |
 | `--fail-on-stale` | 갱신 대상이 있으면 exit 1 |
 | `--fail-on-unknown` | manifest를 확인할 수 없으면 exit 1 |
-| `--now` | 테스트용 기준 시각(ISO 8601) |
+| `--now` | 테스트용 기준 시각(ISO 8601). 기존 이름 |
+| `--generated-at` | 생성 시각 강제 지정(ISO 8601). `--now`와 같은 값 |
 
 ## CI와 PR
 
@@ -136,11 +137,8 @@ Markdown:
 
 JSON:
 
-- `summary`: 변경 파일, stale, clean, unknown, warnings 집계
-- `stale`: manifest, skill, artifact, base, matched, regenerate
-- `clean`: 변경이 없는 manifest
-- `unknown`: 확인하지 못한 manifest와 오류
-- `warnings`: 전체 경고
+- 아래 `## 리포트 모델`을 그대로 저장합니다.
+- stale 모드에서는 `categories`가 비고 `suggestions`는 빈 배열입니다.
 
 ### full
 
@@ -159,7 +157,41 @@ Markdown:
 - `## 릴리스 절차`: change-impact → release-check → release-note
 - `## 경고`
 
-JSON에는 같은 내용과 `categories`, `suggestions`가 추가됩니다.
+JSON은 같은 모델에 `categories`와 `suggestions`가 채워집니다.
+
+## 리포트 모델
+
+`impact-<head>-<mode>.json`은 Markdown과 같은 내용을 담는 리포트 모델입니다. 별도 `--model-out` 없이 이 파일을 모델로 씁니다.
+
+| 필드 | 내용 |
+| --- | --- |
+| `schema_version` | 리포트 모델 스키마 버전. 현재 `1` |
+| `version` | 기존 JSON 소비자를 위한 결과 형식 버전. 현재 `1` |
+| `mode`, `generated_at`, `base`, `head`, `manifest_glob`, `working` | 실행 조건과 기준 시각. 모델의 meta 역할 |
+| `summary` | 변경 파일, stale, clean, unknown, warnings 집계 |
+| `categories` | full 모드의 frontend·api·db·config·dependencies·tests·docs 분류 |
+| `stale` | 갱신 필요 항목: `manifest`, `skill`, `artifact`, `base`, `matched`, `regenerate` |
+| `clean` | 변경이 없는 항목: `manifest`, `skill`, `artifact` |
+| `unknown` | 확인하지 못한 항목: `manifest`, `skill`, `artifact`, `errors` |
+| `suggestions` | full 모드의 확인 제안: `skill`, `reason`, `category` |
+| `warnings` | 전체 경고 |
+
+- `schema_version`은 기존 소비자가 무시할 수 있는 추가 필드입니다. 기존 필드의 이름과 상대 순서는 유지합니다.
+- Markdown과 JSON 렌더러는 같은 모델을 소비합니다. 새 출력 형식은 `render_<format>.py`를 추가하고 `cli.py`에서 호출합니다.
+
+## 스크립트 구조
+
+- `scripts/change_impact.py`: 기존 CLI 진입점(얇은 래퍼)
+- `scripts/change_impact/cli.py`: argparse, 경로 결정, 모델 생성, 렌더러 호출
+- `scripts/change_impact/git.py`: git 명령, commit 해석, 변경 파일 조회
+- `scripts/change_impact/manifest.py`: sidecar manifest 탐색·파싱·글롭 매칭
+- `scripts/change_impact/evaluate.py`: manifest별 stale·clean·unknown 판정
+- `scripts/change_impact/classify.py`: full 모드 변경 분류
+- `scripts/change_impact/model.py`: JSON 직렬화 가능한 리포트 모델
+- `scripts/change_impact/render_md.py`, `scripts/change_impact/render_json.py`: Markdown·JSON 렌더러
+- `scripts/change_impact/constants.py`: 분류 규칙·확인 제안·탐색 제외 디렉터리
+
+모듈 지도와 커스터마이징 지점은 `scripts/README.md`를 참고합니다.
 
 ## 기존 스킬과 연결
 

@@ -2,8 +2,8 @@
 name: gorani-release-note
 description: git 변경과 릴리스 범위에서 고객이 이해할 수 있는 릴리스 노트를 만든다. 새 기능·개선·수정·보안을 고객 관점으로 다시 쓰고, 사용자가 고른 산출물(앱 페이지·GitHub 본문·스토어 요약·내부 기록)을 생성한다. 배포 전 릴리스 노트 작성, 앱 업데이트 안내, 스토어 "새로운 기능" 문구가 필요할 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.21.0"
+  updated: "2026-11-05"
 ---
 
 # 고객용 릴리스 노트 생성
@@ -29,7 +29,7 @@ git 범위의 변경을 고객이 읽을 문장으로 바꾸고, 사용자가 �
 6. 깨지는 변경을 찾습니다. 기존 설정·API·파일 형식·동작이 바뀌면 `breaking_changes` 로 올리고, 고객이 따라 할 수 있는 구체적인 조치를 씁니다.
 7. 릴리스 노트 JSON 을 큐레이션합니다. 아래 입력 형식에 맞춰 `highlights`, `sections`, `breaking_changes`, `known_issues`, `upgrade_notes`, `support`, `short_summary`, `store_summary` 를 채웁니다.
 8. 고객 문장을 씁니다. 아래 고객 문구 규칙을 적용하고, 모든 주장이 commit·diff·PR로 확인되는지 표시합니다. 확인할 수 없으면 쓰지 않습니다.
-9. 결과물을 생성합니다. `python3 <스킬 폴더>/scripts/notes_build.py --input .release/release-input.json --outdir docs/releases --name release-notes --formats html,md,short,store,internal --strict`. 사용자가 고른 형식만 `--formats`에 넣습니다.
+9. 결과물을 생성합니다. `python3 <스킬 폴더>/scripts/notes_build.py --input .release/release-input.json --outdir docs/releases --name release-notes --formats html,md,short,store,internal --strict`. 사용자가 고른 형식만 `--formats`에 넣습니다. 렌더링에 쓸 정규화 모델이 필요하면 `--model-out .release/release-model.json`을 더하고, 생성 시각을 고정하려면 `--generated-at 2026-11-05T21:00:00+09:00`을 씁니다.
 10. 검증합니다. 선택한 산출물을 읽고, 글자 수·링크·내부 정보·깨지는 변경 조치·지원 경로를 확인합니다. HTML을 선택했다면 데스크톱과 모바일 폭에서 엽니다.
 11. 채널에 맞게 게시합니다. GitHub Release 본문은 md, 앱·백엔드 페이지는 html, 앱스토어는 short/store txt를 사용합니다. 게시는 사람이 승인한 뒤에 합니다.
 
@@ -44,6 +44,7 @@ git 범위의 변경을 고객이 읽을 문장으로 바꾸고, 사용자가 �
 - `release_date`: 배포일 (YYYY-MM-DD)
 - `language`: `ko` 또는 `en`. 기본 `ko`
 - `audience`: 고객 설명. 예: "앱 사용자", "관리자"
+- `generated_at`: 수집 시각(ISO 8601). 리포트 모델의 `meta.generated_at` 기본값으로 쓰입니다. `--generated-at`이 있으면 그 값이 우선합니다.
 - `headline`: 한 줄 요약. 선택
 - `summary`: 2-3문장 요약. 선택
 - `highlights`: 카드로 보여 줄 핵심 항목 배열. 각 항목은 `title`, `description`, 선택 `link`
@@ -106,6 +107,18 @@ commit 항목:
 | store | `release-notes-store.txt` | 앱스토어 긴 버전 (기본 4,000자) |
 | internal | `release-notes-internal.md` | 내부 검토용 commit 매핑·경고·확인 목록 |
 
+`--model-out PATH`를 주면 고객 산출물과 별도로 렌더링 전 리포트 모델을 JSON으로 저장합니다. 모델은 Markdown·HTML·텍스트 렌더러가 함께 쓰는 값이며, 다음을 담습니다.
+
+- `schema_version`: 모델 스키마 버전
+- `meta`: 생성기, `generated_at`, 입력 경로, 제품·버전·배포일·언어·대상, 선택한 형식, 비교 범위
+- `summary`: 섹션·항목·highlight·commit 포함/제외 수, short/store 글자 수와 제한, 자동 생성 여부
+- `content`: 제품·버전·배포일, headline·summary, `sections`와 `items`, `highlights`, `breaking_changes`, `known_issues`, `upgrade_notes`, `support`
+- `summaries`: 렌더링에 쓴 short·store 본문
+- `limits`, `warnings`, `strict_issues`, `auto_notes`, `commits`, `logs`
+- `internal.mappings`: commit hash·날짜·제목·분류·포함 여부·note/reason 매핑
+
+`meta.generated_at`은 `--generated-at`이 있으면 그 값, 없으면 입력의 `generated_at`, 둘 다 없으면 현재 시각입니다. 이 값은 고객용 md·html·txt에 들어가지 않으므로 출력 파일은 생성 시각과 무관하게 같습니다.
+
 사용자에게는 짧게 이렇게 묻습니다. "릴리스 노트 산출물을 선택해 주세요. 앱 페이지(html), GitHub 본문(md), 스토어 요약(short/store), 내부 검토(internal) 중 필요한 것을 알려 주세요."
 
 - 선택한 형식만 생성하거나 갱신합니다. 선택하지 않은 기존 파일은 건드리지 않습니다.
@@ -140,6 +153,28 @@ internal:
 - 입력 검증 실패 또는 `--strict` 위반 1
 - argparse 인자 오류 2
 
+## 스크립트 구조
+
+`notes_build.py`는 기존 CLI 경로를 유지하는 얇은 래퍼이고, 구현은 같은 폴더의 `notes_build/` 패키지에 있습니다. `collect_changes.py`는 입력 초안을 만드는 수집기로 그대로 둡니다.
+
+| 파일 | 역할 |
+| --- | --- |
+| `notes_build.py` | 기존 CLI 진입점. `notes_build.cli.main` 호출만 합니다 |
+| `notes_build/constants.py` | 언어별 라벨, 기본 글자 수 제한, 출력 형식, 스키마 버전 |
+| `notes_build/model.py` | 입력 정규화, short/store 자동 생성, commit 내부 매핑, 리포트 모델 생성 |
+| `notes_build/validate.py` | 필수 값·배열·링크·지원 경로·글자 수 검사 |
+| `notes_build/render_md.py` | Markdown 렌더러 |
+| `notes_build/render_html.py` | 자기완결 HTML 렌더러 |
+| `notes_build/render_text.py` | short·store 텍스트 렌더러 |
+| `notes_build/render_internal.py` | 내부 검토 Markdown 렌더러 |
+| `notes_build/render_json.py` | `--model-out` 리포트 모델 JSON 저장 |
+| `notes_build/cli.py` | argparse, 입력 확인, 모델 생성, 렌더러 호출, 콘솔 요약 |
+
+- 고객 문구 구성은 `render_md.py`·`render_html.py`·`render_text.py`에서 바꿉니다.
+- 모델 필드를 추가하려면 `model.py`를 고치고 `render_json.py`로 저장합니다.
+- 새 출력 형식은 `render_<형식>.py`를 추가하고 `cli.py`에서 호출합니다.
+- `model.py`·`validate.py`·렌더러는 표준 라이브러리만 사용합니다.
+
 ## 채널별 사용
 
 - GitHub Release: `release-notes.md` 본문을 붙이고, 제목은 제품명과 버전으로 씁니다.
@@ -151,6 +186,7 @@ internal:
 ## 검증
 
 - `--strict` 로 실행해 commit 매핑, 지원 경로, 링크 형식이 모두 채워졌는지 확인합니다.
+- `--model-out`을 썼다면 콘솔 요약과 모델의 `summary`·`warnings`·`internal.mappings`가 일치하는지 확인합니다. 모델을 소비하는 커스텀 렌더러는 `--generated-at`으로 생성 시각을 고정해 재현합니다.
 - `short_chars` 와 `store_chars` 가 제한 이하인지 확인합니다. 초과한 명시 요약은 스크립트가 실패시킵니다.
 - 선택한 고객 산출물에서 커밋 해시, 이슈 번호, 직원 이름, 내부 URL이 없는지 확인합니다.
 - 모든 고객 문장이 commit·diff·PR로 확인되는지 내부 매핑 표 또는 콘솔 요약과 대조합니다.

@@ -1,8 +1,45 @@
 # 변경 이력
 
-최신 버전은 3.20.0(2026-11-05)입니다. 3.20.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.21.0(2026-11-05)입니다. 3.21.0 이전 이력은 git log와 태그로 확인합니다.
 
 릴리스는 GitHub Release 없이 annotated tag로만 표시합니다.
+
+## 3.21.0 · 2026-11-05
+
+8개 스킬의 큰 스크립트를 리포트 모델·렌더러 구조로 분리
+
+**추가**
+
+- `cve-scan`: `--model-out`, `scripts/cve_report/` 패키지, `samples/cve-scan/cve-report-model-sample.json`
+- `api-contract-diff`: `--generated-at`, `scripts/api_diff/` 패키지, `api-diff.json` 모델 필드
+- `table-spec`: `--model-out`·`--generated-at`, `scripts/table_spec/` 패키지
+- `site-structure`: `--model-out`·`--generated-at`, `scripts/site_structure/` 패키지
+- `license-notice`: `--model-out`·`--generated-at`, `scripts/notice_build/` 패키지
+- `release-note`: `--model-out`·`--generated-at`, `scripts/notes_build/` 패키지
+- `change-impact`: `--generated-at`(`--now` 별칭), `scripts/change_impact/` 패키지, JSON `schema_version`
+- `report`: `--model-out`, `scripts/report_issue/` 패키지
+- 각 스킬의 `scripts/README.md` 모듈 지도와 커스터마이징 지점
+
+**변경**
+
+- 모든 CLI 진입점은 기존 경로·옵션·출력 파일명을 유지하는 얇은 래퍼
+- Markdown·HTML·XLSX·JSON·텍스트 렌더러가 같은 리포트 모델을 소비
+- openpyxl·PyYAML·sqlglot·SQLAlchemy 의존성을 입력 어댑터·렌더러로 격리
+- `table-spec` 파싱 경고 시 XLSX가 `--outdir`가 아니라 저장소 루트에 저장되던 버그 수정. 내용은 동일하고 저장 위치만 정상화
+- `api-diff.json`은 기존 필드를 유지하고 `schema_version`·스펙 버전·클라이언트를 추가
+- `report`의 기존 `--json`은 바이트 호환을 유지하고, `--model-out`은 별도 중첩 모델로 제공
+
+**검증**
+
+- `cve-scan`: xlsx 시트·셀·스타일·검증 범위 동일, OpenVEX JSON 바이트 단위 동일, openpyxl 없이 모델 import
+- `api-contract-diff`: Markdown 바이트 단위 동일, 기존 JSON 필드 동일, `--fail-on-breaking` exit 1
+- `table-spec`: 17/17 골든 시나리오·49/49 추가 검증, md/html 바이트 동일, xlsx 의미 동일
+- `site-structure`: md/html 바이트 동일, xlsx 의미 동일, manifest 구조 동일
+- `license-notice`: HTML·md·review·간소화 출력 바이트 동일, xlsx 의미 동일, 모델만으로 재렌더링
+- `release-note`: 42개 출력 바이트 동일, 35개 CLI 시나리오 exit code 동일
+- `change-impact`: 27개 시나리오, Markdown 바이트 동일, JSON은 `schema_version` 추가 외 동일
+- `report`: 23개 시나리오, 드래프트·`--json`·fake `gh` 호출 로그 바이트 동일
+- 전 스킬 `py_compile`, `--help`, 샘플 재생성, AST 함수 집합 비교 확인
 
 ## 3.20.0 · 2026-11-05
 

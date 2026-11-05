@@ -2,8 +2,8 @@
 name: gorani-report
 description: gorani 스킬 사용 중 만난 오류·개선·아이디어·양식 제안을 GitHub 이슈로 정리해 올린다. 실행 명령·오류 로그·환경을 모아 민감 정보를 마스킹하고 중복 이슈를 확인한다. 공개 이슈 작성 전 사용자 확인을 받아야 할 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.21.0"
+  updated: "2026-11-05"
 ---
 
 # 스킬 문제 보고
@@ -91,6 +91,7 @@ gorani 스킬을 쓰다 만난 오류뿐 아니라 **개선·아이디어·Excel
 | `--tool` | 도구 버전. 여러 번 지정 가능 |
 | `--repo` | 이슈를 만들 저장소. 기본 `allbegray/gorani` |
 | `--out` | 드래프트 경로. `-`이면 파일을 만들지 않고 stdout만 사용 |
+| `--model-out` | 리포트 모델 JSON을 추가로 저장할 경로 |
 | `--json` | 결과를 JSON으로 출력 |
 | `--create` | 사용자 확인 후 새 이슈 생성 |
 | `--comment-on` | 새 이슈 대신 기존 이슈 번호에 코멘트 |
@@ -118,7 +119,7 @@ gorani 스킬을 쓰다 만난 오류뿐 아니라 **개선·아이디어·Excel
 - 문서: `## 제안`, `## 현재 문서`, `## 기대 효과`, `## 참고`
 - 질문: `## 질문`, `## 시도한 것`, `## 참고`
 
-`--json`은 아래 필드를 출력합니다.
+`--json`은 기존 소비자를 위해 필드 이름과 순서를 유지한 결과를 출력합니다.
 
 | 필드 | 내용 |
 | --- | --- |
@@ -132,6 +133,44 @@ gorani 스킬을 쓰다 만난 오류뿐 아니라 **개선·아이디어·Excel
 | `authenticated`, `auth_error` | `gh` 인증 상태 |
 | `created`, `commented`, `url` | 실제 생성·코멘트 결과 |
 | `error` | 실패 사유 |
+
+### 리포트 모델
+
+`--model-out PATH`는 드래프트·이슈 생성에 쓴 리포트 모델을 JSON으로 추가 저장합니다. 드래프트 파일 이름과 본문, `--json` 결과는 바꾸지 않습니다.
+
+| 필드 | 내용 |
+| --- | --- |
+| `schema_version` | 모델 스키마 버전. 현재 `1` |
+| `meta` | `repo`, `skill`, `skill_version`, `skill_updated`, `kind`, `kind_text`, `area`, `area_text`, `title`, `label`, `draft` |
+| `summary` | 마스킹 건수·규칙 수, 위험 패턴 수, 중복 후보 수, 인증·생성·코멘트 상태 |
+| `values` | 마스킹·길이 제한을 거친 입력값. `summary`, `steps`, `expected`, `actual`, `proposal`, `benefit`, `current`, `command`, `error`, `context` 등 |
+| `environment` | 환경 표 행의 `label`, `value` 목록 |
+| `body` | 렌더링된 이슈 본문 Markdown |
+| `duplicates`, `duplicate_error` | 중복 후보와 검색 실패 사유 |
+| `redactions`, `risks` | 마스킹 규칙별 건수, 남은 위험 패턴 |
+| `authenticated`, `auth_error` | `gh` 인증 상태 |
+| `created`, `commented`, `url`, `error` | 실제 생성·코멘트 결과 |
+
+모델은 드래프트 본문과 같은 마스킹을 거친 값만 담습니다. 비밀값 원문은 모델에도 남기지 않습니다.
+
+## 스크립트 구조
+
+`scripts/report_issue.py`는 기존 CLI 진입점이고, 구현은 `scripts/report_issue/` 패키지에 있습니다.
+
+| 모듈 | 역할 |
+| --- | --- |
+| `cli.py` | argparse, 실행 순서, 종료 코드 |
+| `inputs.py` | 인자·입력 파일 읽기 |
+| `environment.py` | `SKILL.md` 메타데이터, git·OS·Python·Shell·도구 수집 |
+| `sanitize.py` | 마스킹, 길이 제한, 잔여 위험 검사 |
+| `github.py` | 중복 검색, 이슈 생성·코멘트 |
+| `model.py` | 리포트 모델 생성 |
+| `render_md.py` | 이슈 본문 Markdown |
+| `render_json.py` | `--json` 결과와 `--model-out` 모델 |
+| `draft.py` | 드래프트 경로·저장 |
+| `constants.py` | 저장소·종류·영역·위험 패턴 상수 |
+
+본문 문장은 `render_md.py`, 모델 필드는 `model.py`, 마스킹 규칙은 `sanitize.py`에서 바꿉니다. 자세한 내용은 `scripts/README.md`를 봅니다.
 
 ## 마스킹과 중복
 

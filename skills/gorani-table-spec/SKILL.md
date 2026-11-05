@@ -2,8 +2,8 @@
 name: gorani-table-spec
 description: SQL DDL 또는 실제 DB에서 테이블·컬럼·PK/FK·인덱스·설명을 추출해 테이블 명세서를 Excel, Markdown, HTML로 만든다. DB 스키마 문서화, 테이블 정의서 작성, 릴리스 전 스키마 검토가 필요할 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.21.0"
+  updated: "2026-11-05"
 ---
 
 # 테이블 명세서 생성
@@ -75,6 +75,8 @@ SQL DDL 파일 또는 실제 데이터베이스에서 테이블 정의를 읽어
 - `--sources`는 산출물 갱신 판단에 쓸 소스 글롭입니다. 생략하면 `--ddl` 경로를 사용합니다. DB 모드에서는 비어 있으므로 마이그레이션 글롭을 직접 지정하는 것을 권장합니다.
 - `--no-manifest`는 sidecar `.artifact.json`을 만들지 않습니다.
 - `--strict`는 경고를 실패로 처리합니다.
+- `--model-out PATH`는 렌더링 전 리포트 모델 JSON을 추가로 저장합니다. 산출물 형식은 바뀌지 않습니다.
+- `--generated-at`은 생성 시각을 ISO 8601로 고정합니다. 샘플 재생성이나 결과 재현에 씁니다.
 
 ## 출력 형식
 
@@ -98,6 +100,33 @@ SQL DDL 파일 또는 실제 데이터베이스에서 테이블 정의를 읽어
 - 검색은 테이블명·컬럼명·설명을 대상으로 동작합니다.
 - 라이트·다크 모드, 모바일 폭, 인쇄를 지원합니다.
 - 검토 메모가 있으면 페이지 하단에 표시합니다.
+
+## 리포트 모델
+
+`--model-out PATH`를 주면 렌더링 전 데이터를 JSON으로 저장합니다. Markdown·HTML·XLSX 렌더러는 같은 모델을 소비하므로, 모델을 확인하면 산출물의 원본 데이터를 기계적으로 검증할 수 있습니다.
+
+| 필드 | 내용 |
+| --- | --- |
+| `schema_version` | 리포트 모델 스키마 버전 |
+| `meta` | `project`, `generated_at`, `source`(`ddl`/`database`), `source_label`, `dialects`, `files`, `generator` |
+| `summary` | `tables`, `columns`, `foreign_keys`, `indexes`, `warnings` 건수 |
+| `tables` | 테이블 목록. 각 항목에 `schema`, `name`, `description`, `columns`, `primary_key`, `foreign_keys`, `uniques`, `indexes`, `source_files` |
+| `warnings` | 파싱 경고 문자열 목록 |
+| `sources` | sidecar manifest에 기록할 소스 글롭 목록 |
+
+- `tables`는 스키마·테이블명 순으로 정렬합니다.
+- `columns`의 각 항목은 `name`, `data_type`, `length`, `nullable`, `default`, `primary_key`, `unique`, `references`, `comment`, `note`, `auto_increment`, `check`를 가집니다.
+- `--model-out` 파일은 manifest의 `outputs`에 넣지 않습니다. 산출물이 아니라 커스터마이징·검증용 입력이기 때문입니다.
+- `--generated-at`을 주면 `meta.generated_at`과 manifest의 `generated_at`, Markdown·HTML·XLSX의 생성 시각이 모두 같은 값으로 고정됩니다.
+
+## 스크립트 구조
+
+- `scripts/table_spec.py`: 기존 CLI 진입점 (얇은 래퍼)
+- `scripts/table_spec/`: `cli`, `ddl`, `db`, `model`, `render_md`, `render_html`, `render_xlsx`, `manifest`, `constants`
+- `model.py`·`render_md.py`·`render_html.py`는 sqlglot·SQLAlchemy·openpyxl 없이 import·동작합니다.
+- `ddl.py`는 sqlglot, `db.py`는 SQLAlchemy, `render_xlsx.py`는 openpyxl이 필요합니다. 없으면 해당 모드·형식에서 설치 안내와 함께 종료합니다.
+- 새 출력 형식은 `render_<format>.py`를 추가하고 `cli.py`에서 호출합니다.
+- 모듈 지도와 커스터마이징 지점은 `scripts/README.md`를 참고합니다.
 
 ## 파싱 규칙
 

@@ -46,10 +46,12 @@
 | 기본 모드 | `--mode stale`. `*.artifact.json` 탐색, manifest 마지막 커밋과 `generated_commit` 중 최신 기준의 git diff, `sources` 글롭 매칭만 사용. 코드 파싱 없음. 1~2초 목표 |
 | full 모드 | 릴리스 전·사용자 요청 시에만. 변경을 frontend·api·db·config·dependencies·tests로 분류하고 확인 제안. 기본 base는 마지막 태그, 없으면 `origin/main`·`main` merge-base, 그다음 `HEAD~1` |
 | 출력 | stale이 있을 때만 `.gorani/impact/impact-<head>-stale.md`·`.json`. full은 항상 `-full.md`·`.json`. 갱신 대상이 없으면 파일·PR 코멘트를 만들지 않음 |
+| 리포트 모델 | `impact-*.json`이 리포트 모델이며 `schema_version`을 포함. `--generated-at`은 기존 `--now`의 별칭 |
+| 스크립트 | `scripts/change_impact.py` CLI 진입점 + `scripts/change_impact/` 패키지. git·manifest·evaluate·classify·model·Markdown/JSON 렌더러 분리 |
 | manifest | 산출물 옆 `<이름>.artifact.json`. `skill`·`artifact`·`outputs`·`sources`·`generated_commit`·`generated_at`·`regenerate` 기록. 중앙 registry를 두지 않음 |
 | CI | path-filter가 걸린 경로에서만 실행. stale이 있을 때만 PR 코멘트. 처음에는 경고, 안정화 후 `--fail-on-stale` |
 | 금지 | 산출물 자동 수정, 매 PR full 실행, manifest 없는 산출물 추측, 확인 불가를 최신으로 간주, `.gorani/` 커밋 |
-| 검증 | 샘플 manifest로 stale·clean·unknown, `--working`, `--fail-on-stale`, `--mode full` 분류 확인 |
+| 검증 | 샘플 manifest로 stale·clean·unknown, `--working`, `--fail-on-stale`, `--mode full` 분류 확인. 리팩터링 전후 Markdown 동일, JSON은 `schema_version` 추가 외 동일 |
 
 ### gorani-report
 
@@ -62,6 +64,8 @@
 | 버전 | 대상 `SKILL.md`의 `metadata.version`·`metadata.updated`를 읽어 본문·JSON에 포함. 없으면 `unknown`, `--skill-version`으로 override |
 | 제안 | `idea`·`format`·`enhancement`는 재현 절차·오류 로그 없이 제안·기대 효과·현재 동작으로 본문 구성. `format`은 `--area`로 Excel·Markdown·HTML 등을 구분 |
 | 출력 | `.gorani/report/*.md` 드래프트, `--json` 메타데이터, 생성·코멘트 URL. `.gorani/`는 커밋 금지 |
+| 리포트 모델 | 기존 `--json`은 바이트 호환을 유지하고, `--model-out`으로 `schema_version`·`meta`·`summary`·`values`·`environment`·`body`·`duplicates` 중첩 모델 저장 |
+| 스크립트 | `scripts/report_issue.py` CLI 진입점 + `scripts/report_issue/` 패키지. 입력·환경·마스킹·GitHub·모델·Markdown/JSON 렌더러 분리 |
 | 확인 | 공개 이슈 작성 전 사용자 확인 필수. `gh` 미인증이면 드래프트만 남기고 `gh auth login` 안내 |
 | 금지 | 자동 생성, 확인 없는 외부 업로드, 고객 정보·시크릿 포함, 경고를 숨긴 `--force`, `.gorani/report` 커밋 |
 | 검증 | 가짜 `gh`로 드래프트·중복·생성·코멘트·마스킹·미인증 경로 확인 |
@@ -85,8 +89,9 @@
 | VEX 보고서 | 사용자 요청 시에만 xlsx·OpenVEX 생성. 요청 없으면 스캔 요약·조치 목록만 만들고 openpyxl 없이 동작 |
 | 보고 범위 | `--scope vuln`(기본, 취약점만) 또는 `--scope all`(SBOM 전체 구성요소). `all`은 `--sbom` CycloneDX JSON이 필요하고, OpenVEX는 두 범위 모두 취약점 statement만 포함 |
 | 용도 메타데이터 | 입력 JSON의 `dependency_metadata` 또는 `--metadata` JSON. `usage`는 50자 이하, PURL > `name@version` > 이름 순서로 매칭. `VEX 판정`·`SBOM 구성요소` 시트에 표시하고 OpenVEX에는 넣지 않음 |
-| 스크립트 | `scripts/vex_xlsx.py`, openpyxl만 사용, 입력 JSON과 시트 구성 유지. `all`은 CycloneDX `components`를 읽어 `SBOM 구성요소` 시트를 추가 |
-| 검증 | 샘플 lockfile로 네 도구 실행 + 요청 시 xlsx·OpenVEX 생성 확인. `--scope all`에서 전체 구성요소·취약점 없는 구성요소·SBOM 미포함 finding·`--sbom` 누락 오류 확인. `--metadata` 매칭, 50자 초과 절단, 잘못된 메타데이터 오류 확인 |
+| 스크립트 | `scripts/vex_xlsx.py` CLI 진입점 + `scripts/cve_report/` 패키지. 입력·모델·렌더러를 분리하고 openpyxl은 `render_xlsx.py`에만 사용. 입력 JSON과 시트 구성 유지. `all`은 CycloneDX `components`를 읽어 `SBOM 구성요소` 시트를 추가 |
+| 리포트 모델 | `--model-out`으로 `schema_version`·`meta`·`summary`·`findings`·`components`·`logs` JSON 저장. 커스텀 렌더러는 이 모델을 소비 |
+| 검증 | 샘플 lockfile로 네 도구 실행 + 요청 시 xlsx·OpenVEX 생성 확인. `--scope all`에서 전체 구성요소·취약점 없는 구성요소·SBOM 미포함 finding·`--sbom` 누락 오류 확인. `--metadata` 매칭, 50자 초과 절단, 잘못된 메타데이터 오류 확인. 리팩터링 전후 xlsx 셀·스타일·검증 범위와 OpenVEX JSON 동일, `model.py` openpyxl 없이 import 확인 |
 
 ### gorani-release-check
 
@@ -108,8 +113,9 @@
 | 비교 | 경로·오퍼레이션·파라미터·요청/응답 body 스키마·before/after 예시·enum·인증·서버. breaking/risky/non-breaking/info |
 | 우선순위 | Google Issue Tracker P0~P4 기준. P0는 전면 중단이 명백할 때만, P1·P2는 breaking, P3는 risky, P4는 non-breaking·info |
 | 출력 | `docs/api/<service>/api-diff.md`, 선택 시 `api-diff.json`, sidecar `api-diff.artifact.json`. 결론·P0~P4 우선순위·먼저 확인할 것·API별 변경·공통 변경·전체 변경 부록과 읽기 쉬운 위치 표기 포함 |
-| 스크립트 | `scripts/api_diff.py`. JSON은 표준 라이브러리, YAML은 PyYAML. 스펙 기준 비교이며 런타임 비교 아님. `--sources`·`--manifest`·`--no-manifest` 지원 |
-| 검증 | 샘플 old/new로 리포트·JSON 생성, P0~P4 분류, `--fail-on-breaking` exit 1 확인 |
+| 리포트 모델 | `api-diff.json`은 Markdown과 같은 모델. `schema_version`·`old`·`new`·버전·서비스·클라이언트·집계·findings·body_changes·unresolved_refs 포함 |
+| 스크립트 | `scripts/api_diff.py` CLI 진입점 + `scripts/api_diff/` 패키지. 스펙 로딩·비교·우선순위·모델·Markdown/JSON 렌더러·manifest 분리. JSON은 표준 라이브러리, YAML은 PyYAML. 스펙 기준 비교이며 런타임 비교 아님. `--sources`·`--manifest`·`--no-manifest`·`--generated-at` 지원 |
+| 검증 | 샘플 old/new로 리포트·JSON 생성, P0~P4 분류, `--fail-on-breaking` exit 1 확인. 리팩터링 전후 Markdown 바이트 단위 동일, 기존 JSON 필드 동일, `--generated-at` 재현 확인 |
 | 금지 | 스펙에 없는 런타임 단정, 코드·스펙 수정, 근거 없는 non-breaking, 외부 업로드 |
 
 ### gorani-license-notice
@@ -122,8 +128,9 @@
 | 간소화 | `--simple`은 `third-party-notices-simple.html`·`.md`에 의존성 이름·버전·GitHub 라이선스 링크만 기록. 전체 고지 의무 대체 아님 |
 | 검토 분리 | copyleft·복수 라이선스·unknown·전문 없음·dev 는 `-review.md`(필요 시 xlsx). HTML·md 에 내부 사유 금지 |
 | 분류 | none/notice/weak/strong/network/unknown, OR=약한 쪽, AND=강한 쪽 |
-| 스크립트 | `scripts/collect_licenses.py`, `scripts/notice_build.py`. HTML·md 는 표준 라이브러리만, xlsx는 `--formats xlsx` 또는 `--xlsx` + openpyxl |
-| 검증 | 샘플 입력으로 HTML·md·review·간소화 페이지 생성, 외부 요청 0건, 검토 파일 미포함 확인 |
+| 리포트 모델 | `--model-out`으로 `schema_version`·`meta`·`summary`·`packages`·`groups`·`review`·`warnings`·`logs` 저장. `--generated-at`으로 생성 시각 고정 |
+| 스크립트 | `scripts/collect_licenses.py` 수집기 + `scripts/notice_build.py` CLI 진입점 + `scripts/notice_build/` 패키지. HTML·md 는 표준 라이브러리만, xlsx는 `--formats xlsx` 또는 `--xlsx` + openpyxl이며 openpyxl은 `render_xlsx.py`에 격리 |
+| 검증 | 샘플 입력으로 HTML·md·review·간소화 페이지 생성, 외부 요청 0건, 검토 파일 미포함 확인. 리팩터링 전후 텍스트 바이트 동일, XLSX 의미 동일, 모델만으로 재렌더링 확인 |
 
 ### gorani-release-note
 
@@ -134,8 +141,9 @@
 | 산출물 선택 | `--formats html,md,short,store,internal`. 기본 전체. 선택한 형식만 생성·갱신 |
 | 고객 문구 | 이점 중심, 내부 용어·commit hash·이슈 번호·직원 이름·내부 URL 금지, 보안 상세 금지 |
 | 검토 분리 | commit 매핑과 제외 사유는 `-internal.md` 에만. 고객 md·html·txt 에 넣지 않음 |
-| 스크립트 | `scripts/notes_build.py`, 표준 라이브러리만. 앱스토어 제한은 입력 `limits` 로 조정 |
-| 검증 | 샘플 입력으로 고객용·내부용 생성, `--strict`, 글자 수, 외부 리소스 0건 확인 |
+| 리포트 모델 | `--model-out`으로 `schema_version`·`meta`·`summary`·`content`·`summaries`·`limits`·`warnings`·`internal.mappings` 저장. `--generated-at`으로 생성 시각 고정 |
+| 스크립트 | `scripts/collect_changes.py` 수집기 + `scripts/notes_build.py` CLI 진입점 + `scripts/notes_build/` 패키지. md·html·short·store·internal 렌더러 분리. 표준 라이브러리만 사용 |
+| 검증 | 샘플 입력으로 고객용·내부용 생성, `--strict`, 글자 수, 외부 리소스 0건 확인. 리팩터링 전후 42개 출력 바이트 동일, 35개 CLI 시나리오 exit code 동일 |
 
 ### gorani-dependency-update
 
@@ -168,9 +176,11 @@
 | 입력 | `.sql`·`.ddl` 파일 또는 디렉터리, SQLAlchemy `--db-url`. DDL은 `CREATE TABLE`·`ALTER TABLE`·`COMMENT ON`·`CREATE INDEX`·`DROP TABLE`을 반영 |
 | 파싱 | DDL은 `sqlglot`과 `--dialect`, DB는 SQLAlchemy Inspector와 `--schema` 사용. postgres·mysql·sqlite·mssql·oracle 지원. 시스템 테이블 기본 제외, `--include-system`으로 포함 |
 | 출력 | `table-spec.xlsx`(요약·테이블 목록·컬럼 명세·관계·인덱스·파싱 메모), `table-spec.md`, 자기완결 `table-spec.html`, sidecar `table-spec.artifact.json` |
-| 선택 | `--formats xlsx,md,html` 기본. 사용자가 고른 형식만 생성. `md`·`html`만 선택하면 openpyxl 없이 동작. `--sources`로 manifest 소스 글롭 지정, `--no-manifest`로 생략. `--strict`는 경고 시 exit 1 |
+| 선택 | `--formats xlsx,md,html` 기본. 사용자가 고른 형식만 생성. `md`·`html`만 선택하면 openpyxl 없이 동작. `--sources`로 manifest 소스 글롭 지정, `--no-manifest`로 생략. `--strict`는 경고 시 exit 1. `--model-out`·`--generated-at` 지원 |
+| 리포트 모델 | `--model-out`으로 `schema_version`·`meta`·`summary`·`tables`·`warnings`·`sources` 저장. 렌더러는 같은 모델을 소비 |
+| 스크립트 | `scripts/table_spec.py` CLI 진입점 + `scripts/table_spec/` 패키지. DDL(sqlglot)·DB(SQLAlchemy)·모델·xlsx/md/html 렌더러·manifest 분리. openpyxl은 xlsx 렌더러에 격리 |
 | 제한 | DB 모드는 접속 시점 스키마만 반영. 뷰·동적 SQL·트리거·저장 프로시저는 테이블 명세 대상이 아님. DB 비밀번호는 결과에서 마스킹 |
-| 검증 | 샘플 DDL xlsx·md·html, PostgreSQL·MySQL·SQL Server·Oracle Docker 실DB, SQLite, URL 마스킹, HTML 외부 요청 0건, `--strict` exit 1 확인 |
+| 검증 | 샘플 DDL xlsx·md·html, PostgreSQL·MySQL·SQL Server·Oracle Docker 실DB, SQLite, URL 마스킹, HTML 외부 요청 0건, `--strict` exit 1 확인. 리팩터링 전후 17개 골든 시나리오·49개 추가 검증, md/html 바이트 동일, xlsx 의미 동일. 파싱 경고 시 XLSX가 `--outdir`에 저장되는지 확인 |
 
 ### gorani-site-structure
 
@@ -179,19 +189,22 @@
 | 입력 | 실제 프론트 레이아웃을 확인해 작성한 `site-structure-input.json`. API 스펙·URL만으로 구조를 만들지 않음 |
 | 기준 | KRDS 디지털 정부서비스 UI/UX 가이드라인과 전자정부 웹사이트 품질관리 지침. 메뉴 depth 최소 2·최대 3 |
 | 출력 | `site-structure.xlsx`(요약·사이트 구조·화면 목록·API 매핑·API only·표준 근거·검토 메모), `.md`, 자기완결 `.html`, sidecar `.artifact.json` |
-| 선택 | `--formats xlsx,md,html` 기본. `md`·`html`만 선택하면 openpyxl 없이 동작. `--sources` 또는 입력 JSON `sources`로 manifest 소스 지정, `--no-manifest`로 생략. `--strict`는 경고 시 exit 1 |
+| 선택 | `--formats xlsx,md,html` 기본. `md`·`html`만 선택하면 openpyxl 없이 동작. `--sources` 또는 입력 JSON `sources`로 manifest 소스 지정, `--no-manifest`로 생략. `--strict`는 경고 시 exit 1. `--model-out`·`--generated-at` 지원 |
+| 리포트 모델 | `--model-out`으로 `schema_version`·`meta`·`summary`·`pages`·`api_only`·`standards`·`warnings`·`sources` 저장. 렌더러는 같은 모델을 소비 |
+| 스크립트 | `scripts/site_structure.py` CLI 진입점 + `scripts/site_structure/` 패키지. 입력·모델·xlsx/md/html 렌더러·manifest 분리. openpyxl은 xlsx 렌더러에 격리 |
 | 제한 | API only는 구조도와 분리. 상세·탭·액션은 부모 화면과 노출 방식으로 표현. 스크린샷은 파일 경로만 기록 |
-| 검증 | 샘플 15화면·2Depth, 동적 Depth 컬럼, HTML 외부 요청 0건, `--strict` exit 1 확인 |
+| 검증 | 샘플 15화면·2Depth, 동적 Depth 컬럼, HTML 외부 요청 0건, `--strict` exit 1 확인. 리팩터링 전후 md/html 바이트 동일, xlsx 의미 동일, manifest 구조 동일 |
 
 ## 4. 스킬 형식
 
 - frontmatter: `name`(`gorani-` prefix를 붙인 폴더명과 동일, 소문자·숫자·하이픈), `description`(1-1024자, 언제 쓰는지 중심)
-- `metadata.version`은 해당 스킬이 마지막으로 바뀐 gorani 릴리스 버전(예: `"3.17.0"`), `metadata.updated`는 그 날짜(`YYYY-MM-DD`)입니다. 값을 바꾸면 `gorani-report`가 이슈 본문에 자동으로 넣습니다.
+- `metadata.version`은 해당 스킬이 마지막으로 바뀐 gorani 릴리스 버전(예: `"3.21.0"`), `metadata.updated`는 그 날짜(`YYYY-MM-DD`)입니다. 값을 바꾸면 `gorani-report`가 이슈 본문에 자동으로 넣습니다.
 - 새 스킬 ID는 `gorani-` prefix를 붙여 다른 설치본과의 충돌을 피함
 - 본문: H1 + 역할 한 줄 → `## 전제`, `## 절차`, `## 출력 형식`, `## 실패 처리`, `## 금지` 같은 섹션
 - 한국어, 코드 펜스 없는 인라인 표기
 - 다른 스킬이나 저장소 밖 파일을 참조하지 않는 자체 완결 지시문
 - 스크립트는 `skills/gorani-<이름>/scripts/`에만 둠
+- 큰 스크립트는 입력 → 리포트 모델 → 렌더러 → CLI 구조로 나누고, 기존 CLI 진입점은 얇은 래퍼로 유지. 선택 의존성은 입력 어댑터·렌더러에 격리하고, 모듈 지도는 `scripts/README.md`에 둠
 
 ## 5. 도구 자동 설치
 
@@ -254,11 +267,19 @@
 | 2026-11-05 | `cve-scan` VEX 보고서에 전체 SBOM 범위·의존성 용도 메타데이터 추가 (v3.18.0) | `.omo/evidence/2026-11-05-cve-scan-sbom-scope.md` |
 | 2026-11-05 | `cve-scan` 의존성 용도 요약 길이를 30자로 확대 (v3.19.0) | `.omo/evidence/2026-11-05-cve-scan-usage-30.md` |
 | 2026-11-05 | `cve-scan` 의존성 용도 요약 길이를 50자 이하로 확대 (v3.20.0) | `.omo/evidence/2026-11-05-cve-scan-usage-50.md` |
+| 2026-11-05 | `cve-scan` 리포트 모델·렌더러 분리와 `--model-out` 추가 (v3.21.0) | `.omo/evidence/2026-11-05-cve-scan-modularization.md` |
+| 2026-11-05 | `api-contract-diff` 리포트 모델·렌더러 분리와 `--generated-at` 추가 (v3.21.0) | `.omo/evidence/2026-11-05-api-contract-diff-modularization.md` |
+| 2026-11-05 | `table-spec` 리포트 모델·렌더러 분리와 XLSX 경로 버그 수정 (v3.21.0) | `.omo/evidence/2026-11-05-table-spec-modularization.md` |
+| 2026-11-05 | `site-structure` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-site-structure-modularization.md` |
+| 2026-11-05 | `license-notice` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-license-notice-modularization.md` |
+| 2026-11-05 | `release-note` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-release-note-modularization.md` |
+| 2026-11-05 | `change-impact` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-change-impact-modularization.md` |
+| 2026-11-05 | `report` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-report-modularization.md` |
 
 ## 9. 릴리스와 태그
 
 - GitHub Release 기능(릴리스 페이지)은 만들지 않습니다.
 - 버전은 CHANGELOG 최신 항목과 각 `SKILL.md`의 `metadata.version`을 맞춥니다.
-- 배포 지점에 annotated tag `v<버전>`을 만들고 push합니다. 예: `git tag -a v3.20.0 -m "v3.20.0"`, `git push origin v3.20.0`.
+- 배포 지점에 annotated tag `v<버전>`을 만들고 push합니다. 예: `git tag -a v3.21.0 -m "v3.21.0"`, `git push origin v3.21.0`.
 - 이미 push한 태그를 옮기거나 덮어쓰지 않습니다. 잘못 만들었으면 사용자와 상의합니다.
 - 태그를 만든 뒤 GitHub Release, 릴리스 페이지, 자동 배포를 추가로 만들지 않습니다.

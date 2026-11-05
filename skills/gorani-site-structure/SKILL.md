@@ -2,8 +2,8 @@
 name: gorani-site-structure
 description: 실제 프론트 화면의 메뉴·탭·레이아웃을 확인해 사이트 구조도 산출물을 만든다. Excel·Markdown·HTML과 화면·API only·표준 근거를 정리한다. IA 문서화, 메뉴 구조 검토, 화면 목록 작성이 필요할 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.21.0"
+  updated: "2026-11-05"
 ---
 
 # 사이트 구조도 생성
@@ -65,10 +65,11 @@ metadata:
 
    `python3 <스킬 폴더>/scripts/site_structure.py --input docs/site-structure/site-structure-input.json --outdir docs/site-structure --name site-structure --formats xlsx,md,html`
 
-8. 사용자가 고른 형식만 생성합니다. 기본은 `xlsx,md,html`입니다.
+8. 사용자가 고른 형식만 생성합니다. 기본은 `xlsx,md,html`입니다. 렌더링 전 데이터를 JSON으로 확인하려면 `--model-out <경로>`를 함께 줍니다.
 9. 산출물 옆에 `site-structure.artifact.json`이 생겼는지 확인합니다. sources가 실제 프론트 소스와 맞지 않으면 `--sources` 또는 입력 JSON의 `sources`로 보정하고 다시 생성합니다.
 10. 출력의 화면 수, depth, API 매핑, API only, 표준 근거, 검토 메모를 확인합니다.
 11. `--strict`를 주면 검증 경고가 있을 때 exit 1로 CI에서 차단할 수 있습니다.
+12. 샘플을 다시 만들거나 결과를 재현해야 하면 `--generated-at <ISO 8601>`으로 manifest와 모델의 `generated_at`을 고정합니다.
 
 ## 입력 JSON
 
@@ -129,9 +130,25 @@ metadata:
   - `검토 메모`: 확인 필요 사항과 가정
 - `site-structure.md`: 같은 내용의 Markdown 표
 - `site-structure.html`: 검색·메뉴 트리·화면 표·표준 근거·검토 메모를 담은 자기완결 HTML
+- `site-structure.model.json`(선택): `--model-out`으로 저장하는 렌더링 전 리포트 모델. `schema_version`, `meta`, `summary`, `pages`, `api_only`, `standards`, `warnings`, `sources`를 담습니다. Markdown·HTML·XLSX 렌더러가 같은 모델을 소비합니다.
 - `site-structure.artifact.json`: 산출물 옆에 남기는 sidecar manifest. `sources`, `generated_commit`, `regenerate`를 기록해 `gorani-change-impact`가 갱신 필요 여부를 판단하게 합니다.
 - `--formats md` 또는 `html`만 주면 openpyxl 없이 동작합니다.
 - `--sources`로 소스 글롭을 직접 지정하고, `--no-manifest`로 manifest를 생략할 수 있습니다.
+- `--generated-at <ISO 8601>`으로 manifest와 모델의 `generated_at`을 고정합니다.
+
+## 구현 구조
+
+- `scripts/site_structure.py`: 기존 CLI 진입점. `site_structure` 패키지를 호출하는 얇은 래퍼입니다.
+- `scripts/site_structure/cli.py`: argparse, 출력 경로, 소스 결정, 모델 저장, 렌더러 호출
+- `scripts/site_structure/input.py`: 입력 JSON 읽기와 페이지·표준·검토 메모 정규화
+- `scripts/site_structure/model.py`: 화면·API·표준·검토 집계와 리포트 모델 생성
+- `scripts/site_structure/render_md.py`: Markdown 렌더러
+- `scripts/site_structure/render_html.py`: 자기완결 HTML 렌더러
+- `scripts/site_structure/render_xlsx.py`: XLSX 렌더러. openpyxl은 이 모듈에서만 import합니다.
+- `scripts/site_structure/manifest.py`: sidecar `.artifact.json` 생성
+- `scripts/site_structure/constants.py`: 출력 형식·상태·검토 질문 상수
+
+`input.py`·`model.py`·`render_md.py`·`render_html.py`는 openpyxl 없이 import할 수 있습니다. 출력 컬럼·스타일은 `render_xlsx.py`, 문장·표 구성은 `render_md.py`·`render_html.py`, 집계 규칙은 `model.py`에서 고칩니다.
 
 ## 검증
 

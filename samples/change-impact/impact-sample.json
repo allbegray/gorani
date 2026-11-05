@@ -1,9 +1,10 @@
 {
+  "schema_version": 1,
   "version": 1,
   "mode": "full",
   "generated_at": "2026-10-31T15:00:00+09:00",
-  "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
-  "head": "87b272f1c7f839f37971ea139b6ebeb3d92eeb3d",
+  "base": "4b06ef30b6063cf17bd663c57e8e9170877618b2",
+  "head": "6dd29f73a8a7371fe011c2e84a3c24776c7fa8c1",
   "manifest_glob": "**/*.artifact.json",
   "working": false,
   "summary": {
@@ -35,7 +36,7 @@
       "manifest": "docs/api/share-api/api-diff.artifact.json",
       "skill": "gorani-api-contract-diff",
       "artifact": "docs/api/share-api/api-diff.md",
-      "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
+      "base": "b1fb8c4726b8b6ac1e053958c7b2b43db08f5663",
       "matched": [
         "openapi/share.yaml"
       ],
@@ -45,7 +46,7 @@
       "manifest": "docs/db/table-spec.artifact.json",
       "skill": "gorani-table-spec",
       "artifact": "docs/db/table-spec.xlsx",
-      "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
+      "base": "b1fb8c4726b8b6ac1e053958c7b2b43db08f5663",
       "matched": [
         "db/migrations/002_status.sql"
       ],
@@ -55,7 +56,7 @@
       "manifest": "docs/site-structure/site-structure.artifact.json",
       "skill": "gorani-site-structure",
       "artifact": "docs/site-structure/site-structure.xlsx",
-      "base": "147977562bb7e4de184fe5af9d1d3c390507c8e2",
+      "base": "b1fb8c4726b8b6ac1e053958c7b2b43db08f5663",
       "matched": [
         "src/app/users/page.tsx"
       ],

@@ -2,8 +2,8 @@
 name: gorani-license-notice
 description: 앱이나 백엔드에 게시할 오픈소스 고지 페이지를 SBOM과 패키지의 LICENSE·NOTICE 원문에서 자동 생성한다. 전체 고지 페이지와 이름·버전·GitHub 라이선스 링크만 담은 간소화 페이지를 지원한다. 앱 배포 전 고지 의무 확인, 서드파티 라이선스 목록 작성, copyleft 검토가 필요할 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.21.0"
+  updated: "2026-11-05"
 ---
 
 # 오픈소스 고지 페이지 생성
@@ -12,7 +12,7 @@ metadata:
 
 ## 전제
 
-- python3 가 필요합니다. HTML 과 md 생성은 표준 라이브러리만 사용합니다.
+- python3 가 필요합니다. HTML·md·리포트 모델 생성은 표준 라이브러리만 사용합니다.
 - SBOM 생성을 위해 `syft` 가 필요합니다. 없으면 아래 `## 도구 설치` 원칙에 따라 자동 설치를 시도합니다.
 - 라이선스 전문은 설치된 패키지 디렉터리에서 읽습니다. npm·pnpm·pub·python 패키지가 설치되어 있어야 하며, 설치하지 않았다면 전문이 비고 검토 목록에 남습니다.
 - 앱에 실제로 포함되는 패키지만 대상으로 하려면 운영 의존성만 설치한 상태에서 수집합니다. 예: `npm ci --omit=dev`
@@ -32,6 +32,7 @@ metadata:
    - 개발 의존성이 섞였으면 `--runtime` 을 지정해 다시 수집하거나, 생성 단계에서 `--exclude-dev` 를 씁니다.
 7. 고지 페이지를 생성합니다. `python3 <스킬 폴더>/scripts/notice_build.py --input .legal/licenses-input.json --outdir docs/licenses --name third-party-notices --formats html,md,review`. 사용자가 고른 형식만 `--formats`에 넣습니다.
    - 간소화 페이지: 같은 명령에 `--simple`을 붙입니다. 기본은 `third-party-notices-simple.html`, `.md`이고, `--formats html` 또는 `--formats md`로 하나만 만들 수 있습니다.
+   - 리포트 모델: `--model-out .legal/license-model.json`을 붙이면 렌더링 전 정규화 데이터를 JSON으로 저장합니다. `--generated-at <ISO 8601>`로 생성 시각을 고정할 수 있습니다.
 8. 앱이나 백엔드에 연결합니다. HTML 은 외부 요청 없이 동작하므로 앱 자산에 넣거나 정적 파일로 제공합니다.
 9. 검증합니다. 브라우저에서 데스크톱·모바일 폭으로 열어 검색과 라이선스 전문 표시를 확인하고, 네트워크 요청이 없는지 확인합니다.
 10. 의존성이 바뀔 때마다 다시 생성합니다. 릴리스 체크리스트나 CI 에 `--fail-on-review` 를 넣으면 검토 항목이 있는 상태로 배포되는 것을 막을 수 있습니다.
@@ -95,6 +96,28 @@ metadata:
 - GitHub 저장소가 없거나 GitHub URL이 아니면 링크를 `-`로 표시하고, 출력 요약의 `missing_github_links`에 집계합니다.
 - `--simple`은 `review`·`xlsx`와 함께 쓸 수 없습니다. `--fail-on-review`는 계속 동작합니다.
 - 간소화 페이지는 전체 고지 의무를 대체하지 않습니다. 배포에는 전체 HTML을 사용하고, 간소화 페이지는 사내 목록이나 링크 모음 용도로만 씁니다.
+
+### 리포트 모델
+
+`--model-out PATH`를 주면 렌더링 전 정규화된 데이터를 JSON 모델로 저장합니다. 커스텀 렌더러를 만들거나 다른 도구에 고지 데이터를 넘길 때 씁니다.
+
+- `schema_version`: 모델 스키마 버전. 현재 1.
+- `meta`: `generator`, `project`, `app_version`, `generated_at`, `ecosystem`, `mode`(full/simple), `name`.
+- `summary`: `packages`, `licenses`, `license_texts`, `review_items`, `missing_license_text`, `missing_github_links`, `status`, `scope`.
+- `packages`: 정규화·병합·정렬된 패키지 목록.
+- `groups`: 라이선스별 전문 그룹과 전문 없는 패키지. `--simple`에서는 빈 배열입니다.
+- `review`: 검토 항목과 사유·조치. `review` 형식을 선택하지 않아도 계산합니다.
+- `warnings`: `missing-license-text`, `unknown-license`, `--simple`의 `missing-github-link`처럼 확인이 필요한 데이터 경고.
+- `logs`: 입력 JSON의 실행 로그.
+
+`--generated-at`은 `2026-11-05T12:34:56+09:00` 같은 ISO 8601 문자열을 받아 입력의 `generated_at`을 덮어씁니다. 샘플 재생성이나 재현 가능한 산출물이 필요할 때 씁니다. 지정하지 않으면 입력의 `generated_at`을 쓰고, 없으면 현재 시각을 넣습니다.
+
+### 스크립트 구조
+
+- `scripts/notice_build.py`: 기존 CLI 진입점. `notice_build` 패키지를 호출하는 얇은 래퍼입니다.
+- `scripts/notice_build/`: `cli.py`(인자·경로·모델 저장), `classify.py`(라이선스 분류), `model.py`(정규화·그룹화·모델), `review.py`(검토 항목·검토 Markdown), `render_md.py`, `render_html.py`, `render_xlsx.py`, `constants.py`로 나뉩니다.
+- `collect_licenses.py`는 입력 수집기로 그대로 둡니다.
+- `render_xlsx.py`만 openpyxl을 import합니다. HTML·Markdown·모델 생성은 openpyxl 없이 동작합니다.
 
 HTML:
 
