@@ -82,7 +82,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - VEX 엑셀·OpenVEX JSON은 사용자가 요청할 때만 생성. 요청하지 않으면 openpyxl 없이 동작
 - VEX 엑셀 범위: `--scope vuln`(기본, 취약점만) 또는 `--scope all`(SBOM 전체 구성요소)
 - `--scope all`은 syft CycloneDX의 모든 구성요소를 `SBOM 구성요소` 시트에 넣고, 취약점 없는 패키지도 표시. `--sbom .security/sbom.cdx.json` 필요
-- 의존성 사용 용도는 `dependency_metadata` 또는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 20자 이내로 표시. 예: `{"package": "logback-classic", "usage": "시스템 로깅"}`
+- 의존성 사용 용도는 `dependency_metadata` 또는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 30자 이내로 표시. 예: `{"package": "logback-classic", "usage": "시스템 로깅"}`
 - 요청 시 결과: 기본은 `docs/security/cve-report-YYYY-MM-DD.xlsx`와 같은 이름의 `.vex.json`, 전체 SBOM은 `cve-report-YYYY-MM-DD-sbom.xlsx`·`.vex.json`
 - OpenVEX JSON은 범위와 무관하게 취약점 statement만 포함. 취약점 없는 패키지를 `not_affected`로 표현하지 않음
 - 고객 제출용 기계 판독 SBOM이 필요하면 `.security/sbom.cdx.json`을 함께 전달. `.security/`는 커밋하지 않음
@@ -305,7 +305,7 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/cve-scan/cve-report-sample.xlsx` | VEX 엑셀 (요청 시 생성, 요약·VEX 판정·용도·원본 findings·실행 로그) |
 | `samples/cve-scan/cve-report-sample.vex.json` | OpenVEX JSON (요청 시 생성) |
 | `samples/cve-scan/sbom.cdx.json` | 전체 SBOM 범위 샘플 입력 (CycloneDX) |
-| `samples/cve-scan/dependency-metadata.json` | 의존성 용도 메타데이터 샘플 (20자 이내) |
+| `samples/cve-scan/dependency-metadata.json` | 의존성 용도 메타데이터 샘플 (30자 이내) |
 | `samples/cve-scan/cve-report-sbom-sample.xlsx` | 전체 SBOM VEX 엑셀 (SBOM 구성요소·용도 포함) |
 | `samples/cve-scan/cve-report-sbom-sample.vex.json` | 전체 SBOM 실행의 OpenVEX JSON (취약점 statement만) |
 | `samples/release-check/release-check-sample.xlsx` | 릴리스 점검 엑셀 (요약, 점검 항목, 변경 파일, 커밋, 실행 로그) |
@@ -347,8 +347,8 @@ samples/<스킬>/                    예시 입력과 결과물
 GitHub Release는 만들지 않고, CHANGELOG 버전에 맞춘 annotated tag만 만듭니다.
 
 ```bash
-git tag -a v3.18.0 -m "v3.18.0"
-git push origin v3.18.0
+git tag -a v3.19.0 -m "v3.19.0"
+git push origin v3.19.0
 ```
 
 이미 push한 태그는 옮기거나 덮어쓰지 않습니다.
