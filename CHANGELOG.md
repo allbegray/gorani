@@ -1,8 +1,40 @@
 # 변경 이력
 
-최신 버전은 3.17.0(2026-10-31)입니다. 3.17.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.18.0(2026-11-05)입니다. 3.18.0 이전 이력은 git log와 태그로 확인합니다.
 
 릴리스는 GitHub Release 없이 annotated tag로만 표시합니다.
+
+## 3.18.0 · 2026-11-05
+
+`gorani-cve-scan` VEX 보고서에 전체 SBOM 범위·의존성 용도 메타데이터 추가
+
+**추가**
+
+- `--scope vuln|all` 옵션. 기본 `vuln`은 기존처럼 취약점이 확인된 패키지만 포함
+- `--scope all`과 `--sbom` CycloneDX JSON으로 SBOM 전체 구성요소를 `SBOM 구성요소` 시트에 포함
+- 취약점 없는 구성요소, SBOM에 없고 findings에만 있는 패키지, 중첩·중복 구성요소 처리
+- 요약 시트에 보고 범위, SBOM 형식·생성 시각, 구성요소·취약점 유무 집계 추가
+- `--scope all` 기본 파일명 `cve-report-YYYY-MM-DD-sbom.xlsx`·`.vex.json`
+- `samples/cve-scan/sbom.cdx.json`과 전체 SBOM 샘플 보고서 추가
+- `dependency_metadata` 또는 `--metadata` JSON으로 의존성 사용 용도(20자 이내) 입력
+- `VEX 판정`·`SBOM 구성요소` 시트에 `용도` 열 추가, 요약에 `용도 미입력 패키지` 집계
+- PURL > `name@version` > 이름 순서 매칭, 20자 초과 시 절단·경고
+- `samples/cve-scan/dependency-metadata.json` 추가
+
+**변경**
+
+- VEX 판정 시트와 OpenVEX JSON은 범위와 무관하게 취약점 statement만 유지
+- 취약점 없는 구성요소를 `not_affected`로 표시하지 않도록 금지 규칙 명시
+- README·AGENTS·samples/README에 전체 SBOM·용도 메타데이터 사용법과 오류 처리 추가
+
+**검증**
+
+- 기본 `--scope vuln`에서 findings 4건, VEX statement 4건, 기존 시트 구성 유지
+- `--scope all`에서 구성요소 12건(취약점 4·취약점 없음 8), VEX statement 4건 유지
+- SBOM에 없는 finding을 `미포함`으로 표시, findings 0건 전체 SBOM 보고서, `--sbom` 누락·잘못된 JSON 오류 확인
+- 실제 syft CycloneDX 1.7 출력에서 `type=file` lockfile 구성요소를 제외하고 루트 앱·의존성 파싱 확인
+- `--metadata` 12건을 `VEX 판정`·`SBOM 구성요소`에 매칭, 용도 미입력 0 확인
+- PURL 없는 메타데이터의 이름 매칭, 20자 초과 절단·경고, 잘못된 항목 건너뜀 확인
 
 ## 3.17.0 · 2026-10-31
 

@@ -14,7 +14,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | `gorani-change-impact` | 기존 산출물이 소스 변경으로 낡았는지 확인할 때, 릴리스 전 갱신 대상을 볼 때 | 갱신 필요 산출물·매칭된 변경·재생성 명령 |
 | `gorani-report` | 스킬 오류·개선점을 GitHub 이슈로 남기고 싶을 때 | 마스킹된 이슈 드래프트·생성 URL |
 | `gorani-docs-governance` | 프로젝트 문서 체계를 처음 잡을 때, 코드 변경 후 문서를 맞출 때 | 루트 문서 6종 + `.github` 5종 |
-| `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀·OpenVEX |
+| `gorani-cve-scan` | 의존성 취약점을 확인할 때, 릴리스 전 보안을 볼 때, 고객사에 SBOM·취약점 목록을 제출할 때 | CVE 요약·조치 목록, 요청 시 VEX 엑셀(취약점만/전체 SBOM)·OpenVEX |
 | `gorani-release-check` | 운영 배포 전 브랜치·리비전 차이를 볼 때 | P0~P4 점검 엑셀 |
 | `gorani-api-contract-diff` | API 스펙 변경이 클라이언트를 깨뜨리는지 볼 때 | API별 변경 리포트, 배포 전·테스트 체크리스트 |
 | `gorani-license-notice` | 앱에 오픈소스 고지 페이지를 넣어야 할 때, 배포 전 라이선스를 점검할 때 | 선택한 고지 HTML·md·검토 목록·엑셀, 간소화 링크 페이지 |
@@ -80,7 +80,12 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 - 수정 버전이 있으면 `affected`, 없으면 `under_investigation`이 기본
 - 기본 결과: CVE 요약과 조치 목록
 - VEX 엑셀·OpenVEX JSON은 사용자가 요청할 때만 생성. 요청하지 않으면 openpyxl 없이 동작
-- 요청 시 결과: `docs/security/cve-report-YYYY-MM-DD.xlsx`와 같은 이름의 `.vex.json`
+- VEX 엑셀 범위: `--scope vuln`(기본, 취약점만) 또는 `--scope all`(SBOM 전체 구성요소)
+- `--scope all`은 syft CycloneDX의 모든 구성요소를 `SBOM 구성요소` 시트에 넣고, 취약점 없는 패키지도 표시. `--sbom .security/sbom.cdx.json` 필요
+- 의존성 사용 용도는 `dependency_metadata` 또는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 20자 이내로 표시. 예: `{"package": "logback-classic", "usage": "시스템 로깅"}`
+- 요청 시 결과: 기본은 `docs/security/cve-report-YYYY-MM-DD.xlsx`와 같은 이름의 `.vex.json`, 전체 SBOM은 `cve-report-YYYY-MM-DD-sbom.xlsx`·`.vex.json`
+- OpenVEX JSON은 범위와 무관하게 취약점 statement만 포함. 취약점 없는 패키지를 `not_affected`로 표현하지 않음
+- 고객 제출용 기계 판독 SBOM이 필요하면 `.security/sbom.cdx.json`을 함께 전달. `.security/`는 커밋하지 않음
 - 패키지를 올리지는 않고 조치 목록만 제시
 
 ### gorani-release-check
@@ -297,8 +302,12 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 
 | 파일 | 내용 |
 | --- | --- |
-| `samples/cve-scan/cve-report-sample.xlsx` | VEX 엑셀 (요청 시 생성, 요약·VEX 판정·원본 findings·실행 로그) |
+| `samples/cve-scan/cve-report-sample.xlsx` | VEX 엑셀 (요청 시 생성, 요약·VEX 판정·용도·원본 findings·실행 로그) |
 | `samples/cve-scan/cve-report-sample.vex.json` | OpenVEX JSON (요청 시 생성) |
+| `samples/cve-scan/sbom.cdx.json` | 전체 SBOM 범위 샘플 입력 (CycloneDX) |
+| `samples/cve-scan/dependency-metadata.json` | 의존성 용도 메타데이터 샘플 (20자 이내) |
+| `samples/cve-scan/cve-report-sbom-sample.xlsx` | 전체 SBOM VEX 엑셀 (SBOM 구성요소·용도 포함) |
+| `samples/cve-scan/cve-report-sbom-sample.vex.json` | 전체 SBOM 실행의 OpenVEX JSON (취약점 statement만) |
 | `samples/release-check/release-check-sample.xlsx` | 릴리스 점검 엑셀 (요약, 점검 항목, 변경 파일, 커밋, 실행 로그) |
 | `samples/license-notice/third-party-notices.html` | 앱에 넣는 자기완결 고지 페이지 (검색, 라이선스 전문 접기) |
 | `samples/license-notice/third-party-notices.md` | 같은 내용의 평문 |
@@ -338,8 +347,8 @@ samples/<스킬>/                    예시 입력과 결과물
 GitHub Release는 만들지 않고, CHANGELOG 버전에 맞춘 annotated tag만 만듭니다.
 
 ```bash
-git tag -a v3.17.0 -m "v3.17.0"
-git push origin v3.17.0
+git tag -a v3.18.0 -m "v3.18.0"
+git push origin v3.18.0
 ```
 
 이미 push한 태그는 옮기거나 덮어쓰지 않습니다.
@@ -353,6 +362,8 @@ git push origin v3.17.0
 | gorani-cve-scan이 도구가 없다고 함 | 스킬이 `## 도구 설치` 원칙에 따라 자동 설치를 시도. 실패하면 표시된 명령으로 수동 설치 후 재실행 |
 | gorani-license-notice가 syft가 없다고 함 | 스킬이 자동 설치를 시도. 실패하면 표시된 명령으로 수동 설치 후 재실행. 수집기는 SBOM을 직접 만들지 않음 |
 | VEX 엑셀 생성 실패 | VEX 보고서를 요청한 경우에만 openpyxl 필요. 요청하지 않았으면 생성하지 않으며, 필요할 때 스킬이 자동 설치를 시도 |
+| 전체 SBOM 보고서에서 SBOM 파일을 못 찾음 | `--scope all`은 `--sbom .security/sbom.cdx.json`이 필요. syft SBOM 생성 단계가 성공했는지 확인 |
+| `용도` 열이 비어 있음 | `dependency_metadata` 또는 `--metadata` JSON의 `package`(또는 `name`)·`version`·`purl`이 보고서의 패키지와 맞는지 확인. 매칭되지 않으면 빈 값 |
 | gorani-release-check가 ref를 못 찾음 | 브랜치면 `git fetch origin`, 태그·리비전이면 `git fetch --tags origin` 후 ref 확인. 없으면 추측하지 말고 중단 |
 | gorani-license-notice에서 라이선스 전문이 비어 있음 | 대상 패키지가 설치되어 있는지 확인. `npm ci --omit=dev` 후 재수집. 원본에 LICENSE가 없으면 입력 JSON에 원문을 넣거나 검토 목록에 남김 |
 | HTML이 앱 WebView에서 안 열림 | 파일을 앱 자산에 실제로 복사했는지, CSP·WebView의 JavaScript 설정 확인. 검색만 안 되고 목록은 보여야 정상 |
