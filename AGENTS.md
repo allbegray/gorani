@@ -84,9 +84,9 @@
 | VEX 기본값 | 수정 버전이 있으면 `affected`, 없으면 `under_investigation`. 근거 없는 `not_affected` 금지 |
 | VEX 보고서 | 사용자 요청 시에만 xlsx·OpenVEX 생성. 요청 없으면 스캔 요약·조치 목록만 만들고 openpyxl 없이 동작 |
 | 보고 범위 | `--scope vuln`(기본, 취약점만) 또는 `--scope all`(SBOM 전체 구성요소). `all`은 `--sbom` CycloneDX JSON이 필요하고, OpenVEX는 두 범위 모두 취약점 statement만 포함 |
-| 용도 메타데이터 | 입력 JSON의 `dependency_metadata` 또는 `--metadata` JSON. `usage`는 30자 이내, PURL > `name@version` > 이름 순서로 매칭. `VEX 판정`·`SBOM 구성요소` 시트에 표시하고 OpenVEX에는 넣지 않음 |
+| 용도 메타데이터 | 입력 JSON의 `dependency_metadata` 또는 `--metadata` JSON. `usage`는 50자 이하, PURL > `name@version` > 이름 순서로 매칭. `VEX 판정`·`SBOM 구성요소` 시트에 표시하고 OpenVEX에는 넣지 않음 |
 | 스크립트 | `scripts/vex_xlsx.py`, openpyxl만 사용, 입력 JSON과 시트 구성 유지. `all`은 CycloneDX `components`를 읽어 `SBOM 구성요소` 시트를 추가 |
-| 검증 | 샘플 lockfile로 네 도구 실행 + 요청 시 xlsx·OpenVEX 생성 확인. `--scope all`에서 전체 구성요소·취약점 없는 구성요소·SBOM 미포함 finding·`--sbom` 누락 오류 확인. `--metadata` 매칭, 30자 초과 절단, 잘못된 메타데이터 오류 확인 |
+| 검증 | 샘플 lockfile로 네 도구 실행 + 요청 시 xlsx·OpenVEX 생성 확인. `--scope all`에서 전체 구성요소·취약점 없는 구성요소·SBOM 미포함 finding·`--sbom` 누락 오류 확인. `--metadata` 매칭, 50자 초과 절단, 잘못된 메타데이터 오류 확인 |
 
 ### gorani-release-check
 
@@ -253,11 +253,12 @@
 | 2026-10-31 | 릴리스 정책 변경: GitHub Release 없이 annotated tag만 사용, v3.17.0 태그 | - |
 | 2026-11-05 | `cve-scan` VEX 보고서에 전체 SBOM 범위·의존성 용도 메타데이터 추가 (v3.18.0) | `.omo/evidence/2026-11-05-cve-scan-sbom-scope.md` |
 | 2026-11-05 | `cve-scan` 의존성 용도 요약 길이를 30자로 확대 (v3.19.0) | `.omo/evidence/2026-11-05-cve-scan-usage-30.md` |
+| 2026-11-05 | `cve-scan` 의존성 용도 요약 길이를 50자 이하로 확대 (v3.20.0) | `.omo/evidence/2026-11-05-cve-scan-usage-50.md` |
 
 ## 9. 릴리스와 태그
 
 - GitHub Release 기능(릴리스 페이지)은 만들지 않습니다.
 - 버전은 CHANGELOG 최신 항목과 각 `SKILL.md`의 `metadata.version`을 맞춥니다.
-- 배포 지점에 annotated tag `v<버전>`을 만들고 push합니다. 예: `git tag -a v3.19.0 -m "v3.19.0"`, `git push origin v3.19.0`.
+- 배포 지점에 annotated tag `v<버전>`을 만들고 push합니다. 예: `git tag -a v3.20.0 -m "v3.20.0"`, `git push origin v3.20.0`.
 - 이미 push한 태그를 옮기거나 덮어쓰지 않습니다. 잘못 만들었으면 사용자와 상의합니다.
 - 태그를 만든 뒤 GitHub Release, 릴리스 페이지, 자동 배포를 추가로 만들지 않습니다.

@@ -9,14 +9,14 @@
 | 파일 | 내용 |
 | --- | --- |
 | `vex-input.json` | 정규화된 스캔 결과 입력 |
-| `dependency-metadata.json` | 의존성 사용 용도 메타데이터 (30자 이내) |
+| `dependency-metadata.json` | 의존성 사용 용도 메타데이터 (50자 이하) |
 | `sbom.cdx.json` | 전체 SBOM 범위 샘플 입력 (CycloneDX) |
 | `cve-report-sample.xlsx` | VEX 엑셀 보고서 (요약, VEX 판정·용도, 원본 findings, 실행 로그) |
 | `cve-report-sample.vex.json` | OpenVEX JSON |
 | `cve-report-sbom-sample.xlsx` | 전체 SBOM VEX 엑셀 보고서 (SBOM 구성요소·용도 포함) |
 | `cve-report-sbom-sample.vex.json` | 전체 SBOM 실행의 OpenVEX JSON (취약점 statement만) |
 
-VEX 엑셀과 OpenVEX는 사용자가 요청했을 때만 생성되는 선택 산출물의 예시입니다. 요청하지 않으면 스캔 요약과 조치 목록만 만듭니다. `--scope all`은 SBOM 전체 구성요소를 포함하고, `VEX 판정`과 OpenVEX에는 취약점만 남깁니다. 의존성 용도는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 표시합니다. `dependency-metadata.json`의 각 항목은 `package`(또는 `name`), 선택 `version`, 선택 `purl`, `usage`(30자 이내)를 가집니다.
+VEX 엑셀과 OpenVEX는 사용자가 요청했을 때만 생성되는 선택 산출물의 예시입니다. 요청하지 않으면 스캔 요약과 조치 목록만 만듭니다. `--scope all`은 SBOM 전체 구성요소를 포함하고, `VEX 판정`과 OpenVEX에는 취약점만 남깁니다. 의존성 용도는 `--metadata` JSON으로 넣고, `VEX 판정`·`SBOM 구성요소` 시트의 `용도` 열에 표시합니다. `dependency-metadata.json`의 각 항목은 `package`(또는 `name`), 선택 `version`, 선택 `purl`, `usage`(50자 이하)를 가집니다.
 
 재생성:
 
