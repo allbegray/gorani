@@ -157,6 +157,26 @@ DB 모드:
 python3 skills/gorani-table-spec/scripts/table_spec.py --db-url "$DATABASE_URL" --schema public --project "My Service" --outdir docs/db --name table-spec --formats xlsx,md,html
 ```
 
+## gorani-ddl-format
+
+| 파일 | 내용 |
+| --- | --- |
+| `postgres-dump.sql` | 실제 PostgreSQL 17 `pg_dump` 출력 (데이터·뷰·함수·트리거·COPY 블록 포함) |
+| `postgres-schema.sql` | 사람이 읽는 스타일로 변환한 PostgreSQL DDL |
+| `postgres-schema.review.md` | 빠진 객체·경고를 담은 검토 md |
+| `mysql-dump.sql` | 실제 MySQL 8.4 `mysqldump --no-data` 출력 |
+| `mysql-schema.sql` | 같은 방식으로 변환한 MySQL DDL |
+| `mysql-schema.review.md` | MySQL 검토 md |
+
+재생성:
+
+```bash
+python3 skills/gorani-ddl-format/scripts/ddl_format.py --input samples/ddl-format/postgres-dump.sql --outdir samples/ddl-format --name postgres-schema --formats sql,review --title "쇼핑몰 스키마" --generated-at 2026-11-12T00:00:00+09:00
+python3 skills/gorani-ddl-format/scripts/ddl_format.py --input samples/ddl-format/mysql-dump.sql --outdir samples/ddl-format --name mysql-schema --formats sql,review --title "쇼핑몰 스키마 (MySQL)" --generated-at 2026-11-12T00:00:00+09:00
+```
+
+샘플 dump는 PostgreSQL 17과 MySQL 8.4 컨테이너에서 실제로 뜬 출력입니다. 변환 결과는 같은 버전의 빈 DB에 실행해 오류가 없는 것과, 컬럼·제약 구성이 원본과 같은 것을 확인했습니다.
+
 ## gorani-license-notice
 
 | 파일 | 내용 |
@@ -229,4 +249,5 @@ ID는 `V/P/F-{AREA}-{TOPIC}-{NN}` 형식을 사용합니다. 샘플은 `P-RESERV
 - gorani-report는 Python 3와 `gh`가 필요합니다. 실제 이슈 생성에는 `gh auth login` 인증이 필요합니다.
 - PostgreSQL DB 모드는 `psycopg[binary]`, MySQL은 `pymysql`, SQL Server는 `pymssql`, Oracle은 `oracledb`를 추가로 설치합니다.
 - gorani-release-note는 표준 라이브러리만 사용합니다.
+- gorani-ddl-format은 표준 라이브러리만 사용합니다. 검증용 `psql`·`mysql` 클라이언트만 있으면 됩니다.
 - 스크립트나 시트 구성을 바꾸면 샘플도 다시 생성해 같은 변경에 포함합니다.

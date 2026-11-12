@@ -22,6 +22,7 @@ AI CLI에 붙여 쓰는 실무 스킬 모음입니다. 스킬은 Agent Skills �
 | `gorani-dependency-update` | 현재 언어·프레임워크 라인의 최신 안정으로 정렬할 때, CVE만 고칠 때, 라인까지 올릴 때 | 모드별 업데이트 계획·적용·검증 |
 | `gorani-spec-analysis` | 기획서를 정리·검토할 때, 용어·도메인·프로세스·흐름을 뽑을 때 | markdown 원문, 용어 사전, 도메인 모델, 프로세스·플로우, 검증 리포트 |
 | `gorani-table-spec` | DB 테이블 정의서를 만들 때, DDL이나 실제 DB로 스키마를 문서화할 때 | 테이블·컬럼·PK/FK·인덱스 명세 Excel·Markdown·HTML |
+| `gorani-ddl-format` | dump SQL을 읽기 좋은 DDL로 정리할 때, 스키마 정의서 기준 DDL이 필요할 때 | PK·FK·UNIQUE·INDEX가 정리된 schema.sql, 검토 md |
 | `gorani-site-structure` | 실제 프론트 메뉴·레이아웃을 사이트 구조도로 정리할 때 | 메뉴 구조·화면 목록·API only·표준 근거 Excel·Markdown·HTML |
 
 ## 각 스킬이 하는 일
@@ -224,6 +225,25 @@ SQL DDL 또는 실제 DB에서 테이블 정의를 읽어 테이블 명세서를
 - 스크립트는 `scripts/table_spec/` 패키지로 분리. 렌더러 교체는 `skills/gorani-table-spec/scripts/README.md` 참고
 - 파싱 경고가 있어도 XLSX를 `--outdir`에 저장하도록 기존 경로 버그를 수정
 
+### gorani-ddl-format
+
+`pg_dump`·`mysqldump`가 만든 dump SQL을 사람이 손으로 쓴 것처럼 읽기 좋은 DDL로 바꿉니다.
+
+- dump에 섞인 `SET`, `OWNER TO`, 데이터 블록, 시퀀스 보정을 걷어냄
+- 테이블 밖으로 흩어진 PK·FK·UNIQUE·CHECK를 `CREATE TABLE` 안으로 모음
+- 단일 컬럼 제약은 컬럼 줄에 인라인, 복합 컬럼 제약은 `CONSTRAINT` 줄로 배치
+- PostgreSQL INDEX는 테이블·COMMENT와 한 블록으로 묶고, MySQL `KEY`는 테이블 안에 배치
+- FK 참조 대상이 먼저 오도록 테이블 순서를 재배열
+- `users_pkey`·`users_email_key` 같은 dump 자동 이름을 `pk_users`·`uq_users_email`로 정리
+- `character varying` → `varchar`, `timestamp with time zone` → `timestamptz`, `bigint + nextval` → `bigserial`
+- PostgreSQL ENUM은 `CREATE TYPE`으로 결과 맨 위에 둠
+- 결과: `docs/db/schema.sql`, `schema.review.md`(빠진 객체·바뀐 이름·경고)
+- `--formats sql`, `--comments inline|text|off`, `--strip-schema`, `--keep-names`, `--no-serial`, `--no-align`
+- `--model-out`으로 `summary`·`tables`·`enums`·`warnings` 모델 JSON 저장, `--generated-at`으로 시각 고정
+- 표준 라이브러리만 사용. `sqlglot`·`SQLAlchemy`를 쓰지 않음
+- 변환 결과는 빈 DB에 실행해 검증하고, 원본과 컬럼·제약 수를 대조
+- 스크립트는 `scripts/ddl_format/` 패키지로 분리. 모듈 지도는 `skills/gorani-ddl-format/scripts/README.md` 참고
+
 ## 설치
 
 스킬 폴더를 에이전트가 읽는 위치에 연결합니다. 심볼릭 링크를 쓸 수 없는 환경(Windows 등)에서는 같은 경로에 폴더를 복사하세요.
@@ -239,7 +259,7 @@ SCOPE=.opencode/skills          # 프로젝트에만
 # SCOPE=~/.config/opencode/skills  # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-ask gorani-change-impact gorani-report gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-ask gorani-change-impact gorani-report gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-ddl-format gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
 Claude Code — 같은 방식으로 위치만 바꿉니다.
@@ -249,10 +269,10 @@ SCOPE=.claude/skills          # 프로젝트에만
 # SCOPE=~/.claude/skills      # 모든 프로젝트
 
 mkdir -p "$SCOPE"
-for s in gorani-ask gorani-change-impact gorani-report gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
+for s in gorani-ask gorani-change-impact gorani-report gorani-docs-governance gorani-cve-scan gorani-release-check gorani-api-contract-diff gorani-license-notice gorani-release-note gorani-dependency-update gorani-spec-analysis gorani-table-spec gorani-ddl-format gorani-site-structure; do ln -s ~/gorani/skills/$s "$SCOPE/$s"; done
 ```
 
-opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 열세 스킬이 보입니다.
+opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으므로, Claude Code 위치에 한 번만 설치해도 둘 다 사용할 수 있습니다. 설치 후 에이전트를 실행하면 스킬 목록에 열네 스킬이 보입니다.
 
 ## 도구 자동 설치
 
@@ -269,7 +289,7 @@ opencode는 Claude 호환 경로(`.claude/skills`, `~/.claude/skills`)도 읽으
 
 ## 프롬프트로 쓰기
 
-저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-ask`, `gorani-change-impact`, `gorani-report`, `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-api-contract-diff`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`, `gorani-table-spec`, `gorani-site-structure`을 넣습니다.
+저장소를 설치하지 않고 raw URL에서 `SKILL.md`를 받아 프롬프트로 넘깁니다. 아래 예시의 `S` 값만 바꾸면 다른 스킬을 실행합니다. `S`에는 `gorani-ask`, `gorani-change-impact`, `gorani-report`, `gorani-docs-governance`, `gorani-cve-scan`, `gorani-release-check`, `gorani-api-contract-diff`, `gorani-license-notice`, `gorani-release-note`, `gorani-dependency-update`, `gorani-spec-analysis`, `gorani-table-spec`, `gorani-ddl-format`, `gorani-site-structure`을 넣습니다.
 
 PowerShell은 한글 인코딩을 위해 아래 프리픽스를 붙이고 `irm` 대신 `curl.exe`를 씁니다.
 
@@ -343,6 +363,7 @@ opencode에서 권한 프롬프트를 매번 승인하기 번거로우면 `--aut
 | `samples/spec-analysis/` | 기획서 분석 패키지 (source, index, glossary, domain, processes, flows, validation) |
 | `samples/api-contract-diff/` | OpenAPI 이전·새 스펙과 계약 변경 리포트 |
 | `samples/table-spec/` | DDL과 테이블 명세서 Excel·Markdown 샘플 |
+| `samples/ddl-format/` | 실제 pg_dump·mysqldump 입력과 사람이 읽는 스타일로 변환한 DDL·검토 md |
 | `samples/site-structure/` | 실제 레이아웃 인벤토리와 사이트 구조도 Excel·Markdown·HTML 샘플 |
 | `samples/change-impact/` | sidecar manifest 예시, PR path-filter 워크플로, stale·full 리포트 샘플 |
 | `samples/report/` | `gorani-report`가 만드는 오류·Excel 양식 제안 이슈 본문 샘플 |

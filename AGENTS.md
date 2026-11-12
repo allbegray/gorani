@@ -182,6 +182,24 @@
 | 제한 | DB 모드는 접속 시점 스키마만 반영. 뷰·동적 SQL·트리거·저장 프로시저는 테이블 명세 대상이 아님. DB 비밀번호는 결과에서 마스킹 |
 | 검증 | 샘플 DDL xlsx·md·html, PostgreSQL·MySQL·SQL Server·Oracle Docker 실DB, SQLite, URL 마스킹, HTML 외부 요청 0건, `--strict` exit 1 확인. 리팩터링 전후 17개 골든 시나리오·49개 추가 검증, md/html 바이트 동일, xlsx 의미 동일. 파싱 경고 시 XLSX가 `--outdir`에 저장되는지 확인 |
 
+### gorani-ddl-format
+
+| 항목 | 내용 |
+| --- | --- |
+| 역할 | `pg_dump`·`mysqldump` dump를 사람이 작성한 스타일의 스키마 DDL로 변환 |
+| 입력 | dump SQL 파일 또는 디렉터리, `--dialect auto|postgres|mysql|sqlite|mssql|oracle` |
+| 모으기 | 테이블 밖 `ALTER TABLE ... ADD CONSTRAINT`의 PK·FK·UNIQUE·CHECK를 `CREATE TABLE` 안으로 넣음. 단일 컬럼은 인라인, 복합은 `CONSTRAINT` 줄 |
+| INDEX | PostgreSQL은 테이블·COMMENT와 한 블록으로 묶은 `CREATE INDEX`, MySQL은 테이블 안 `KEY`. PostgreSQL에는 테이블 안 INDEX 문법이 없음 |
+| 정렬 | FK 참조 대상이 먼저 오도록 테이블 재배열. 순환 참조는 이름 순 |
+| 이름 | pg_dump 자동 이름(`users_pkey`, `users_email_key`, `users_team_id_fkey`)을 `pk_`·`uq_`·`fk_`·`ck_`·`idx_` 형식으로 정리. `--keep-names`로 유지 |
+| 타입 | `character varying`→`varchar`, `timestamp with time zone`→`timestamptz`, `'x'::type` 캐스트 제거, `bigint+nextval`→`bigserial`, `= ANY(ARRAY[...])`→`IN (...)` |
+| 제외 | 데이터 INSERT·COPY, `SET`, `OWNER TO`, `GRANT`, 시퀀스 보정, 뷰·함수·프로시저·트리거 본문. 제외 목록과 경고는 검토 md에 기록 |
+| 출력 | `schema.sql`, `schema.review.md`, 선택 시 `--model-out` JSON. `--formats sql,review` |
+| 스크립트 | `scripts/ddl_format.py` CLI 진입점 + `scripts/ddl_format/` 패키지(`cli`·`parse`·`model`·`tokenizer`·`render_sql`·`render_review`·`verify`·`constants`) |
+| 의존성 | 표준 라이브러리만 사용. sqlglot·SQLAlchemy 없음. dump의 비표준 문법을 직접 인식하고 모르는 문장은 warnings에 남김 |
+| 검증 | 실제 PostgreSQL 17 `pg_dump`·MySQL 8.4 `mysqldump` 출력으로 변환, 빈 DB 실행 성공, 컬럼 19/19·제약·인덱스 구성 일치. 복합 PK/FK, 예약어 컬럼, 자기 참조 FK, ENUM, 표현식 인덱스, COPY 데이터 블록 확인 |
+| 금지 | dump에 없는 객체 생성, 데이터 옮기기, 해석 실패 문장의 무단 삭제, 실행 검증 없는 완료 보고, 운영 DB 직접 실행, 원본 dump 덮어쓰기 |
+
 ### gorani-site-structure
 
 | 항목 | 내용 |
@@ -275,6 +293,7 @@
 | 2026-11-05 | `release-note` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-release-note-modularization.md` |
 | 2026-11-05 | `change-impact` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-change-impact-modularization.md` |
 | 2026-11-05 | `report` 리포트 모델·렌더러 분리 (v3.21.0) | `.omo/evidence/2026-11-05-report-modularization.md` |
+| 2026-11-12 | `ddl-format` 추가 (dump SQL → 사람이 읽는 DDL, PK·FK·UNIQUE·INDEX 인라인 정리) | `.omo/evidence/2026-11-12-ddl-format.md` |
 
 ## 9. 릴리스와 태그
 

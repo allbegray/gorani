@@ -1,8 +1,40 @@
 # 변경 이력
 
-최신 버전은 3.21.0(2026-11-05)입니다. 3.21.0 이전 이력은 git log와 태그로 확인합니다.
+최신 버전은 3.22.0(2026-11-12)입니다. 3.22.0 이전 이력은 git log와 태그로 확인합니다.
 
 릴리스는 GitHub Release 없이 annotated tag로만 표시합니다.
+
+## 3.22.0 · 2026-11-12
+
+`gorani-ddl-format` 추가 — dump SQL을 사람이 작성한 스타일의 DDL로 변환
+
+**추가**
+
+- `gorani-ddl-format`: `pg_dump`·`mysqldump` 출력에서 스키마 정의만 남기고 사람이 읽는 DDL로 변환
+- 테이블 밖 `ALTER TABLE ... ADD CONSTRAINT`의 PK·FK·UNIQUE·CHECK를 `CREATE TABLE` 안으로 모음
+- 단일 컬럼 제약은 컬럼 줄 인라인, 복합 컬럼 제약은 `CONSTRAINT` 줄로 배치
+- PostgreSQL INDEX는 테이블·COMMENT와 한 블록으로 묶고, MySQL `KEY`는 테이블 안에 배치
+- FK 참조 대상이 먼저 오도록 테이블 재배열
+- pg_dump 자동 이름(`users_pkey` 등)을 `pk_`·`uq_`·`fk_`·`ck_` 형식으로 정리
+- 타입 별칭·캐스트·`ANY(ARRAY)` 정리, `bigint+nextval` → `bigserial`, PostgreSQL ENUM `CREATE TYPE` 출력
+- `schema.sql`, `schema.review.md`(빠진 객체·바뀐 이름·경고), `--model-out` 리포트 모델
+- `--formats`·`--comments`·`--strip-schema`·`--keep-names`·`--no-serial`·`--no-align`·`--strict`·`--generated-at`
+- `samples/ddl-format/` 실제 PostgreSQL 17·MySQL 8.4 dump와 변환 결과
+- `gorani-ask` 스킬 지도·DB 변경 경로에 `gorani-ddl-format` 추가
+
+**변경**
+
+- `gorani-ask`·`gorani-ddl-format` `metadata.version`을 3.22.0으로, `updated`를 2026-11-12로 갱신
+- README 스킬 표·설명·설치 목록·프롬프트 목록·샘플 표에 `gorani-ddl-format` 반영
+- AGENTS 스킬 계약과 변경 기록에 `gorani-ddl-format` 추가
+
+**검증**
+
+- 실제 PostgreSQL 17 `pg_dump`(데이터·뷰·함수·트리거·COPY 포함)와 MySQL 8.4 `mysqldump` 출력으로 변환
+- 변환 결과를 빈 PostgreSQL·MySQL DB에 실행해 오류 0건
+- 원본과 컬럼 19/19, PK·FK·UNIQUE·CHECK·INDEX 구성 일치 확인
+- 복합 PK·FK, 예약어 컬럼, 자기 참조 FK, ENUM, 표현식 인덱스(`lower(email)`), partial index, COPY 데이터 블록, 시퀀스 보정 처리 확인
+- `--strict` exit code, `--keep-names`·`--comments`·`--no-align` 동작 확인
 
 ## 3.21.0 · 2026-11-05
 

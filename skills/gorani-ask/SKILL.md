@@ -2,8 +2,8 @@
 name: gorani-ask
 description: 여러 gorani 스킬 중 지금 상황에 맞는 스킬과 작업 순서를 안내한다. 어떤 스킬을 써야 할지 모르거나 릴리스·API·DB·기획서·문서 작업을 어디서 시작할지 물을 때 사용.
 metadata:
-  version: "3.17.0"
-  updated: "2026-10-31"
+  version: "3.22.0"
+  updated: "2026-11-12"
 ---
 
 # Gorani Ask
@@ -27,6 +27,7 @@ metadata:
 | `gorani-site-structure` | 실제 프론트 메뉴·탭·레이아웃을 사이트 구조도로 만들 때 | Excel·Markdown·HTML 구조도 |
 | `gorani-api-contract-diff` | OpenAPI 이전·새 스펙의 breaking change를 볼 때 | API별 변경 리포트 |
 | `gorani-table-spec` | DDL 또는 실제 DB에서 테이블 명세서를 만들 때 | Excel·Markdown·HTML 명세서 |
+| `gorani-ddl-format` | dump SQL을 사람이 읽는 스타일의 DDL로 정리할 때 | 정리된 schema.sql·검토 md |
 | `gorani-release-check` | 배포 전 브랜치·리비전 diff를 점검할 때 | P0~P4 점검 엑셀 |
 | `gorani-cve-scan` | 의존성 CVE·SBOM·VEX를 확인할 때 | CVE 요약·조치 목록 |
 | `gorani-dependency-update` | 의존성을 최신 안정·CVE 최소 수정으로 올릴 때 | 업데이트 계획·적용·검증 |
@@ -95,9 +96,10 @@ metadata:
 
 ### DB 변경
 
-`gorani-table-spec` → `gorani-release-check`
+`gorani-ddl-format` → `gorani-table-spec` → `gorani-release-check`
 
-- DDL 또는 실제 DB에서 테이블 명세서를 만듭니다.
+- dump가 지저분하면 먼저 사람이 읽는 DDL로 정리합니다.
+- 정리된 DDL 또는 실제 DB에서 테이블 명세서를 만듭니다.
 - 배포 전 데이터·마이그레이션 점검으로 넘깁니다.
 
 ### 기획서에서 화면 구조까지
